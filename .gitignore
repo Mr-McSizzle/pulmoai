@@ -29,6 +29,7 @@ models/allcells_lung_disease_classifier.joblib
 models/covid_vs_healthy_logistic_regression.joblib
 models/lung_disease_classifier.joblib
 models/pilot_best_logistic_regression.joblib
+models/medmnist/*.pt
 
 # Frontend dependencies and cache (dist is kept so friend does not need Node.js)
 frontend/node_modules/
