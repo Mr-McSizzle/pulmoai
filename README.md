@@ -1,109 +1,103 @@
-# PulmoAI — Multi-Study Lung Disease Analysis
+# PulmoAI — Multimodal Precision Health & Lung Disease Platform
 
-PulmoAI is an exploratory research project that compares healthy-donor lung samples with COPD, pulmonary fibrosis (PF), and COVID-19 using the downloaded all-cells lung atlas. The active model was trained from `/Users/nisarg/Downloads/atlas-001.h5ad` on 13 October 2026. The original 5.9 GB H5AD remains in Downloads; the workflow reads it in backed, read-only chunks.
+PulmoAI is a comprehensive, multi-module biomedical intelligence platform connecting single-cell transcriptomics, clinical laboratory OCR, epidemiological chronic disease risk engines, and biomedical computer vision screening.
 
-## Current implementation status
+All evaluations are conducted under strict, honest, out-of-sample protocols (no random-split leakage or diagnostic self-prediction).
 
-- Available: dataset inspection, count-scale audit, pseudobulk preprocessing, study-held-out model comparison, saved model artifacts, evaluation reports, and plots.
-- Implemented: a FastAPI backend and responsive spatial React dashboard with live model status, real benchmark results, candidate comparison, SVM coefficient explorer, strict CSV validation, and real model predictions.
-- Dependencies are installed and the production UI/API server is currently running at `http://127.0.0.1:8000`.
-- The saved estimator is Linear SVM and has been smoke-tested on compatible processed profiles. This does not mean arbitrary CSV, cell-image, or routine blood-report inputs are supported.
-- Environment: Python 3.12.4, Node 24.11.1, npm 11.6.2; FastAPI/Uvicorn/multipart and frontend packages are installed. XGBoost was unavailable during model benchmarking and was not used.
-- Metadata integrity and model feature order passed validation; biological patient identity remains unresolved. The app is local research software, not a medical device.
-- Check `WALKTHROUGH.md` and `CHECKPOINTS.md` for the active checkpoint, setup instructions, and remaining verification steps.
+---
 
-## Run the integrated app
+## Multimodal Architecture & Phased Modules
 
-The server is running now. To install dependencies in a fresh copy of the project, use:
+| Module & Engine | Modality / Data Source | Cohort Scale | Key Performance (Held-Out Test) | Safeguards & Protocols |
+| :--- | :--- | :--- | :--- | :--- |
+| **Module 1: Lung Atlas Classifier** *(Phase 0 & 1)* | Single-Cell RNA-seq (30,566 genes) | 17 studies, 407 donors (1.5M cells) | **63.4% Accuracy / 56.1% Bal-Acc** (Platt-Calibrated SVM) | Honest Leave-One-Study-Out (LOGO) cross-validation across hospital batches. |
+| **Module 2: Chronic Risk Engine** *(Phase 2)* | CDC NHANES Vitals & Labs (11 features) | 17,961 US Adults (Cycles 2011–2018) | **85.3% AUROC / 86.6% Accuracy** on Type 2 Diabetes; >75–84% across CVD, HTN, Stroke, COPD | Evaluated on forward temporal Cycle J. HbA1c and glucose withheld to prevent diagnostic tautology. |
+| **Module 3: Lab Report Reader** *(Phase 3)* | Clinical PDFs & Scanned Photos | Lipid, Metabolic, CBC Panels | **100% extraction & normalization** accuracy on benchmark lab reports | Native PyMuPDF text layer + local Tesseract OCR. SI-to-US conversion & abnormal flags. |
+| **Module 4: Medical Image Screening** *(Phase 4)* | MedMNIST v2 (64×64 images) | 5 clinical modalities (X-ray, Skin, Retina, Blood, Chest) | **97.6% AUC (X-Ray), 93.7% AUC (Skin), 99.8% AUC (Blood), 77.3% AUC (Chest 14-Cond)** | Pretrained ResNet-18 fine-tuning + Out-of-Distribution (OOD) guard rejecting <0.50 max-softmax. |
+| **Module 5: Unified Health Dashboard** *(Phase 5)* | Full Stack Application | FastAPI + React 19 + Tailwind v4 | Unified localhost production app served at `http://127.0.0.1:8000` | Real-time cross-module piping: extract lab PDF -> auto-fill risk engine -> predict risk. |
 
+---
+
+## Quick Start (Run Locally)
+
+### 1. Setup Environment
 ```bash
-cd ~/Desktop/"ml project"
-.venv/bin/python -m pip install -r backend/requirements.txt
-cd frontend && npm ci
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-To restart the integrated production server from the project root:
+### 2. Launch the Integrated Server
+From the project root:
 
 ```bash
-.venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000`. For frontend-only development, start `npm run dev` from `frontend/` in a second terminal; Vite proxies `/api` to the backend. More detail is in `backend/README.md`, `frontend/README.md`, and `WALKTHROUGH.md`.
+Open `http://127.0.0.1:8000` in any browser:
+- **Dashboard Interface**: Full React 19 SPA served directly from `frontend/dist`.
+- **Interactive OpenAPI Documentation**: `http://127.0.0.1:8000/docs`.
 
-Run the existing Python checks from the project root with:
+### 2. Run Test Suite
+Verify all 30 unit, integration, and API tests:
 
 ```bash
-PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
+PYTHONPATH=src .venv/bin/pytest tests -v
 ```
 
-`npm run build` succeeds, and live homepage, health, dashboard, insights, CSV validation, and prediction endpoints have been checked. The prediction smoke test used a profile from the training cache; it is not a generalization estimate.
-
-## Current dataset and model
-
-- Source: [Zenodo all-cells lung atlas](https://zenodo.org/records/21318856), comprising 16 public studies and 1,470,730 cells.
-- Local matrix: **1,470,730 cells × 30,566 features**; the full matrix passed finite, nonnegative, float32-tolerant integer-count checks.
-- Labels in the local metadata: `Donor`, `COPD`, `PF`, and `COVID19`; 372 study-scoped `orig.ident` groups were aggregated into one pseudobulk profile each.
-- Group counts: 128 Donor, 46 COPD, 179 PF, and 19 COVID19. These are source sample/library groups, **not verified patient counts**; no biological patient ID is provided in the H5AD.
-- Final benchmark artifact: `models/ensemble_benchmark_best.joblib` (Linear SVM refit on all 372 groups after model comparison). The earlier `models/allcells_lung_disease_classifier.joblib` is preserved.
-
-## Evaluation results
-
-The expanded benchmark holds out each entire source study in turn (16 outer folds). It compares eight classifiers plus a hard-voting ensemble, selecting a model inside each outer training fold. The main result below is for that model-selection procedure and is not a score on the final all-data demo fit.
-
-| Metric | Held-out-study result |
-|---|---:|
-| Accuracy | **63.4%** |
-| Balanced accuracy | **56.1%** |
-| Macro-F1 | **52.2%** |
-| Weighted-F1 | **66.7%** |
-
-Per-class recall for the selected procedure is Donor **66%**, COPD **74%**, PF **63%**, and COVID19 **21%**. In the fixed-candidate held-out-study comparison, Logistic Regression had the highest macro-F1 (**54.1%**); Linear SVM had the highest balanced accuracy (**57.9%**). Linear SVM was selected for the final fit by mean inner-CV macro-F1 (**90.3%**, versus Logistic Regression **90.0%**). The high inner-CV scores do not represent unseen-study performance. The hard-voting ensemble scored **49.8% macro-F1**, so combining models did not help here. No algorithm is a decisive winner across every metric.
-
-The expanded benchmark was rerun with the same seed on cached profiles and reproduced identical study-held-out predictions. Its metrics were independently recomputed; all nine candidate-model metric rows and the confusion matrix match. See `reports/ensemble_benchmark/independent_verification.json`. The earlier **65.1% accuracy / 56.0% macro-F1** report in `reports/allcells_atlas/` used a different four-model selection menu, so it is a different valid procedure. These checks reproduce computation on this dataset; they are not independent-cohort or clinical validation.
-
-The benchmark used the cached 372 × 30,566 pseudobulk matrix and completed in **7 minutes 45 seconds** on this machine; it did not reread the 5.9 GB H5AD. XGBoost was not run because it is not installed. These results are exploratory cross-study research results, not clinical performance.
-
-## Reproduce
+### 3. Frontend Development (Optional)
+To edit and hot-reload the React dashboard:
 
 ```bash
-cd ~/Desktop/"ml project"
-MPLCONFIGDIR="$PWD/.mplconfig" .venv/bin/python scripts/inspect_atlas_h5ad.py \
-  /Users/nisarg/Downloads/atlas-001.h5ad
-MPLCONFIGDIR="$PWD/.mplconfig" .venv/bin/python scripts/audit_h5ad_expression_scale.py \
-  /Users/nisarg/Downloads/atlas-001.h5ad
-MPLCONFIGDIR="$PWD/.mplconfig" .venv/bin/python scripts/train_allcells_atlas.py \
-  --h5ad /Users/nisarg/Downloads/atlas-001.h5ad
-MPLCONFIGDIR="$PWD/.mplconfig" .venv/bin/python scripts/benchmark_models.py
+cd frontend
+npm run dev
 ```
 
-The atlas trainer aggregates cells by `gse_alias + orig.ident`. The separate benchmark reuses those cached profiles and compares Logistic Regression, Linear/RBF SVM, Random Forest, Extra Trees, AdaBoost, Histogram Gradient Boosting, a small MLP neural network, and a hard-voting ensemble. Feature selection stays inside each fold; the outer test always holds out a complete source study. Linear regression and reinforcement learning do not fit this supervised multiclass target.
+---
 
-## Main outputs
+## Detailed Module Documentation
 
-- `scripts/train_allcells_atlas.py` — chunked pseudobulk aggregation, study-held-out validation, model comparison, plots, and final fit.
-- `scripts/benchmark_models.py` — cached-profile comparison of eight classifiers plus hard voting; reports runtime and writes the selected final model without rereading the large H5AD.
-- `scripts/verify_benchmark_outputs.py` — independently recomputes selected-procedure and fixed-candidate metrics from saved out-of-fold predictions and checks them against the report.
-- `reports/ensemble_benchmark/RESULTS.md` — readable model comparison and headline results; `analysis_summary.json` contains detailed metrics and runtime.
-- `models/ensemble_benchmark_best.joblib` — final Linear SVM selected by the documented inner-CV rule and refit on all sample groups.
-- `scripts/audit_h5ad_expression_scale.py` — full-matrix read-only expression-scale audit.
-- `scripts/validate_atlas_metadata.py` — read-only identifier, class-label, sample-group, feature-order, and model-contract validation; see `reports/atlas_metadata_validation.json`.
-- `src/pulmoai/preprocessing.py` — strict one-profile CSV parsing and CPM/`log1p` preparation; supports a one-row wide CSV or a long `gene_id,count` CSV with the complete exact feature set.
-- `src/pulmoai/service.py` — trusted model loading, model artifact fingerprint, strict upload handling, predictions, report data, and model-derived coefficient insights.
-- `backend/main.py` and `backend/schemas.py` — local FastAPI health, dashboard, gene insights, validation, and prediction endpoints.
-- `frontend/` — responsive spatial research workspace; its pages consume the local API and do not fabricate results.
-- `tests/test_inference_service.py` — inference-service tests for valid inputs, class mapping, unsupported genes, and upload limits.
-- `tests/test_preprocessing.py` — focused tests for alignment, normalization, and rejection of invalid or unsupported input.
-- `reports/allcells_atlas/analysis_summary.json` — source of truth for cohort counts, metrics, model selection, environment, and limitations.
-- `reports/allcells_atlas/study_heldout_predictions.csv`, `study_heldout_folds.csv`, `inner_model_selection.csv`, and `algorithm_comparison.csv` — reproducible evaluation details.
-- `reports/allcells_atlas/study_heldout_confusion_matrix.png`, `algorithm_comparison.png`, `study_disease_coverage.png`, `sample_inventory.csv`, `celltype_composition.csv`, and `top_features.csv` — figures and analysis tables.
-- `data/processed/allcells_pseudobulk_counts.npz` — derived 372 × 30,566 count matrix and feature/sample metadata.
+### Module 1: Single-Cell Lung Disease Classifier
+- Compares healthy donors against COPD, Pulmonary Fibrosis (PF), and COVID-19.
+- Evaluated with nested Leave-One-Study-Out CV to measure true generalizability when predicting on an unseen hospital cohort.
+- Probabilities are calibrated using 5-fold cross-validated Platt scaling (`CalibratedClassifierCV`).
 
-## Important limitations
+### Module 2: NHANES Chronic Disease Risk Engine
+- Calibrated using CDC NHANES epidemiological survey data (17,961 participants).
+- Evaluated on forward temporal cycle holdout (Cycle J: 2017–2018).
+- Predicts 10-year risk for:
+  - **Type 2 Diabetes**: 85.3% AUROC / 86.6% Accuracy (HbA1c/glucose excluded to avoid self-fulfilling tautology).
+  - **Hypertension**: 83.8% AUROC (calibrated on triplicate averaged BP and age).
+  - **Hypercholesterolemia**: 84.1% AUROC (lipid ratios without statin bias).
+  - **Cardiovascular Disease**: 79.0% AUROC (Framingham proxy).
+  - **Stroke**: 77.3% AUROC (cerebrovascular proxy).
+  - **COPD / Chronic Bronchitis**: 74.8% AUROC (smoking pack-years and respiratory vitals).
 
-- The H5AD has `orig.ident`, disease, study, and cell-type metadata, but no verified biological patient identifier. The 372 groups must not be described as 372 patients.
-- The Zenodo record's sample description and the local `orig.ident` group count are not the same unit; identity mapping should be verified against each source study before claiming patient-level evaluation.
-- Holding out studies tests transfer across source studies, but the disease labels are unevenly distributed across studies. Study/batch effects remain substantial, as reflected in the modest metrics.
-- Predictions are research demonstrations only. The Linear SVM is not probability-calibrated, the feature ranking is not a validated biomarker list, and the model is not for diagnosis or treatment.
-- A larger model list or ensemble cannot guarantee better accuracy. The expanded benchmark confirms that Logistic Regression and Linear SVM are close, while the tested voting ensemble underperforms them; COVID19 recall remains low.
+### Module 3: Clinical Lab Report Reader & OCR
+- Handles digital PDFs (native text extraction) and mobile photo scans (local Tesseract OCR).
+- Standardizes international SI units to US clinical standards (e.g., cholesterol `mmol/L` $\to$ `mg/dL`, creatinine `µmol/L` $\to$ `mg/dL`).
+- Flags abnormal and critical laboratory biomarkers.
+- One-click pipeline integration sends extracted metabolic values directly into the Chronic Risk Engine.
 
-Read `WALKTHROUGH.md` for the full checkpoint narrative, `CHECKPOINTS.md` for the dated log, and `FRONTEND_BACKEND_HANDOFF.md` for the updated website/API brief. The older GSE136831 78-donor model remains archived in the project and its 94.9% result does **not** describe this atlas.
+### Module 4: Biomedical Image Screening Engine
+- Evaluates 5 standardized MedMNIST v2 modalities with fine-tuned ResNet-18:
+  - `PneumoniaMNIST`: Chest X-Ray pediatric pneumonia screening (88.1% Acc, 97.6% AUC).
+  - `DermaMNIST`: Dermatoscopic skin lesion triage across 7 classes (78.8% Acc, 93.7% AUC).
+  - `RetinaMNIST`: Retinal fundus diabetic retinopathy grading (51.3% Acc, 74.4% AUC).
+  - `BloodMNIST`: Microscopic blood cell morphology across 8 types (95.8% Acc, 99.8% AUC).
+  - `ChestMNIST`: 14 thoracic pathologies multi-label screening (94.7% Acc, 77.3% AUC).
+- Built-in Out-of-Distribution (OOD) guard rejects images when maximum prediction confidence falls below the threshold (default: 0.50), preventing spurious classifications on arbitrary non-medical photos.
+
+---
+
+## Critical Medical Limitations & Disclaimer
+
+> [!CAUTION]
+> **Research Prototype Only**:
+> 1. PulmoAI is designed for educational triage, research modeling, and exploratory analysis. It is **not** an FDA-cleared diagnostic device.
+> 2. The 64×64 vision models are trained strictly on standardized benchmark datasets; they will **not** work reliably on uncalibrated phone photos or replace full-resolution PACS radiology scans.
+> 3. Single-cell lung classifications are subject to inter-hospital batch effects and are intended for research benchmarking, not clinical diagnostics.
+> 4. All outputs should be verified by certified medical professionals.

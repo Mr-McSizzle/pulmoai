@@ -1,20 +1,35 @@
+# Virtual environments & local caches
 .venv/
 .mplconfig/
 __pycache__/
 *.pyc
 *.pyo
-data/raw/
-data/atlas/
-data/processed/
-models/*.joblib
-*.joblib
-*.h5ad
-*.h5
-*.npz
 .DS_Store
 .pytest_cache/
 backend/.venv/
 backend/.pytest_cache/
+
+# Datasets (large files not needed to run the website)
+data/
+*.h5ad
+*.h5
+*.npz
+
+# Internal notes, reports, and walkthroughs
+reports/
+final_report.md
+WALKTHROUGH.md
+FULL_MODEL_PLAN.md
+CHECKPOINTS.md
+FRONTEND_BACKEND_HANDOFF.md
+architecture_diagram_concept.jpg
+
+# Old / unused experimental model files
+models/allcells_lung_disease_classifier.joblib
+models/covid_vs_healthy_logistic_regression.joblib
+models/lung_disease_classifier.joblib
+models/pilot_best_logistic_regression.joblib
+
+# Frontend dependencies and cache (dist is kept so friend does not need Node.js)
 frontend/node_modules/
-frontend/dist/
 frontend/.vite/

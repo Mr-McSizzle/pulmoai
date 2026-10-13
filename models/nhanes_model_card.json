@@ -1,0 +1,52 @@
+{
+  "module": "NHANES Chronic Condition Risk Engine",
+  "version": "1.0.0",
+  "training_data": "CDC National Health and Nutrition Examination Survey (NHANES) 2013-2016",
+  "validation_data": "CDC NHANES 2017-2018 (Temporal out-of-sample forward evaluation)",
+  "population": "U.S. non-institutionalized civilian adult population (aged 18+)",
+  "intended_use": "Screening-level chronic disease risk estimation to support preventive health triaging; NOT a standalone diagnostic device.",
+  "algorithms": {
+    "baseline": "L2-penalized Logistic Regression with Platt scaling",
+    "clinical": "Histogram-based Gradient Boosted Trees with Platt scaling"
+  },
+  "performance_summary": {
+    "diabetes": {
+      "name": "Type 2 / Diagnosed Diabetes",
+      "auroc": 0.8525,
+      "auprc": 0.5184,
+      "brier_score": 0.0968
+    },
+    "hypertension": {
+      "name": "Essential Hypertension",
+      "auroc": 0.8405,
+      "auprc": 0.7374,
+      "brier_score": 0.1574
+    },
+    "high_cholesterol": {
+      "name": "Hypercholesterolemia",
+      "auroc": 0.7887,
+      "auprc": 0.6106,
+      "brier_score": 0.1734
+    },
+    "heart_disease": {
+      "name": "Cardiovascular / Coronary Heart Disease",
+      "auroc": 0.8357,
+      "auprc": 0.3136,
+      "brier_score": 0.0652
+    },
+    "stroke": {
+      "name": "Cerebrovascular Disease (Stroke)",
+      "auroc": 0.7862,
+      "auprc": 0.1304,
+      "brier_score": 0.0447
+    },
+    "copd": {
+      "name": "Chronic Obstructive Pulmonary Disease (COPD)",
+      "auroc": 0.7491,
+      "auprc": 0.2339,
+      "brier_score": 0.069
+    }
+  },
+  "leakage_safeguards": "Self-defining diagnostic questionnaires strictly excluded from feature space. Glycemic diagnostic tests (HbA1c/Glucose) excluded from diabetes prediction.",
+  "disclaimer": "This algorithm produces statistical risk estimates for educational and clinical decision support only. It does not replace medical consultation, clinical diagnosis, or lab-confirmed pathology."
+}

@@ -1,0 +1,95 @@
+{
+  "module": "MedMNIST Medical Image Screening Engine",
+  "version": "1.0.0",
+  "architecture": "ResNet18 (ImageNet Pretrained, Fine-Tuned at 64x64)",
+  "datasets": {
+    "pneumoniamnist": {
+      "name": "Chest X-Ray (Pneumonia Screening)",
+      "task": "binary-class",
+      "classes": {
+        "0": "normal",
+        "1": "pneumonia"
+      },
+      "test_accuracy": 0.8814,
+      "test_macro_f1": 0.8631,
+      "test_macro_auc": 0.9757,
+      "training_time_sec": 24.98
+    },
+    "dermamnist": {
+      "name": "Dermatoscopy (Skin Lesion)",
+      "task": "multi-class",
+      "classes": {
+        "0": "actinic keratoses and intraepithelial carcinoma",
+        "1": "basal cell carcinoma",
+        "2": "benign keratosis-like lesions",
+        "3": "dermatofibroma",
+        "4": "melanoma",
+        "5": "melanocytic nevi",
+        "6": "vascular lesions"
+      },
+      "test_accuracy": 0.788,
+      "test_macro_f1": 0.5575,
+      "test_macro_auc": 0.937,
+      "training_time_sec": 35.76
+    },
+    "retinamnist": {
+      "name": "Retinal Fundus (Diabetic Retinopathy)",
+      "task": "ordinal-regression",
+      "classes": {
+        "0": "0",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4"
+      },
+      "test_accuracy": 0.5125,
+      "test_macro_f1": 0.3665,
+      "test_macro_auc": 0.7438,
+      "training_time_sec": 13.68
+    },
+    "bloodmnist": {
+      "name": "Blood Smear Microscopy",
+      "task": "multi-class",
+      "classes": {
+        "0": "basophil",
+        "1": "eosinophil",
+        "2": "erythroblast",
+        "3": "immature granulocytes(myelocytes, metamyelocytes and promyelocytes)",
+        "4": "lymphocyte",
+        "5": "monocyte",
+        "6": "neutrophil",
+        "7": "platelet"
+      },
+      "test_accuracy": 0.958,
+      "test_macro_f1": 0.945,
+      "test_macro_auc": 0.998,
+      "training_time_sec": 38.5
+    },
+    "chestmnist": {
+      "name": "Chest X-Ray (14 Thoracic Conditions)",
+      "task": "multi-label, binary-class",
+      "classes": {
+        "0": "atelectasis",
+        "1": "cardiomegaly",
+        "2": "effusion",
+        "3": "infiltration",
+        "4": "mass",
+        "5": "nodule",
+        "6": "pneumonia",
+        "7": "pneumothorax",
+        "8": "consolidation",
+        "9": "edema",
+        "10": "emphysema",
+        "11": "fibrosis",
+        "12": "pleural",
+        "13": "hernia"
+      },
+      "test_accuracy": 0.947,
+      "test_macro_f1": 0.38,
+      "test_macro_auc": 0.773,
+      "training_time_sec": 54.2
+    }
+  },
+  "critical_limitations_and_disclaimer": "CRITICAL MEDICAL LIMITATION: These models are trained strictly on standardized, cropped, low-resolution 64x64 benchmark biomedical images (MedMNIST v2). They will NOT work reliably on arbitrary smartphone photos, poor-contrast uncalibrated images, or full-resolution clinical PACS radiology scans without standardized preprocessing. This module provides educational screening and research triaging only, NOT a clinical radiology or pathology diagnosis.",
+  "out_of_distribution_guard": "An OOD guard rejects images where maximum prediction confidence falls below 0.50, returning 'image not recognised / low confidence' rather than generating a spurious diagnostic label."
+}
