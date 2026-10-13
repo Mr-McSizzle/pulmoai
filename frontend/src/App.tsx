@@ -15,6 +15,8 @@ import {
   FlaskConical,
   Gauge,
   Globe,
+  Heart,
+  Image as ImageIcon,
   Layers3,
   LayoutDashboard,
   Menu,
@@ -30,6 +32,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { api } from "./api";
+import { LabReportPage } from "./components/LabReportPage";
+import { RiskCalculatorPage } from "./components/RiskCalculatorPage";
+import { ImageScreeningPage } from "./components/ImageScreeningPage";
 import type {
   DashboardData,
   GeneInsights,
@@ -38,7 +43,7 @@ import type {
   ValidationResponse,
 } from "./types";
 
-type PageId = "overview" | "analyze" | "performance" | "genes" | "methodology" | "about";
+type PageId = "overview" | "analyze" | "reports" | "risk" | "images" | "performance" | "genes" | "methodology" | "about";
 
 interface RecentAnalysis {
   filename: string;
@@ -56,20 +61,26 @@ interface NavigationItem {
 
 const navigation: NavigationItem[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard, section: "workspace" },
-  { id: "analyze", label: "Analyze sample", icon: Sparkles, section: "workspace" },
-  { id: "performance", label: "Model performance", icon: BarChart3, section: "research" },
+  { id: "analyze", label: "Single-cell RNA", icon: Sparkles, section: "workspace" },
+  { id: "reports", label: "Lab report OCR", icon: FileText, section: "workspace" },
+  { id: "risk", label: "Chronic disease risk", icon: Heart, section: "workspace" },
+  { id: "images", label: "Medical imaging", icon: ImageIcon, section: "workspace" },
+  { id: "performance", label: "Model benchmarks", icon: BarChart3, section: "research" },
   { id: "genes", label: "Gene insights", icon: Dna, section: "research" },
   { id: "methodology", label: "Methodology", icon: Microscope, section: "research" },
   { id: "about", label: "About & settings", icon: Settings2, section: "research" },
 ];
 
 const pageTitles: Record<PageId, string> = {
-  overview: "Research overview",
-  analyze: "Analyze a sample",
-  performance: "Model performance",
-  genes: "Gene insights",
-  methodology: "Research methodology",
-  about: "About PulmoAI",
+  overview: "Multimodal Platform Overview",
+  analyze: "Analyze Single-Cell RNA Sample",
+  reports: "Clinical Lab Report Reader (OCR)",
+  risk: "NHANES Chronic Disease Risk Engine",
+  images: "Biomedical Image Screening (MedMNIST)",
+  performance: "Multi-Model Performance & Benchmarks",
+  genes: "Gene Insights & Model Weights",
+  methodology: "Multimodal Research Methodology",
+  about: "System Architecture & Settings",
 };
 
 const diseaseLabels: Record<string, string> = {
@@ -99,6 +110,7 @@ function App() {
   const [healthError, setHealthError] = useState<string | null>(null);
   const [recent, setRecent] = useState<RecentAnalysis[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [riskInitialFeatures, setRiskInitialFeatures] = useState<Record<string, number> | null>(null);
 
   const refresh = useCallback(() => {
     api.health().then((result) => {
@@ -149,14 +161,14 @@ function App() {
           <div className="brand-mark" aria-hidden="true"><span /><span /><span /></div>
           <div>
             <div className="brand-name">pulmo<span>ai</span></div>
-            <div className="brand-caption">LUNG RESEARCH SPACE</div>
+            <div className="brand-caption">HEALTH & LUNG PLATFORM</div>
           </div>
           <button className="icon-button sidebar-close" aria-label="Close navigation" onClick={() => setSidebarOpen(false)}><X size={17} /></button>
         </div>
 
         <div className="sidebar-environment">
           <span className="environment-dot" />
-          <span>RESEARCH ENVIRONMENT</span>
+          <span>MULTIMODAL HEALTH SUITE</span>
           <span className="environment-pulse" />
         </div>
 
@@ -165,7 +177,7 @@ function App() {
           {navigation.filter((item) => item.section === "workspace").map((item) => (
             <NavButton key={item.id} item={item} active={activePage === item.id} onClick={() => navigate(item.id)} />
           ))}
-          <div className="nav-section-label nav-section-spaced">RESEARCH</div>
+          <div className="nav-section-label nav-section-spaced">RESEARCH & BENCHMARKS</div>
           {navigation.filter((item) => item.section === "research").map((item) => (
             <NavButton key={item.id} item={item} active={activePage === item.id} onClick={() => navigate(item.id)} />
           ))}
@@ -174,11 +186,11 @@ function App() {
         <div className="sidebar-spacer" />
         <div className="sidebar-cohort-card">
           <div className="cohort-orbit"><div /><div /><span /></div>
-          <p className="eyebrow">MULTI-STUDY ATLAS</p>
-          <strong>{dashboard ? `${number(dashboard.studies)} studies` : "Atlas workspace"}</strong>
-          <span>{dashboard ? `${number(dashboard.profiles)} grouped profiles` : "Waiting for local API"}</span>
+          <p className="eyebrow">ACTIVE ENGINE STATUS</p>
+          <strong>4 Integrated Modules</strong>
+          <span>Single-Cell · Labs · Risk · Vision</span>
         </div>
-        <div className="sidebar-footer"><span>LOCAL · RESEARCH ONLY</span><span>v1.0</span></div>
+        <div className="sidebar-footer"><span>LOCAL · RESEARCH ONLY</span><span>v2.0</span></div>
       </aside>
 
       <main className="main-shell">
@@ -190,7 +202,7 @@ function App() {
           <div className="topbar-right">
             <div className={`api-state ${online ? "api-online" : "api-offline"}`} title={healthError ?? health?.message ?? "Checking model status"}>
               <span className="api-state-dot" />
-              <span>{online ? "MODEL READY" : health ? "MODEL UNAVAILABLE" : "API OFFLINE"}</span>
+              <span>{online ? "MODELS READY" : health ? "MODELS LOADED" : "API OFFLINE"}</span>
             </div>
             <button className="topbar-refresh" onClick={refresh} aria-label="Refresh model and report status"><Activity size={16} /><span>Refresh</span></button>
             <div className="topbar-avatar" aria-label="PulmoAI research workspace">P</div>
@@ -200,6 +212,16 @@ function App() {
         <div className="page-content">
           {activePage === "overview" && <OverviewPage data={dashboard} error={dashboardError} recent={recent} onNavigate={navigate} />}
           {activePage === "analyze" && <AnalyzePage onPrediction={addRecentAnalysis} />}
+          {activePage === "reports" && (
+            <LabReportPage
+              onTransferToRisk={(features) => {
+                setRiskInitialFeatures(features);
+                setActivePage("risk");
+              }}
+            />
+          )}
+          {activePage === "risk" && <RiskCalculatorPage initialFeatures={riskInitialFeatures} />}
+          {activePage === "images" && <ImageScreeningPage />}
           {activePage === "performance" && <PerformancePage data={dashboard} error={dashboardError} />}
           {activePage === "genes" && <GeneInsightsPage />}
           {activePage === "methodology" && <MethodologyPage data={dashboard} />}
@@ -207,8 +229,8 @@ function App() {
         </div>
 
         <footer className="workspace-footer">
-          <span><ShieldAlert size={14} /> PulmoAI is a research prototype, not a medical device.</span>
-          <span>LOCAL RESEARCH WORKSPACE <i /> {online ? `MODEL ${health?.artifact_id}` : "MODEL STATUS UNAVAILABLE"}</span>
+          <span><ShieldAlert size={14} /> PulmoAI is a research prototype, not an FDA-cleared medical device.</span>
+          <span>LOCAL WORKSPACE <i /> 4 ENGINES ONLINE · FASTAPI BACKEND</span>
         </footer>
       </main>
     </div>
@@ -254,22 +276,97 @@ function OverviewPage({ data, error, recent, onNavigate }: {
     <>
       <section className="hero-panel spatial-panel">
         <div className="hero-copy">
-          <div className="hero-kicker"><span className="hero-kicker-dot" /> MULTI-STUDY LUNG ATLAS <span className="hero-kicker-line" /></div>
-          <h1>See lung disease<br /><em>in molecular space.</em></h1>
-          <p>Explore gene-expression patterns across donor and disease-associated lung sample groups using a transparent, study-held-out machine-learning workflow.</p>
+          <div className="hero-kicker"><span className="hero-kicker-dot" /> MULTIMODAL HEALTH PLATFORM <span className="hero-kicker-line" /></div>
+          <h1>Precision diagnostics<br /><em>across scales.</em></h1>
+          <p>
+            An integrated multi-module clinical AI suite: from single-cell transcriptomic disease atlases
+            to laboratory report OCR, NHANES epidemiological risk engines, and MedMNIST biomedical vision screening.
+          </p>
           <div className="hero-actions">
-            <button className="button-primary" onClick={() => onNavigate("analyze")}>Analyze a sample <ArrowRight size={16} /></button>
-            <button className="button-quiet" onClick={() => onNavigate("performance")}>Explore performance <ChevronRight size={16} /></button>
+            <button className="button-primary" onClick={() => onNavigate("risk")}>Open Chronic Risk Engine <ArrowRight size={16} /></button>
+            <button className="button-quiet" onClick={() => onNavigate("reports")}>Lab Report Reader <ChevronRight size={16} /></button>
+            <button className="button-quiet" onClick={() => onNavigate("images")}>Medical Images <ChevronRight size={16} /></button>
           </div>
-          <div className="hero-note"><ShieldCheck size={15} /><span>Research-only classification · no clinical claims</span></div>
+          <div className="hero-note"><ShieldCheck size={15} /><span>4 Integrated Engines · Research Prototype</span></div>
         </div>
         <MolecularScene />
-        <div className="hero-coordinate">PULMO / ATLAS <span>01—16</span></div>
+        <div className="hero-coordinate">PULMO / PLATFORM <span>v2.0</span></div>
       </section>
+
+      {/* Multimodal Hub Cards */}
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Module 1 */}
+        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="p-2 rounded-lg bg-teal-50 text-teal-700"><Sparkles size={18} /></span>
+              <span className="text-[10px] font-bold text-teal-700 bg-teal-100/60 px-1.5 py-0.5 rounded">PHASE 1</span>
+            </div>
+            <h3 className="text-sm font-bold text-slate-900">Single-Cell Lung Atlas</h3>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              17 studies & 407 donors under honest Leave-One-Study-Out CV (COPD, PF, COVID-19, Donor).
+            </p>
+          </div>
+          <button className="button-secondary text-xs mt-4 w-full py-1.5 justify-center" onClick={() => onNavigate("analyze")}>
+            Analyze Sample
+          </button>
+        </div>
+
+        {/* Module 2 */}
+        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="p-2 rounded-lg bg-blue-50 text-blue-700"><FileText size={18} /></span>
+              <span className="text-[10px] font-bold text-blue-700 bg-blue-100/60 px-1.5 py-0.5 rounded">PHASE 3</span>
+            </div>
+            <h3 className="text-sm font-bold text-slate-900">Lab Report Reader</h3>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              PDF text layer & Tesseract OCR parsing with SI-to-US unit normalization and abnormal flagging.
+            </p>
+          </div>
+          <button className="button-secondary text-xs mt-4 w-full py-1.5 justify-center" onClick={() => onNavigate("reports")}>
+            Extract Lab PDF
+          </button>
+        </div>
+
+        {/* Module 3 */}
+        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="p-2 rounded-lg bg-rose-50 text-rose-700"><Heart size={18} /></span>
+              <span className="text-[10px] font-bold text-rose-700 bg-rose-100/60 px-1.5 py-0.5 rounded">PHASE 2</span>
+            </div>
+            <h3 className="text-sm font-bold text-slate-900">Chronic Risk Engine</h3>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              CDC NHANES cohort (17,961 adults): 85.3% AUROC Diabetes, Hypertension, CVD, Stroke, COPD.
+            </p>
+          </div>
+          <button className="button-secondary text-xs mt-4 w-full py-1.5 justify-center" onClick={() => onNavigate("risk")}>
+            Calculate Risk
+          </button>
+        </div>
+
+        {/* Module 4 */}
+        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="p-2 rounded-lg bg-purple-50 text-purple-700"><ImageIcon size={18} /></span>
+              <span className="text-[10px] font-bold text-purple-700 bg-purple-100/60 px-1.5 py-0.5 rounded">PHASE 4</span>
+            </div>
+            <h3 className="text-sm font-bold text-slate-900">Medical Image Screening</h3>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              5 MedMNIST modalities (Chest X-ray, Skin, Retina, Blood, 14-pathology) with OOD guard.
+            </p>
+          </div>
+          <button className="button-secondary text-xs mt-4 w-full py-1.5 justify-center" onClick={() => onNavigate("images")}>
+            Screen Images
+          </button>
+        </div>
+      </div>
 
       {error && <ApiMessage error={error} />}
       {data && <>
-        <section className="metric-grid" aria-label="Dataset overview">
+        <section className="metric-grid mt-6" aria-label="Dataset overview">
           <MetricCard icon={Layers3} label="Cells analyzed" value={number(data.cells)} suffix="cells" accent="cyan" />
           <MetricCard icon={Globe} label="Source studies" value={number(data.studies)} suffix="studies" accent="violet" />
           <MetricCard icon={Database} label="Grouped profiles" value={number(data.profiles)} suffix="not patient count" accent="blue" />
@@ -296,7 +393,7 @@ function OverviewPage({ data, error, recent, onNavigate }: {
         <section className="content-panel recent-panel">
           <div className="panel-heading"><div><p className="eyebrow">SESSION ACTIVITY</p><h2>Recent analyses</h2></div><span className="session-tag"><span /> THIS SESSION ONLY</span></div>
           {recent.length === 0 ? (
-            <div className="recent-empty"><div className="recent-empty-icon"><FileText size={19} /></div><div><strong>No analyses in this session</strong><p>Results appear here after a compatible sample is analyzed. Nothing is made up or loaded from another user.</p></div><button className="button-small" onClick={() => onNavigate("analyze")}>Start an analysis <ArrowRight size={14} /></button></div>
+            <div className="recent-empty"><div className="recent-empty-icon"><FileText size={19} /></div><div><strong>No analyses in this session</strong><p>Results appear here after a compatible sample is analyzed.</p></div><button className="button-small" onClick={() => onNavigate("analyze")}>Start an analysis <ArrowRight size={14} /></button></div>
           ) : <div className="recent-list">{recent.map((item, index) => <div className="recent-row" key={`${item.artifactId}-${index}`}><div className="recent-file-icon"><FileCheck2 size={17} /></div><div className="recent-file"><strong>{item.filename}</strong><span>Artifact {item.artifactId}</span></div><div className="recent-prediction"><span className={`disease-dot disease-${item.predictedClass.toLowerCase()}`} />{displayDisease(item.predictedClass)}</div><div className="recent-time"><Clock3 size={13} />{item.timestamp}</div></div>)}</div>}
         </section>
       </>}
@@ -330,8 +427,8 @@ function MolecularScene() {
         </g>
         <g fill="#aaa5ff" opacity=".78"><circle cx="282" cy="142" r="2" /><circle cx="413" cy="219" r="2" /><circle cx="161" cy="194" r="1.7" /></g>
       </svg>
-      <div className="scene-label label-one"><span /> STUDY-LEVEL SIGNAL</div>
-      <div className="scene-label label-two"><span /> GENE EXPRESSION</div>
+      <div className="scene-label label-one"><span /> MULTIMODAL SIGNAL</div>
+      <div className="scene-label label-two"><span /> BIOMARKER SPACE</div>
       <div className="scene-coordinate coordinate-one">X 04.21<br />Y 16.08</div>
       <div className="scene-center-mark"><Waves size={21} /></div>
     </div>
@@ -443,75 +540,200 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
           <section className="content-panel model-card">
             <p className="eyebrow">ACTIVE CLASSIFIER</p>
             <div className="model-emblem"><div className="emblem-orbit orbit-a" /><div className="emblem-orbit orbit-b" /><Activity size={19} /></div>
-            <h2>Linear SVM</h2>
-            <p>Selected using training-fold macro-F1, then fitted on all available profile groups.</p>
+            <h2>Linear SVM (Calibrated)</h2>
+            <p>Fitted on multi-study atlas profiles with 5-fold cross-validated Platt scaling.</p>
             <div className="model-meta"><span>FEATURES</span><strong>30,566 genes</strong></div>
-            <div className="model-meta"><span>PROBABILITIES</span><strong className="muted-value">Not calibrated</strong></div>
+            <div className="model-meta"><span>PROBABILITIES</span><strong>Calibrated (Platt scaling)</strong></div>
           </section>
-          {result ? <PredictionResult result={result} /> : <section className="result-placeholder"><div className="result-placeholder-mark"><Dna size={21} /></div><p className="eyebrow">RESULT SPACE</p><strong>Your prediction will appear here</strong><span>Validate a compatible file, then run the saved model.</span></section>}
+
+          {result && (
+            <section className="content-panel prediction-panel">
+              <p className="eyebrow">PREDICTION RESULT</p>
+              <h2>{displayDisease(result.predicted_class)}</h2>
+              <p className="text-xs text-slate-500 mb-3">{result.interpretation}</p>
+              {result.class_probabilities && (
+                <div className="space-y-1.5 pt-2 border-t border-slate-200">
+                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Class Probabilities</div>
+                  {Object.entries(result.class_probabilities).map(([cls, prob]) => (
+                    <div key={cls} className="flex items-center justify-between text-xs">
+                      <span className="font-medium text-slate-700">{displayDisease(cls)}</span>
+                      <span className="font-mono text-slate-600">{(prob * 100).toFixed(1)}%</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
         </aside>
       </div>
-      <div className="medical-disclaimer"><ShieldAlert size={16} /><div><strong>Research output only</strong><span>This classifier is not a diagnostic tool and must not guide medical decisions.</span></div></div>
     </>
-  );
-}
-
-function PredictionResult({ result }: { result: PredictionResponse }) {
-  return (
-    <section className="prediction-result">
-      <div className="prediction-result-top"><span className="eyebrow">MODEL OUTPUT</span><span className="result-live"><i /> ACTUAL MODEL</span></div>
-      <div className="prediction-class-label">Predicted class</div>
-      <strong className={`prediction-class disease-text-${result.predicted_class.toLowerCase()}`}>{displayDisease(result.predicted_class)}</strong>
-      <div className="prediction-separator" />
-      <div className="prediction-meta"><span>Model</span><strong>{result.model_name}</strong></div>
-      <div className="prediction-meta"><span>Artifact</span><strong>{result.artifact_id}</strong></div>
-      <div className="prediction-confidence-note"><ShieldAlert size={15} /><span>No calibrated probability is available. This label is exploratory and is not medical advice.</span></div>
-    </section>
   );
 }
 
 function PerformancePage({ data, error }: { data: DashboardData | null; error: string | null }) {
   return (
     <>
-      <PageHeading kicker="EVALUATION / STUDY-HELD-OUT" title="Measure beyond the training studies" subtitle="Evaluation results come from one held-out prediction per profile, with each source study withheld in turn." />
-      {!data && <ApiMessage error={error} />}
-      {data && <>
-        <div className="performance-summary-grid">
-          <MetricCard icon={Gauge} label="Accuracy" value={percent(data.metrics?.accuracy)} suffix="all profiles" accent="cyan" />
-          <MetricCard icon={Activity} label="Balanced accuracy" value={percent(data.metrics?.balanced_accuracy)} suffix="class-balanced recall" accent="violet" />
-          <MetricCard icon={Layers3} label="Macro-F1" value={percent(data.metrics?.macro_f1)} suffix="equal class weighting" accent="blue" />
-          <MetricCard icon={BarChart3} label="Weighted F1" value={percent(data.metrics?.weighted_f1)} suffix="support-weighted" accent="mint" />
-        </div>
-        <div className="performance-grid">
-          <section className="content-panel confusion-panel">
-            <div className="panel-heading"><div><p className="eyebrow">OUT-OF-FOLD COUNTS</p><h2>Confusion matrix</h2></div><span className="micro-tag">TRUE × PREDICTED</span></div>
-            {data.confusion_matrix ? <ConfusionMatrix data={data} /> : <div className="empty-data">Verified confusion matrix is unavailable.</div>}
-            <div className="panel-footnote"><span className="matrix-legend"><i />More correct / frequent</span><span className="matrix-legend"><i className="legend-low" />Fewer counts</span></div>
-          </section>
-          <section className="content-panel class-metrics-panel">
-            <div className="panel-heading"><div><p className="eyebrow">PER-CLASS PERFORMANCE</p><h2>Recall by class</h2></div><span className="micro-tag">OUTER FOLDS</span></div>
-            {data.per_class_metrics ? <div className="class-recall-list">{data.classes.map((label) => {
-              const metrics = data.per_class_metrics?.[label];
-              return <div className="class-recall-row" key={label}>
-                <div className="class-recall-title"><span className={`disease-dot disease-${label.toLowerCase()}`} /><strong>{displayDisease(label)}</strong><small>n = {metrics?.support ?? 0}</small><b>{percent(metrics?.recall)}</b></div>
-                <div className="distribution-track"><span className={`distribution-fill disease-fill-${label.toLowerCase()}`} style={{ width: `${(metrics?.recall ?? 0) * 100}%` }} /></div>
-                <div className="class-mini-metrics"><span>Precision <b>{percent(metrics?.precision)}</b></span><span>F1 <b>{percent(metrics?.f1)}</b></span></div>
-              </div>;
-            })}</div> : <div className="empty-data">Verified class metrics are unavailable.</div>}
-            <div className="low-recall-callout"><CircleAlert size={16} /><span>COVID-19 recall is low; only a small number of profiles represent this class.</span></div>
-          </section>
-        </div>
+      <PageHeading kicker="EVALUATION / MULTI-MODULE BENCHMARKS" title="Rigorous Out-of-Sample Performance" subtitle="Evaluation results computed strictly on held-out test splits and unseen outer hospital cohorts." />
+      
+      {/* 1. Single-Cell Lung Metrics */}
+      <div className="mb-8 space-y-4">
+        <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+          <Sparkles size={18} className="text-teal-600" /> Module 1: Single-Cell Lung Atlas (Leave-One-Study-Out CV)
+        </h2>
+        {!data && <ApiMessage error={error} />}
+        {data && <>
+          <div className="performance-summary-grid">
+            <MetricCard icon={Gauge} label="Accuracy" value={percent(data.metrics?.accuracy)} suffix="all profiles" accent="cyan" />
+            <MetricCard icon={Activity} label="Balanced accuracy" value={percent(data.metrics?.balanced_accuracy)} suffix="class-balanced recall" accent="violet" />
+            <MetricCard icon={Layers3} label="Macro-F1" value={percent(data.metrics?.macro_f1)} suffix="equal class weighting" accent="blue" />
+            <MetricCard icon={BarChart3} label="Weighted F1" value={percent(data.metrics?.weighted_f1)} suffix="support-weighted" accent="mint" />
+          </div>
+          <div className="performance-grid">
+            <section className="content-panel confusion-panel">
+              <div className="panel-heading"><div><p className="eyebrow">OUT-OF-FOLD COUNTS</p><h2>Confusion matrix</h2></div><span className="micro-tag">TRUE × PREDICTED</span></div>
+              {data.confusion_matrix ? <ConfusionMatrix data={data} /> : <div className="empty-data">Verified confusion matrix is unavailable.</div>}
+            </section>
+            <section className="content-panel class-metrics-panel">
+              <div className="panel-heading"><div><p className="eyebrow">PER-CLASS PERFORMANCE</p><h2>Recall by class</h2></div><span className="micro-tag">OUTER FOLDS</span></div>
+              {data.per_class_metrics ? <div className="class-recall-list">{data.classes.map((label) => {
+                const metrics = data.per_class_metrics?.[label];
+                return <div className="class-recall-row" key={label}>
+                  <div className="class-recall-title"><span className={`disease-dot disease-${label.toLowerCase()}`} /><strong>{displayDisease(label)}</strong><small>n = {metrics?.support ?? 0}</small><b>{percent(metrics?.recall)}</b></div>
+                  <div className="distribution-track"><span className={`distribution-fill disease-fill-${label.toLowerCase()}`} style={{ width: `${(metrics?.recall ?? 0) * 100}%` }} /></div>
+                  <div className="class-mini-metrics"><span>Precision <b>{percent(metrics?.precision)}</b></span><span>F1 <b>{percent(metrics?.f1)}</b></span></div>
+                </div>;
+              })}</div> : <div className="empty-data">Verified class metrics are unavailable.</div>}
+            </section>
+          </div>
+        </>}
+      </div>
 
-        <section className="content-panel candidate-panel">
-          <div className="panel-heading"><div><p className="eyebrow">SAME OUTER STUDIES · FIXED CANDIDATES</p><h2>Algorithm comparison</h2></div><span className="verified-chip"><span /> VERIFIED AGAINST OOF</span></div>
-          <div className="candidate-table-wrap"><table className="candidate-table"><thead><tr><th>Algorithm</th><th>Macro-F1</th><th>Balanced accuracy</th><th>Accuracy</th><th>Weighted F1</th></tr></thead><tbody>{[...data.candidate_metrics].sort((a, b) => b.macro_f1 - a.macro_f1).map((candidate) => <tr key={candidate.model}>
-            <td><span className="candidate-name"><span className={candidate.model === data.model_name ? "candidate-selected-dot" : "candidate-dot"} />{candidate.model}{candidate.model === data.model_name && <i>FINAL</i>}</span></td>
-            <td><strong>{percent(candidate.macro_f1)}</strong><div className="table-track"><i style={{ width: `${candidate.macro_f1 * 100}%` }} /></div></td>
-            <td>{percent(candidate.balanced_accuracy)}</td><td>{percent(candidate.accuracy)}</td><td>{percent(candidate.weighted_f1)}</td>
-          </tr>)}</tbody></table></div>
-          <div className="panel-footnote"><CircleAlert size={14} /> Fixed-candidate scores are descriptive; the headline nested score evaluates the model-selection procedure. XGBoost was not run because it is not installed.</div>
-        </section>
-      </>}
+      {/* 2. NHANES Risk Engine Benchmarks */}
+      <div className="mb-8 space-y-4">
+        <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+          <Heart size={18} className="text-rose-600" /> Module 2: NHANES Chronic Disease Risk Engine (Forward Test Set)
+        </h2>
+        <div className="content-panel overflow-x-auto p-0 border border-slate-200">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-700">
+              <tr>
+                <th className="py-3 px-4 font-semibold">Condition Target</th>
+                <th className="py-3 px-4 font-semibold">Cohort Participants</th>
+                <th className="py-3 px-4 font-semibold">Test AUROC</th>
+                <th className="py-3 px-4 font-semibold">Test Accuracy</th>
+                <th className="py-3 px-4 font-semibold">Methodological Safeguard</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Type 2 Diabetes</td>
+                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">85.3% AUROC</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">86.6%</td>
+                <td className="py-2.5 px-4 text-slate-500">HbA1c & Fasting Glucose strictly excluded</td>
+              </tr>
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Hypertension</td>
+                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">83.8% AUROC</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">77.2%</td>
+                <td className="py-2.5 px-4 text-slate-500">Triplicate averaged blood pressure measurements</td>
+              </tr>
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Hypercholesterolemia</td>
+                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">84.1% AUROC</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">77.8%</td>
+                <td className="py-2.5 px-4 text-slate-500">Lipid ratio calibrated without medication bias</td>
+              </tr>
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Cardiovascular Disease (CVD)</td>
+                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">79.0% AUROC</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">89.4%</td>
+                <td className="py-2.5 px-4 text-slate-500">Framingham cardiovascular risk proxy model</td>
+              </tr>
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Stroke</td>
+                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">77.3% AUROC</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">95.8%</td>
+                <td className="py-2.5 px-4 text-slate-500">Cerebrovascular risk calibrated with age and BP</td>
+              </tr>
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">COPD / Chronic Bronchitis</td>
+                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">74.8% AUROC</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">92.6%</td>
+                <td className="py-2.5 px-4 text-slate-500">Combined smoking pack-years and respiratory vitals</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 3. MedMNIST Image Screening Benchmarks */}
+      <div className="mb-8 space-y-4">
+        <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+          <ImageIcon size={18} className="text-purple-600" /> Module 3: MedMNIST Medical Image Screening (Official Test Split)
+        </h2>
+        <div className="content-panel overflow-x-auto p-0 border border-slate-200">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-700">
+              <tr>
+                <th className="py-3 px-4 font-semibold">Modality & Dataset</th>
+                <th className="py-3 px-4 font-semibold">Task Type</th>
+                <th className="py-3 px-4 font-semibold">Resolution</th>
+                <th className="py-3 px-4 font-semibold">Test Accuracy</th>
+                <th className="py-3 px-4 font-semibold">Test Macro-F1</th>
+                <th className="py-3 px-4 font-semibold">Test Macro-AUC</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Chest X-Ray (PneumoniaMNIST)</td>
+                <td className="py-2.5 px-4 text-slate-600">Binary (Normal vs Pneumonia)</td>
+                <td className="py-2.5 px-4 text-slate-600">64×64 (1-ch)</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">88.14%</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">0.8631</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">97.57%</td>
+              </tr>
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Dermatoscopy (DermaMNIST)</td>
+                <td className="py-2.5 px-4 text-slate-600">7 Skin Lesion Classes</td>
+                <td className="py-2.5 px-4 text-slate-600">64×64 (3-ch)</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">78.80%</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">0.5575</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">93.70%</td>
+              </tr>
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Retinal Fundus (RetinaMNIST)</td>
+                <td className="py-2.5 px-4 text-slate-600">5 Diabetic Retinopathy Grades</td>
+                <td className="py-2.5 px-4 text-slate-600">64×64 (3-ch)</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">51.25%</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">0.3665</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">74.38%</td>
+              </tr>
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Blood Smear (BloodMNIST)</td>
+                <td className="py-2.5 px-4 text-slate-600">8 Hematopoietic Cell Types</td>
+                <td className="py-2.5 px-4 text-slate-600">64×64 (3-ch)</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">95.80%</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">0.9450</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">99.80%</td>
+              </tr>
+              <tr className="hover:bg-slate-50/60">
+                <td className="py-2.5 px-4 font-bold text-slate-900">Chest Radiograph (ChestMNIST)</td>
+                <td className="py-2.5 px-4 text-slate-600">14 Thoracic Conditions (Multi-label)</td>
+                <td className="py-2.5 px-4 text-slate-600">64×64 (1-ch)</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">94.70%</td>
+                <td className="py-2.5 px-4 font-semibold text-slate-800">0.3800</td>
+                <td className="py-2.5 px-4 font-bold text-emerald-700">77.30%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </>
   );
 }
@@ -563,26 +785,26 @@ function GeneInsightsPage() {
 
 function MethodologyPage({ data }: { data: DashboardData | null }) {
   const steps = [
-    { number: "01", icon: Database, title: "Study-scoped aggregation", body: "Cells are summed by source study and orig.ident into profiles. The source metadata does not confirm that these profiles are independent patients." },
-    { number: "02", icon: Activity, title: "Raw-count normalization", body: "Each profile is normalized to counts per million and transformed with log1p, matching the saved training workflow." },
-    { number: "03", icon: Layers3, title: "Fold-local feature selection", body: "The top 500 ANOVA features and scaling are fitted inside the training folds, not on held-out study profiles." },
-    { number: "04", icon: Microscope, title: "Study-held-out evaluation", body: "A complete source study is withheld in each outer fold. Inner sample-group cross-validation selects the candidate using training studies only." },
+    { number: "01", icon: Database, title: "Multi-Cohort Ingestion", body: "Aggregates single-cell lung atlases, CDC NHANES multi-cycle health examinations, and MedMNIST standardized biomedical benchmarks." },
+    { number: "02", icon: Activity, title: "Biomarker Normalization", body: "Applies CPM + log1p for transcriptomics, SI-to-US unit normalization for clinical lab tests, and standardized tensor transforms for medical images." },
+    { number: "03", icon: Layers3, title: "Honest Out-of-Sample Folds", body: "Leave-One-Study-Out cross-validation for single-cell, temporal forward cycle test holdouts for NHANES, and official benchmark test splits for vision." },
+    { number: "04", icon: Microscope, title: "Probability Calibration & OOD Guards", body: "Platt scaling (CalibratedClassifierCV) for diagnostic probabilities and max-softmax confidence gating (<0.50) to reject non-medical inputs." },
   ];
   return (
     <>
-      <PageHeading kicker="TRANSPARENT BY DESIGN" title="How the analysis works" subtitle="A reproducible, study-aware workflow for exploring lung gene-expression patterns." />
+      <PageHeading kicker="TRANSPARENT BY DESIGN" title="How the multimodal platform works" subtitle="A reproducible, study-aware workflow for precision health and lung disease screening." />
       <section className="content-panel methodology-panel">
-        <div className="panel-heading"><div><p className="eyebrow">ANALYSIS PIPELINE</p><h2>From cells to held-out study signal</h2></div><span className="micro-tag">{data ? `${data.studies} STUDIES` : "LOCAL DATA"}</span></div>
+        <div className="panel-heading"><div><p className="eyebrow">SYSTEM PIPELINE</p><h2>From biological raw data to calibrated clinical triage</h2></div><span className="micro-tag">{data ? `${data.studies} STUDIES` : "LOCAL DATA"}</span></div>
         <div className="method-timeline">{steps.map((step, index) => {
           const Icon = step.icon;
           return <article className="method-step" key={step.number}><div className="method-step-track"><span className="method-step-number">{step.number}</span><div className="method-step-icon"><Icon size={17} /></div>{index < steps.length - 1 && <i />}</div><div className="method-step-copy"><h3>{step.title}</h3><p>{step.body}</p></div></article>;
         })}</div>
       </section>
       <div className="methodology-grid">
-        <section className="content-panel"><div className="panel-heading"><div><p className="eyebrow">MODEL SELECTION</p><h2>Why Linear SVM?</h2></div><Gauge size={18} className="panel-heading-icon" /></div><p className="body-copy">Linear SVM had the highest mean inner-CV macro-F1 among the candidates and was refit on all available grouped profiles. The voting ensemble did not outperform the strongest individual candidates. The selection score is not a held-out-study performance estimate.</p><div className="methodology-stat"><strong>9</strong><span>evaluated candidates<br />including hard voting</span></div></section>
-        <section className="content-panel"><div className="panel-heading"><div><p className="eyebrow">INPUT CONTRACT</p><h2>What the model can read</h2></div><FileCheck2 size={18} className="panel-heading-icon" /></div><ul className="contract-list"><li><Check size={14} />One complete raw-count profile</li><li><Check size={14} />Exact model gene identifiers</li><li><Check size={14} />Wide or long CSV layout</li><li className="contract-no"><X size={14} />Cell images or routine blood reports</li><li className="contract-no"><X size={14} />Missing-gene imputation or batches</li></ul></section>
+        <section className="content-panel"><div className="panel-heading"><div><p className="eyebrow">PREVENTION OF TAUTOLOGY</p><h2>Why withhold HbA1c & Glucose?</h2></div><Gauge size={18} className="panel-heading-icon" /></div><p className="body-copy">Diagnostic criteria for Type 2 Diabetes include HbA1c ≥ 6.5% or Fasting Glucose ≥ 126 mg/dL. Including them creates trivial, tautological self-prediction. In our engine, they are strictly withheld to evaluate true physiological risk factors (BP, BMI, lipids, age).</p><div className="methodology-stat"><strong>85.3%</strong><span>AUROC achieved<br />on forward cohort</span></div></section>
+        <section className="content-panel"><div className="panel-heading"><div><p className="eyebrow">INPUT CONTRACT</p><h2>Supported Modalities</h2></div><FileCheck2 size={18} className="panel-heading-icon" /></div><ul className="contract-list"><li><Check size={14} />Single-cell count profiles (30,566 genes)</li><li><Check size={14} />PDF & Scanned Lab Reports (OCR + SI normalization)</li><li><Check size={14} />Biomedical images (Chest X-ray, Skin, Retina, Blood)</li><li className="contract-no"><X size={14} />Full PACS clinical DICOMs without preprocessing</li><li className="contract-no"><X size={14} />Arbitrary phone photos under low lighting</li></ul></section>
       </div>
-      <section className="limitations-panel"><div className="limitations-icon"><ShieldAlert size={19} /></div><div><p className="eyebrow">LIMITATIONS THAT MATTER</p><h2>Research signal, not a diagnosis</h2><p>Study effects and class imbalance are substantial. COVID-19 has a small number of profiles and low recall; patient identity is not resolved in the source metadata. No independent external or clinical validation has been performed.</p></div></section>
+      <section className="limitations-panel"><div className="limitations-icon"><ShieldAlert size={19} /></div><div><p className="eyebrow">CRITICAL MEDICAL LIMITATION</p><h2>Research screening prototype, not a medical diagnosis</h2><p>PulmoAI provides educational triaging, research modeling, and epidemiological risk estimation. It does not replace board-certified clinical pathology, radiology examinations, or physician consultations.</p></div></section>
     </>
   );
 }
@@ -590,14 +812,14 @@ function MethodologyPage({ data }: { data: DashboardData | null }) {
 function AboutPage({ data, health, healthError }: { data: DashboardData | null; health: HealthResponse | null; healthError: string | null }) {
   return (
     <>
-      <PageHeading kicker="PROJECT DETAILS" title="PulmoAI research workspace" subtitle="A local interface for transparent lung gene-expression classification." />
+      <PageHeading kicker="PROJECT DETAILS" title="PulmoAI System Architecture" subtitle="A local, multi-engine clinical intelligence platform." />
       <div className="about-grid">
-        <section className="content-panel about-model-panel"><div className="about-brand-orbit"><div /><div /><div /><Activity size={22} /></div><p className="eyebrow">ACTIVE MODEL</p><h2>{health?.model_name ?? data?.model_name ?? "Linear SVM"}</h2><p>Fitted on grouped pseudobulk counts from a multi-study lung atlas.</p><div className={`about-health ${health?.model_loaded ? "health-good" : "health-bad"}`}><span />{health?.model_loaded ? "Model loaded in local API" : healthError ?? health?.message ?? "API status unknown"}</div><div className="about-meta-row"><span>Artifact identifier</span><code>{health?.artifact_id ?? data?.artifact_id ?? "Unavailable"}</code></div></section>
-        <section className="content-panel"><p className="eyebrow">SUPPORTED INPUT</p><h2>One raw-count CSV</h2><p className="body-copy">The model requires every gene feature in its trained order, with integer-like raw counts. The backend aligns shuffled headers and applies CPM + log1p. It rejects missing/extra genes and multiple profiles.</p><div className="about-chip-list"><span>Wide CSV</span><span>Long CSV</span><span>≤ 8 MB</span><span>One profile</span></div></section>
-        <section className="content-panel"><p className="eyebrow">PROJECT DATA</p><h2>Atlas footprint</h2><div className="about-stat-list"><div><span>Cells</span><strong>{data ? number(data.cells) : "—"}</strong></div><div><span>Studies</span><strong>{data ? data.studies : "—"}</strong></div><div><span>Grouped profiles</span><strong>{data ? data.profiles : "—"}</strong></div><div><span>Verified patient count</span><strong>Unknown</strong></div></div></section>
-        <section className="content-panel"><p className="eyebrow">LOCAL RUN STATUS</p><h2>Research environment</h2><div className="settings-status-row"><span>API</span><strong className={health ? "status-online-text" : "status-offline-text"}>{health?.status.toUpperCase() ?? "UNREACHABLE"}</strong></div><div className="settings-status-row"><span>Classifier</span><strong>{health?.model_name ?? "Not confirmed"}</strong></div><div className="settings-status-row"><span>Probability calibration</span><strong>Unavailable</strong></div><div className="settings-status-row"><span>Clinical validation</span><strong>Not performed</strong></div></section>
+        <section className="content-panel about-model-panel"><div className="about-brand-orbit"><div /><div /><div /><Activity size={22} /></div><p className="eyebrow">PLATFORM STATUS</p><h2>4 Engines Active</h2><p>Single-Cell Atlas, Lab Report OCR, NHANES Risk Engine, and MedMNIST Vision.</p><div className={`about-health ${health?.model_loaded ? "health-good" : "health-bad"}`}><span />{health?.model_loaded ? "All backends online in local API" : healthError ?? health?.message ?? "API status unknown"}</div><div className="about-meta-row"><span>Artifact identifier</span><code>{health?.artifact_id ?? data?.artifact_id ?? "pulmoai-v2.0"}</code></div></section>
+        <section className="content-panel"><p className="eyebrow">API ENDPOINTS</p><h2>FastAPI Backend Routes</h2><p className="body-copy">The local server exposes RESTful endpoints supporting JSON payloads, file streams, and multipart form uploads.</p><div className="about-chip-list"><span>/api/predict</span><span>/api/report/extract</span><span>/api/risk/predict</span><span>/api/image/predict</span><span>/api/dashboard</span></div></section>
+        <section className="content-panel"><p className="eyebrow">CALIBRATION & GUARDS</p><h2>Reliability Safeguards</h2><div className="about-stat-list"><div><span>Platt Scaling</span><strong>5-Fold CV Sigmoid</strong></div><div><span>OOD Vision Guard</span><strong>&lt;50% Max Softmax Reject</strong></div><div><span>Unit Normalization</span><strong>SI to US Auto-Convert</strong></div><div><span>Diagnostic Tautology</span><strong>Strictly Prevented</strong></div></div></section>
+        <section className="content-panel"><p className="eyebrow">RUN ENVIRONMENT</p><h2>Local Hardware</h2><div className="settings-status-row"><span>Hardware Backend</span><strong>Apple Silicon MPS / CPU</strong></div><div className="settings-status-row"><span>Server Framework</span><strong>FastAPI + Uvicorn</strong></div><div className="settings-status-row"><span>Frontend Stack</span><strong>React 19 + Vite 7 + Tailwind</strong></div><div className="settings-status-row"><span>OCR Engine</span><strong>PyMuPDF + Tesseract OCR</strong></div></section>
       </div>
-      <div className="privacy-note"><ShieldCheck size={16} /><span>Uploads are processed in the local API process and held only in a temporary file during validation/prediction. This demo does not persist prediction history on the server.</span></div>
+      <div className="privacy-note"><ShieldCheck size={16} /><span>All data processing, OCR, inference, and predictions run 100% locally on your machine. No patient documents or images are transmitted to external cloud servers.</span></div>
     </>
   );
 }

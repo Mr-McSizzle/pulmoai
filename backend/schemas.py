@@ -58,3 +58,75 @@ class GeneInsightsResponse(BaseModel):
     interpretation: str | None = None
     message: str | None = None
     features: list[dict[str, Any]] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# Phase 3: Report Reader & Risk Prediction Schemas
+# ---------------------------------------------------------------------------
+
+class LabItemSchema(BaseModel):
+    raw_name: str
+    canonical_name: str
+    display_name: str
+    category: str
+    value: float
+    raw_value: str
+    unit: str
+    raw_unit: str
+    reference_range: str
+    flag: Literal["NORMAL", "HIGH", "LOW", "UNKNOWN"]
+    confidence: float
+
+
+class ReportExtractResponse(BaseModel):
+    extraction_method: str
+    extracted_tests: list[LabItemSchema]
+    raw_text: str
+    unmatched_lines: list[str] = Field(default_factory=list)
+    count: int
+
+
+class RiskPredictionRequest(BaseModel):
+    inputs: dict[str, float | int | None]
+
+
+class ConditionRiskResult(BaseModel):
+    target_id: str
+    display_name: str
+    description: str
+    calibrated_risk: float | None = None
+    risk_category: str
+    model_auroc: float | None = None
+    model_brier_score: float | None = None
+    test_prevalence: float | None = None
+
+
+class RiskPredictionResponse(BaseModel):
+    risk_predictions: dict[str, ConditionRiskResult]
+    contributing_factors: list[str] = Field(default_factory=list)
+    features_provided_count: int
+    disclaimer: str
+
+
+# ---------------------------------------------------------------------------
+# Phase 4: Medical Image Screening Schemas
+# ---------------------------------------------------------------------------
+
+class ImagePredictionResponse(BaseModel):
+    image_type: str
+    modality_name: str
+    recognized: bool
+    status: Literal["success", "low_confidence", "error"]
+    message: str | None = None
+    predicted_class: str | None = None
+    confidence: float | None = None
+    max_confidence: float | None = None
+    threshold_applied: float | None = None
+    class_probabilities: dict[str, float] | None = None
+    multilabel: bool = False
+    active_conditions: list[str] | None = None
+    probabilities: dict[str, float] | None = None
+    model_metrics: dict[str, float] | None = None
+    disclaimer: str
+
+
