@@ -217,7 +217,7 @@ export function ImageScreeningPage() {
           <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
             <div className="flex items-center justify-between text-xs font-medium text-slate-700 mb-1">
               <span className="flex items-center gap-1">
-                <Sliders size={12} className="text-slate-500" /> OOD Guard Threshold:
+                <Sliders size={12} className="text-slate-500" /> Rejection Heuristic Threshold:
               </span>
               <strong className="text-teal-700">{(oodThreshold * 100).toFixed(0)}%</strong>
             </div>
@@ -230,8 +230,8 @@ export function ImageScreeningPage() {
               onChange={(e) => setOodThreshold(Number(e.target.value))}
               className="w-full accent-teal-600"
             />
-            <div className="text-[10px] text-slate-500 mt-1">
-              Rejects non-medical inputs when prediction confidence falls below this minimum threshold.
+            <div className="text-[10px] text-slate-500 mt-1 leading-snug">
+              Maximum Softmax Probability (MSP) triage threshold. Evaluated against genuine cross-modality medical datasets to measure empirical False Accept Rates.
             </div>
           </div>
 
@@ -433,6 +433,30 @@ export function ImageScreeningPage() {
                       )
                     )}
                   </div>
+                </div>
+              )}
+
+              {/* Empirical OOD Benchmark Information */}
+              {result.ood_methodology_statement && (
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+                    <span className="flex items-center gap-1.5">
+                      <ShieldAlert size={14} className="text-teal-600" /> Empirical OOD Rejection Profile
+                    </span>
+                    {result.empirical_false_accept_rate !== undefined && result.empirical_false_accept_rate !== null && (
+                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
+                        Empirical FAR: {(result.empirical_false_accept_rate * 100).toFixed(1)}%
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    {result.ood_methodology_statement}
+                  </p>
+                  {result.ood_benchmark?.tested_against_cross_modalities && (
+                    <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200">
+                      Cross-modality test sets: {result.ood_benchmark.tested_against_cross_modalities.join(", ")}
+                    </div>
+                  )}
                 </div>
               )}
 

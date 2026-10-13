@@ -16,13 +16,16 @@ data/
 *.npz
 
 # Internal notes, reports, and walkthroughs
-reports/
+reports/*
+!reports/evaluation_registry.json
+!reports/ood_benchmark.json
 final_report.md
 WALKTHROUGH.md
 FULL_MODEL_PLAN.md
 CHECKPOINTS.md
 FRONTEND_BACKEND_HANDOFF.md
 architecture_diagram_concept.jpg
+architecture_diagram.png
 
 # Old / unused experimental model files
 models/allcells_lung_disease_classifier.joblib
