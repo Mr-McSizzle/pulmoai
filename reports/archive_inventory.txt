@@ -1,0 +1,106 @@
+Archive: /Users/nisarg/Downloads/GSE248688_RAW.tar
+Archive size: 3,876,075,520 bytes
+Tar members: 68
+Regular files: 68
+Sum of tar-reported file sizes: 3,876,016,978 bytes
+Note: entries are listed only; no files were extracted.
+
+Unique GSM accessions (20):
+  GSM7918784
+  GSM7918785
+  GSM7918786
+  GSM7918787
+  GSM7918788
+  GSM7918789
+  GSM7918803
+  GSM7918804
+  GSM7918840
+  GSM7918841
+  GSM7918842
+  GSM7918843
+  GSM7918844
+  GSM7918845
+  GSM7918846
+  GSM7918847
+  GSM8335813
+  GSM8335814
+  GSM8335815
+  GSM8335816
+
+File types:
+  CMO confidence table: 2
+  CMO metadata: 10
+  barcodes.tsv.gz: 18
+  features.tsv.gz: 18
+  genotype metadata: 2
+  matrix.mtx.gz: 18
+
+Archive member names:
+  GSM7918784_wloajxw2_wwu1l8mf_barcodes.tsv.gz
+  GSM7918784_wloajxw2_wwu1l8mf_features.tsv.gz
+  GSM7918784_wloajxw2_wwu1l8mf_matrix.mtx.gz
+  GSM7918785_p7dv1p4d_f75b2am6_barcodes.tsv.gz
+  GSM7918785_p7dv1p4d_f75b2am6_features.tsv.gz
+  GSM7918785_p7dv1p4d_f75b2am6_matrix.mtx.gz
+  GSM7918786_i33pzh12_shyncra2_barcodes.tsv.gz
+  GSM7918786_i33pzh12_shyncra2_features.tsv.gz
+  GSM7918786_i33pzh12_shyncra2_matrix.mtx.gz
+  GSM7918787_tb4y1wh9_md4w7t7n_barcodes.tsv.gz
+  GSM7918787_tb4y1wh9_md4w7t7n_features.tsv.gz
+  GSM7918787_tb4y1wh9_md4w7t7n_matrix.mtx.gz
+  GSM7918788_daohhq14_oozs3a3o_barcodes.tsv.gz
+  GSM7918788_daohhq14_oozs3a3o_features.tsv.gz
+  GSM7918788_daohhq14_oozs3a3o_matrix.mtx.gz
+  GSM7918789_uqeiybkw_t4rsslk1_barcodes.tsv.gz
+  GSM7918789_uqeiybkw_t4rsslk1_features.tsv.gz
+  GSM7918789_uqeiybkw_t4rsslk1_matrix.mtx.gz
+  GSM7918803_mja67nqr_gbqwoikm_CMO.csv.gz
+  GSM7918803_mja67nqr_gbqwoikm_barcodes.tsv.gz
+  GSM7918803_mja67nqr_gbqwoikm_features.tsv.gz
+  GSM7918803_mja67nqr_gbqwoikm_matrix.mtx.gz
+  GSM7918804_ujbuy9k3_89lyigjo_CMO.csv.gz
+  GSM7918804_ujbuy9k3_89lyigjo_barcodes.tsv.gz
+  GSM7918804_ujbuy9k3_89lyigjo_features.tsv.gz
+  GSM7918804_ujbuy9k3_89lyigjo_matrix.mtx.gz
+  GSM7918840_hner8v5o_m8skafb5_CMO.csv.gz
+  GSM7918840_hner8v5o_m8skafb5_barcodes.tsv.gz
+  GSM7918840_hner8v5o_m8skafb5_features.tsv.gz
+  GSM7918840_hner8v5o_m8skafb5_matrix.mtx.gz
+  GSM7918841_w1oxhhll_d4comu1j_CMO.csv.gz
+  GSM7918841_w1oxhhll_d4comu1j_barcodes.tsv.gz
+  GSM7918841_w1oxhhll_d4comu1j_features.tsv.gz
+  GSM7918841_w1oxhhll_d4comu1j_matrix.mtx.gz
+  GSM7918842_eoogcieu_var4q976_CMO.csv.gz
+  GSM7918842_eoogcieu_var4q976_barcodes.tsv.gz
+  GSM7918842_eoogcieu_var4q976_features.tsv.gz
+  GSM7918842_eoogcieu_var4q976_matrix.mtx.gz
+  GSM7918843_ee31rg5x_hsm6kstq_CMO.csv.gz
+  GSM7918843_ee31rg5x_hsm6kstq_barcodes.tsv.gz
+  GSM7918843_ee31rg5x_hsm6kstq_features.tsv.gz
+  GSM7918843_ee31rg5x_hsm6kstq_matrix.mtx.gz
+  GSM7918844_ydel7jem_7vfzbxy2_barcodes.tsv.gz
+  GSM7918844_ydel7jem_7vfzbxy2_features.tsv.gz
+  GSM7918844_ydel7jem_7vfzbxy2_geno.csv.gz
+  GSM7918844_ydel7jem_7vfzbxy2_matrix.mtx.gz
+  GSM7918845_kccuxr4e_pitw68dw_barcodes.tsv.gz
+  GSM7918845_kccuxr4e_pitw68dw_features.tsv.gz
+  GSM7918845_kccuxr4e_pitw68dw_geno.csv.gz
+  GSM7918845_kccuxr4e_pitw68dw_matrix.mtx.gz
+  GSM7918846_mf25ll5r_cj55ewzz_CMO.csv.gz
+  GSM7918846_mf25ll5r_cj55ewzz_barcodes.tsv.gz
+  GSM7918846_mf25ll5r_cj55ewzz_features.tsv.gz
+  GSM7918846_mf25ll5r_cj55ewzz_matrix.mtx.gz
+  GSM7918847_bq82lbgc_ocghqebd_CMO.csv.gz
+  GSM7918847_bq82lbgc_ocghqebd_barcodes.tsv.gz
+  GSM7918847_bq82lbgc_ocghqebd_features.tsv.gz
+  GSM7918847_bq82lbgc_ocghqebd_matrix.mtx.gz
+  GSM8335813_ul6ge419_oxt3y11v_barcodes.tsv.gz
+  GSM8335813_ul6ge419_oxt3y11v_features.tsv.gz
+  GSM8335813_ul6ge419_oxt3y11v_matrix.mtx.gz
+  GSM8335814_ul6ge419_oxt3y11v_CMO.csv.gz
+  GSM8335814_ul6ge419_oxt3y11v_CMO_assignment_confidence_table.csv.gz
+  GSM8335815_kbdmjydj_hyfxxft5_barcodes.tsv.gz
+  GSM8335815_kbdmjydj_hyfxxft5_features.tsv.gz
+  GSM8335815_kbdmjydj_hyfxxft5_matrix.mtx.gz
+  GSM8335816_kbdmjydj_hyfxxft5_CMO.csv.gz
+  GSM8335816_kbdmjydj_hyfxxft5_CMO_assignment_confidence_table.csv.gz

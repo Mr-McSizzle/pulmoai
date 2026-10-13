@@ -1,0 +1,2 @@
+model,status,details
+XGBoost,not run; package is not installed,ModuleNotFoundError: No module named 'xgboost'

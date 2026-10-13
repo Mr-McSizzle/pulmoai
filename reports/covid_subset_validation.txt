@@ -1,0 +1,69 @@
+Archive: /Users/nisarg/Downloads/GSE248688_RAW.tar
+Reads Matrix Market headers and compressed text metadata; extracts no files.
+
+Library: GSM8335813_ul6ge419_oxt3y11v_matrix.mtx.gz
+  compressed matrix member: 242,532,329 bytes
+  matrix shape (features x barcodes): 36,601 x 45,930
+  declared nonzero entries: 62,014,171
+  feature rows: 36,601
+  barcode rows: 45,930
+  assignment rows: 45,932
+  unique assignment barcodes: 45,932
+  duplicate matrix barcodes: 0
+  duplicate assignment barcodes: 0
+  matching matrix/assignment barcodes: 45,922
+  feature count matches matrix: True
+  barcode count matches matrix: True
+  matrix barcodes missing assignments: 8
+  assignments without matrix barcodes: 10
+    assignment-only examples: ATCGGATAGCTAGCCC-1, CACACAATCTGGGCAC-1, CAGGCCAAGTTGCTCA-1, CCCTCAAAGAAGCGCT-1, CCTTGTGAGCAGTCTT-1
+    matrix-only examples: AGATGCTAGGAGAGTA-1, GCCTGTTTCAGAGCGA-1, GGATGTTTCTCCGAAA-1, GGTTGTACAATCTCGA-1, TAGAGTCGTCATGGCC-1
+  donor labels in paired CMO file: COVID_PNA, COVID_mild, healthy
+  feature types:
+    Gene Expression: 36,601
+  matched barcodes assigned to labeled donors:
+    CNAG_20 (healthy): 4,236
+    CNAG_22 (healthy): 4,346
+    CNAG_24 (healthy): 3,773
+    CNAG_26 (healthy): 4,043
+    SPAU_11 (COVID_PNA): 4,556
+    SPAU_12 (COVID_PNA): 4,240
+    SPAU_13 (COVID_mild): 4,079
+    SPAU_14 (COVID_PNA): 4,421
+  matched barcodes without a donor CMO label:
+    Blanks: 613
+    Multiplet: 6,976
+    Unassigned: 4,639
+
+Library: GSM8335815_kbdmjydj_hyfxxft5_matrix.mtx.gz
+  compressed matrix member: 192,512,499 bytes
+  matrix shape (features x barcodes): 36,601 x 30,741
+  declared nonzero entries: 49,637,175
+  feature rows: 36,601
+  barcode rows: 30,741
+  assignment rows: 30,741
+  unique assignment barcodes: 30,741
+  duplicate matrix barcodes: 0
+  duplicate assignment barcodes: 0
+  matching matrix/assignment barcodes: 30,741
+  feature count matches matrix: True
+  barcode count matches matrix: True
+  matrix barcodes missing assignments: 0
+  assignments without matrix barcodes: 0
+  donor labels in paired CMO file: COVID_PNA, COVID_mild, healthy
+  feature types:
+    Gene Expression: 36,601
+  matched barcodes assigned to labeled donors:
+    CNAG_20 (healthy): 2,819
+    CNAG_22 (healthy): 3,007
+    CNAG_24 (healthy): 2,567
+    CNAG_26 (healthy): 2,582
+    SPAU_11 (COVID_PNA): 3,128
+    SPAU_12 (COVID_PNA): 3,033
+    SPAU_13 (COVID_mild): 2,640
+    SPAU_14 (COVID_PNA): 2,964
+  matched barcodes without a donor CMO label:
+    Blanks: 444
+    Multiplet: 6,522
+    Unassigned: 1,035
+

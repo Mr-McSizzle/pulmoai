@@ -1,0 +1,341 @@
+{
+  "status": "completed; exploratory research benchmark",
+  "source_profiles": "/Users/nisarg/Desktop/ml project/data/processed/allcells_pseudobulk_counts.npz",
+  "sample_group_count": 372,
+  "source_study_count": 16,
+  "cells_aggregated_into_profiles": 1470730,
+  "feature_count": 30566,
+  "label_order": [
+    "Donor",
+    "COPD",
+    "PF",
+    "COVID19"
+  ],
+  "sample_group_counts": {
+    "Donor": 128,
+    "COPD": 46,
+    "PF": 179,
+    "COVID19": 19
+  },
+  "validation": {
+    "outer": "LeaveOneGroupOut with gse_alias as group; every source study is held out once",
+    "inner": "stratified 3-fold sample-group CV within outer training data; used only to select a model per outer fold",
+    "final_selection_rule": "highest mean inner-CV macro-F1 across outer training folds; balanced accuracy breaks ties",
+    "reported_selected_procedure_metrics": {
+      "accuracy": 0.6344086021505376,
+      "balanced_accuracy": 0.5612510416932999,
+      "macro_f1": 0.5218717979243988,
+      "weighted_f1": 0.6665634450114054
+    },
+    "confusion_matrix_labels_rows_true_columns_predicted": [
+      "Donor",
+      "COPD",
+      "PF",
+      "COVID19"
+    ],
+    "confusion_matrix": [
+      [
+        85,
+        36,
+        4,
+        3
+      ],
+      [
+        3,
+        34,
+        5,
+        4
+      ],
+      [
+        9,
+        49,
+        113,
+        8
+      ],
+      [
+        6,
+        1,
+        8,
+        4
+      ]
+    ],
+    "classification_report": {
+      "Donor": {
+        "precision": 0.8252427184466019,
+        "recall": 0.6640625,
+        "f1-score": 0.7359307359307359,
+        "support": 128.0
+      },
+      "COPD": {
+        "precision": 0.2833333333333333,
+        "recall": 0.7391304347826086,
+        "f1-score": 0.40963855421686746,
+        "support": 46.0
+      },
+      "PF": {
+        "precision": 0.8692307692307693,
+        "recall": 0.6312849162011173,
+        "f1-score": 0.7313915857605178,
+        "support": 179.0
+      },
+      "COVID19": {
+        "precision": 0.21052631578947367,
+        "recall": 0.21052631578947367,
+        "f1-score": 0.21052631578947367,
+        "support": 19.0
+      },
+      "accuracy": 0.6344086021505376,
+      "macro avg": {
+        "precision": 0.5470832842000446,
+        "recall": 0.5612510416932999,
+        "f1-score": 0.5218717979243988,
+        "support": 372.0
+      },
+      "weighted avg": {
+        "precision": 0.748001905878511,
+        "recall": 0.6344086021505376,
+        "f1-score": 0.6665634450114054,
+        "support": 372.0
+      }
+    },
+    "selected_model_by_heldout_study": [
+      {
+        "study": "ERP114453",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE122960",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE128033",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE128169",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE132771",
+        "model": "Hard Voting Ensemble"
+      },
+      {
+        "study": "GSE135893",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE136831",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE150068",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE150247",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE158127",
+        "model": "Histogram Gradient Boosting"
+      },
+      {
+        "study": "GSE168191",
+        "model": "Hard Voting Ensemble"
+      },
+      {
+        "study": "GSE171541",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE171668",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE173896",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE196341",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE227136",
+        "model": "Linear SVM"
+      }
+    ],
+    "fixed_candidate_heldout_study_metrics": [
+      {
+        "model": "Logistic Regression",
+        "accuracy": 0.6451612903225806,
+        "balanced_accuracy": 0.565025407129297,
+        "macro_f1": 0.5405271199388846,
+        "weighted_f1": 0.6761424217780954
+      },
+      {
+        "model": "Linear SVM",
+        "accuracy": 0.6478494623655914,
+        "balanced_accuracy": 0.5792357316981578,
+        "macro_f1": 0.5349221807404156,
+        "weighted_f1": 0.6789924083148192
+      },
+      {
+        "model": "RBF SVM",
+        "accuracy": 0.5994623655913979,
+        "balanced_accuracy": 0.4613758501335924,
+        "macro_f1": 0.43506263406263407,
+        "weighted_f1": 0.6200763805279934
+      },
+      {
+        "model": "Random Forest",
+        "accuracy": 0.5672043010752689,
+        "balanced_accuracy": 0.4423901657760505,
+        "macro_f1": 0.4198946853131751,
+        "weighted_f1": 0.5986736954418264
+      },
+      {
+        "model": "Extra Trees",
+        "accuracy": 0.5725806451612904,
+        "balanced_accuracy": 0.4244363120901141,
+        "macro_f1": 0.4091395962054547,
+        "weighted_f1": 0.5953722437973907
+      },
+      {
+        "model": "AdaBoost",
+        "accuracy": 0.5698924731182796,
+        "balanced_accuracy": 0.45687137554651447,
+        "macro_f1": 0.4216100960586254,
+        "weighted_f1": 0.5908207762848813
+      },
+      {
+        "model": "Histogram Gradient Boosting",
+        "accuracy": 0.553763440860215,
+        "balanced_accuracy": 0.44257356072542603,
+        "macro_f1": 0.4253625203943102,
+        "weighted_f1": 0.5905125354366629
+      },
+      {
+        "model": "Neural Network (MLP)",
+        "accuracy": 0.5913978494623656,
+        "balanced_accuracy": 0.4826634220034388,
+        "macro_f1": 0.46062247141698676,
+        "weighted_f1": 0.6239972505267972
+      },
+      {
+        "model": "Hard Voting Ensemble",
+        "accuracy": 0.6370967741935484,
+        "balanced_accuracy": 0.5251985659189113,
+        "macro_f1": 0.4979811956287074,
+        "weighted_f1": 0.6646318486433536
+      }
+    ]
+  },
+  "models": {
+    "evaluated": [
+      "Logistic Regression",
+      "Linear SVM",
+      "RBF SVM",
+      "Random Forest",
+      "Extra Trees",
+      "AdaBoost",
+      "Histogram Gradient Boosting",
+      "Neural Network (MLP)",
+      "Hard Voting Ensemble"
+    ],
+    "unavailable": [
+      {
+        "model": "XGBoost",
+        "status": "not run; package is not installed",
+        "details": "ModuleNotFoundError: No module named 'xgboost'"
+      }
+    ],
+    "inner_cv_mean_scores": {
+      "Logistic Regression": {
+        "accuracy": 0.9290644190127975,
+        "balanced_accuracy": 0.8918582259263568,
+        "macro_f1": 0.8997511972757537,
+        "weighted_f1": 0.9289496871176319
+      },
+      "Linear SVM": {
+        "accuracy": 0.9388281304866888,
+        "balanced_accuracy": 0.9026057820410143,
+        "macro_f1": 0.9034199716900115,
+        "weighted_f1": 0.9387336805423516
+      },
+      "RBF SVM": {
+        "accuracy": 0.8831063156426016,
+        "balanced_accuracy": 0.824578299104801,
+        "macro_f1": 0.8273518252516316,
+        "weighted_f1": 0.883114586995664
+      },
+      "Random Forest": {
+        "accuracy": 0.8640261973366344,
+        "balanced_accuracy": 0.8199483239521098,
+        "macro_f1": 0.8258953123681768,
+        "weighted_f1": 0.864478722069474
+      },
+      "Extra Trees": {
+        "accuracy": 0.8777306072862866,
+        "balanced_accuracy": 0.8023701546422157,
+        "macro_f1": 0.8287756142376839,
+        "weighted_f1": 0.8761540569864581
+      },
+      "AdaBoost": {
+        "accuracy": 0.8722847687121278,
+        "balanced_accuracy": 0.7813284722349879,
+        "macro_f1": 0.8112857328798726,
+        "weighted_f1": 0.869766304090637
+      },
+      "Histogram Gradient Boosting": {
+        "accuracy": 0.8987862207893726,
+        "balanced_accuracy": 0.8407008229417485,
+        "macro_f1": 0.8558534520477292,
+        "weighted_f1": 0.8979075305073632
+      },
+      "Neural Network (MLP)": {
+        "accuracy": 0.8615718747347447,
+        "balanced_accuracy": 0.780744934043591,
+        "macro_f1": 0.7918952755109093,
+        "weighted_f1": 0.8606902569004271
+      },
+      "Hard Voting Ensemble": {
+        "accuracy": 0.9315693138679413,
+        "balanced_accuracy": 0.884051928349264,
+        "macro_f1": 0.8993374553529079,
+        "weighted_f1": 0.9311171916077355
+      }
+    },
+    "selected_final_algorithm": "Linear SVM",
+    "final_model_path": "/Users/nisarg/Desktop/ml project/models/ensemble_benchmark_best.joblib"
+  },
+  "runtime_seconds": {
+    "nested_model_fits_by_candidate": {
+      "Logistic Regression": 5.97,
+      "Linear SVM": 16.72,
+      "RBF SVM": 5.0,
+      "Random Forest": 13.99,
+      "Extra Trees": 11.14,
+      "AdaBoost": 131.42,
+      "Histogram Gradient Boosting": 622.8,
+      "Neural Network (MLP)": 10.44,
+      "Hard Voting Ensemble": 28.76
+    },
+    "final_fit_and_save_seconds": 2.15,
+    "total_benchmark_seconds": 865.73
+  },
+  "limitations": [
+    "The 1,470,730 cells are aggregated into 372 study-scoped source sample/library profiles; they are not 1,470,730 independent labeled examples.",
+    "The H5AD has no verified biological patient identifier; sample groups must not be called patients.",
+    "Study-held-out evaluation is intentionally difficult; labels are confounded with source study and class coverage is uneven.",
+    "Model comparisons are exploratory and the selected model's outer-fold score is for the selection procedure, not a clinical performance claim.",
+    "Linear regression and reinforcement learning are excluded because the target is supervised multiclass disease classification.",
+    "The hard-voting ensemble uses Logistic Regression, Linear SVM, and Extra Trees; it uses hard voting.",
+    "XGBoost was not run because the package is not installed; no package was downloaded."
+  ],
+  "environment": {
+    "python": "3.12.4",
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "scikit_learn": "1.9.1",
+    "xgboost_available": false
+  }
+}

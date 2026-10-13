@@ -1,0 +1,181 @@
+{
+  "task": "donor-level COVID versus healthy classification",
+  "status": "exploratory; eight independent donors only",
+  "archive": "/Users/nisarg/Downloads/GSE248688_RAW.tar",
+  "donor_count": 8,
+  "class_counts": {
+    "healthy": 4,
+    "COVID": 4
+  },
+  "donor_cell_counts": {
+    "CNAG_20": 7055,
+    "CNAG_22": 7353,
+    "CNAG_24": 6340,
+    "CNAG_26": 6625,
+    "SPAU_11": 7684,
+    "SPAU_12": 7273,
+    "SPAU_13": 6719,
+    "SPAU_14": 7385
+  },
+  "preprocessing": "sum assigned raw counts by donor across both libraries; normalize each donor to counts per million; apply log1p",
+  "cell_filtering": "keep CMO Assignment values mapped to a donor label; omit Blanks, Multiplet, Unassigned, and barcode mismatches; no additional probability threshold",
+  "model": "VarianceThreshold, fold-local SelectKBest(f_classif, k=min(top_features, feature_count)), and L2-regularized LogisticRegression(C=0.1, class_weight=balanced)",
+  "top_features": 100,
+  "cv": "4-fold stratified cross-validation over donor-level profiles; random_state=42",
+  "balanced_accuracy": 1.0,
+  "weighted_f1": 1.0,
+  "confusion_matrix_labels_order": [
+    "healthy",
+    "COVID"
+  ],
+  "confusion_matrix": [
+    [
+      4,
+      0
+    ],
+    [
+      0,
+      4
+    ]
+  ],
+  "classification_report": {
+    "healthy": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 4.0
+    },
+    "COVID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 4.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 8.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 8.0
+    }
+  },
+  "source_matrices": [
+    {
+      "matrix_member": "GSM8335813_ul6ge419_oxt3y11v_matrix.mtx.gz",
+      "matrix_shape": [
+        36601,
+        45930
+      ],
+      "matrix_nonzero_entries": 62014171,
+      "metadata_member": "GSM8335814_ul6ge419_oxt3y11v_CMO.csv.gz",
+      "assignment_member": "GSM8335814_ul6ge419_oxt3y11v_CMO_assignment_confidence_table.csv.gz",
+      "assignment_rows": 45932,
+      "barcodes_in_matrix": 45930,
+      "matched_labeled_cells_by_donor": {
+        "CNAG_20": 4236,
+        "CNAG_22": 4346,
+        "CNAG_24": 3773,
+        "CNAG_26": 4043,
+        "SPAU_11": 4556,
+        "SPAU_12": 4240,
+        "SPAU_13": 4079,
+        "SPAU_14": 4421
+      }
+    },
+    {
+      "matrix_member": "GSM8335815_kbdmjydj_hyfxxft5_matrix.mtx.gz",
+      "matrix_shape": [
+        36601,
+        30741
+      ],
+      "matrix_nonzero_entries": 49637175,
+      "metadata_member": "GSM8335816_kbdmjydj_hyfxxft5_CMO.csv.gz",
+      "assignment_member": "GSM8335816_kbdmjydj_hyfxxft5_CMO_assignment_confidence_table.csv.gz",
+      "assignment_rows": 30741,
+      "barcodes_in_matrix": 30741,
+      "matched_labeled_cells_by_donor": {
+        "CNAG_20": 2819,
+        "CNAG_22": 3007,
+        "CNAG_24": 2567,
+        "CNAG_26": 2582,
+        "SPAU_11": 3128,
+        "SPAU_12": 3033,
+        "SPAU_13": 2640,
+        "SPAU_14": 2964
+      }
+    }
+  ],
+  "folds": [
+    {
+      "fold": 1,
+      "train_donors": [
+        "CNAG_20",
+        "CNAG_22",
+        "CNAG_26",
+        "SPAU_11",
+        "SPAU_12",
+        "SPAU_14"
+      ],
+      "test_donors": [
+        "CNAG_24",
+        "SPAU_13"
+      ]
+    },
+    {
+      "fold": 2,
+      "train_donors": [
+        "CNAG_22",
+        "CNAG_24",
+        "CNAG_26",
+        "SPAU_12",
+        "SPAU_13",
+        "SPAU_14"
+      ],
+      "test_donors": [
+        "CNAG_20",
+        "SPAU_11"
+      ]
+    },
+    {
+      "fold": 3,
+      "train_donors": [
+        "CNAG_20",
+        "CNAG_22",
+        "CNAG_24",
+        "SPAU_11",
+        "SPAU_12",
+        "SPAU_13"
+      ],
+      "test_donors": [
+        "CNAG_26",
+        "SPAU_14"
+      ]
+    },
+    {
+      "fold": 4,
+      "train_donors": [
+        "CNAG_20",
+        "CNAG_24",
+        "CNAG_26",
+        "SPAU_11",
+        "SPAU_13",
+        "SPAU_14"
+      ],
+      "test_donors": [
+        "CNAG_22",
+        "SPAU_12"
+      ]
+    }
+  ],
+  "limitations": [
+    "Only eight independent donors are available, so cross-validation metrics are highly unstable.",
+    "This is a COVID-versus-healthy pilot, not a multi-disease classifier.",
+    "There is no external cohort validation; results do not establish clinical performance."
+  ]
+}

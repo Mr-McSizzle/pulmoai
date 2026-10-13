@@ -1,0 +1,10 @@
+              precision    recall  f1-score   support
+
+       Donor       0.83      0.66      0.74       128
+        COPD       0.28      0.74      0.41        46
+          PF       0.87      0.63      0.73       179
+     COVID19       0.21      0.21      0.21        19
+
+    accuracy                           0.63       372
+   macro avg       0.55      0.56      0.52       372
+weighted avg       0.75      0.63      0.67       372

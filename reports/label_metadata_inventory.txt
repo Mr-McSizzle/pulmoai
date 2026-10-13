@@ -1,0 +1,106 @@
+Archive: /Users/nisarg/Downloads/GSE248688_RAW.tar
+Metadata is streamed from the archive; expression matrices are not read or extracted.
+
+CMO donor metadata:
+  GSM7918803_mja67nqr_gbqwoikm_CMO.csv.gz
+    CMO301: Z8700000001000000701; label=not stated in this file
+    CMO303: Z8700000003000000701; label=not stated in this file
+    CMO302: Z8700000002000000701; label=not stated in this file
+    CMO304: Z8700000005000000701; label=not stated in this file
+  GSM7918804_ujbuy9k3_89lyigjo_CMO.csv.gz
+    CMO305: Z8700000004000000701; label=not stated in this file
+    CMO307: Z8700000007000000701; label=not stated in this file
+    CMO306: Z8700000006000000701; label=not stated in this file
+    CMO308: Z8700000008000000701; label=not stated in this file
+  GSM7918840_hner8v5o_m8skafb5_CMO.csv.gz
+    CMO301: CNAG_117; label=not stated in this file
+    CMO302: CNAG_117; label=not stated in this file
+    CMO303: CNAG_117; label=not stated in this file
+    CMO304: CNAG_117; label=not stated in this file
+    CMO305: CNAG_117; label=not stated in this file
+    CMO306: CNAG_117; label=not stated in this file
+  GSM7918841_w1oxhhll_d4comu1j_CMO.csv.gz
+    CMO307: CNAG_118; label=not stated in this file
+    CMO308: CNAG_118; label=not stated in this file
+    CMO309: CNAG_118; label=not stated in this file
+    CMO310: CNAG_118; label=not stated in this file
+    CMO311: CNAG_118; label=not stated in this file
+    CMO312: CNAG_118; label=not stated in this file
+  GSM7918842_eoogcieu_var4q976_CMO.csv.gz
+    CMO301: CNAG_121; label=not stated in this file
+    CMO303: CNAG_123; label=not stated in this file
+    CMO304: CNAG_124; label=not stated in this file
+    CMO305: CNAG_125; label=not stated in this file
+    CMO306: CNAG_126; label=not stated in this file
+    CMO307: CNAG_143; label=not stated in this file
+  GSM7918843_ee31rg5x_hsm6kstq_CMO.csv.gz
+    CMO301: CNAG_121; label=not stated in this file
+    CMO303: CNAG_123; label=not stated in this file
+    CMO304: CNAG_124; label=not stated in this file
+    CMO305: CNAG_125; label=not stated in this file
+    CMO306: CNAG_126; label=not stated in this file
+    CMO307: CNAG_143; label=not stated in this file
+  GSM7918846_mf25ll5r_cj55ewzz_CMO.csv.gz
+    CMO301: SEO112; label=not stated in this file
+    CMO302: SEO123; label=not stated in this file
+    CMO303: SEO162; label=not stated in this file
+    CMO304: SEO165; label=not stated in this file
+    CMO305: SEO167; label=not stated in this file
+    CMO306: SEO177; label=not stated in this file
+    CMO307: SEO181; label=not stated in this file
+    CMO308: SEO182; label=not stated in this file
+  GSM7918847_bq82lbgc_ocghqebd_CMO.csv.gz
+    CMO301: SEO129; label=not stated in this file
+    CMO302: SEO132; label=not stated in this file
+    CMO303: SEO184; label=not stated in this file
+    CMO304: SEO190; label=not stated in this file
+    CMO305: SEO199; label=not stated in this file
+    CMO306: SEO220; label=not stated in this file
+    CMO307: SEO223; label=not stated in this file
+    CMO308: SEO228; label=not stated in this file
+  GSM8335814_ul6ge419_oxt3y11v_CMO.csv.gz
+    CMO305: CNAG_20; label=healthy
+    CMO306: CNAG_22; label=healthy
+    CMO307: CNAG_24; label=healthy
+    CMO308: CNAG_26; label=healthy
+    CMO309: SPAU_11; label=COVID_PNA
+    CMO310: SPAU_12; label=COVID_PNA
+    CMO311: SPAU_13; label=COVID_mild
+    CMO312: SPAU_14; label=COVID_PNA
+  GSM8335816_kbdmjydj_hyfxxft5_CMO.csv.gz
+    CMO305: CNAG_20; label=healthy
+    CMO306: CNAG_22; label=healthy
+    CMO307: CNAG_24; label=healthy
+    CMO308: CNAG_26; label=healthy
+    CMO309: SPAU_11; label=COVID_PNA
+    CMO310: SPAU_12; label=COVID_PNA
+    CMO311: SPAU_13; label=COVID_mild
+    CMO312: SPAU_14; label=COVID_PNA
+
+Barcode assignment counts:
+  GSM8335814_ul6ge419_oxt3y11v_CMO_assignment_confidence_table.csv.gz
+    barcode rows: 45,932
+    Blanks: 614
+    CMO305 (CNAG_20; healthy): 4,239
+    CMO306 (CNAG_22; healthy): 4,347
+    CMO307 (CNAG_24; healthy): 3,773
+    CMO308 (CNAG_26; healthy): 4,044
+    CMO309 (SPAU_11; COVID_PNA): 4,556
+    CMO310 (SPAU_12; COVID_PNA): 4,241
+    CMO311 (SPAU_13; COVID_mild): 4,079
+    CMO312 (SPAU_14; COVID_PNA): 4,424
+    Multiplet: 6,976
+    Unassigned: 4,639
+  GSM8335816_kbdmjydj_hyfxxft5_CMO_assignment_confidence_table.csv.gz
+    barcode rows: 30,741
+    Blanks: 444
+    CMO305 (CNAG_20; healthy): 2,819
+    CMO306 (CNAG_22; healthy): 3,007
+    CMO307 (CNAG_24; healthy): 2,567
+    CMO308 (CNAG_26; healthy): 2,582
+    CMO309 (SPAU_11; COVID_PNA): 3,128
+    CMO310 (SPAU_12; COVID_PNA): 3,033
+    CMO311 (SPAU_13; COVID_mild): 2,640
+    CMO312 (SPAU_14; COVID_PNA): 2,964
+    Multiplet: 6,522
+    Unassigned: 1,035

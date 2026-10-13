@@ -1,0 +1,324 @@
+{
+  "source_file": "/Users/nisarg/Downloads/atlas-001.h5ad",
+  "shape": [
+    1470730,
+    30566
+  ],
+  "backed_mode": "read-only",
+  "stored_nonzero_values": 2778291635,
+  "finite_value_errors": 0,
+  "negative_values": 0,
+  "minimum_stored_value": 1.0,
+  "maximum_stored_value": 54740.0,
+  "absolute_distance_from_nearest_integer_counts": {
+    "1e-06": 1687874,
+    "1e-05": 258093,
+    "0.0001": 8046,
+    "0.001": 256,
+    "0.01": 0,
+    "0.1": 0,
+    "0.5": 0
+  },
+  "fractional_value_distribution_sample": {
+    "sampled_values": 28916,
+    "value_quantiles": [
+      59.9999885559082,
+      59.9999885559082,
+      65.00001525878906,
+      127.99998474121094,
+      332.00006103515625,
+      1226.0001220703125,
+      9585.00390625
+    ],
+    "distance_quantiles": [
+      1.1444091796875e-05,
+      1.1444091796875e-05,
+      1.52587890625e-05,
+      1.52587890625e-05,
+      6.103515625e-05,
+      0.00018310546875,
+      0.00390625
+    ]
+  },
+  "examples_not_integer_like_at_1e-5": [
+    {
+      "study": "ERP114453",
+      "value": 70.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "MALAT1"
+    },
+    {
+      "study": "ERP114453",
+      "value": 138.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "MALAT1"
+    },
+    {
+      "study": "ERP114453",
+      "value": 70.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "MGP"
+    },
+    {
+      "study": "ERP114453",
+      "value": 2643.000244140625,
+      "distance_to_integer": 0.000244140625,
+      "gene": "SCGB1A1"
+    },
+    {
+      "study": "ERP114453",
+      "value": 93.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "SLPI"
+    },
+    {
+      "study": "ERP114453",
+      "value": 179.9999542236328,
+      "distance_to_integer": 4.57763671875e-05,
+      "gene": "EEF1A1"
+    },
+    {
+      "study": "ERP114453",
+      "value": 220.00003051757812,
+      "distance_to_integer": 3.0517578125e-05,
+      "gene": "FTL"
+    },
+    {
+      "study": "ERP114453",
+      "value": 177.9999542236328,
+      "distance_to_integer": 4.57763671875e-05,
+      "gene": "MT-CO1"
+    },
+    {
+      "study": "ERP114453",
+      "value": 149.99996948242188,
+      "distance_to_integer": 3.0517578125e-05,
+      "gene": "MT-CO2"
+    },
+    {
+      "study": "ERP114453",
+      "value": 161.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "MT-CO3"
+    },
+    {
+      "study": "ERP114453",
+      "value": 103.99998474121094,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "MT-CYB"
+    },
+    {
+      "study": "ERP114453",
+      "value": 84.99998474121094,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "MT-ND3"
+    },
+    {
+      "study": "ERP114453",
+      "value": 95.99998474121094,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "MT-ND4"
+    },
+    {
+      "study": "ERP114453",
+      "value": 82.99998474121094,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPL32"
+    },
+    {
+      "study": "ERP114453",
+      "value": 70.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPL39"
+    },
+    {
+      "study": "ERP114453",
+      "value": 240.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPL41"
+    },
+    {
+      "study": "ERP114453",
+      "value": 72.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPL7"
+    },
+    {
+      "study": "ERP114453",
+      "value": 133.00003051757812,
+      "distance_to_integer": 3.0517578125e-05,
+      "gene": "RPLP1"
+    },
+    {
+      "study": "ERP114453",
+      "value": 143.99998474121094,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPS12"
+    },
+    {
+      "study": "ERP114453",
+      "value": 64.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPS17"
+    },
+    {
+      "study": "ERP114453",
+      "value": 131.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPS27"
+    },
+    {
+      "study": "ERP114453",
+      "value": 59.9999885559082,
+      "distance_to_integer": 1.1444091796875e-05,
+      "gene": "RPS27A"
+    },
+    {
+      "study": "ERP114453",
+      "value": 66.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPS3A"
+    },
+    {
+      "study": "ERP114453",
+      "value": 103.99998474121094,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPS6"
+    },
+    {
+      "study": "ERP114453",
+      "value": 66.00001525878906,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "RPS8"
+    },
+    {
+      "study": "ERP114453",
+      "value": 141.00003051757812,
+      "distance_to_integer": 3.0517578125e-05,
+      "gene": "SCGB1A1"
+    },
+    {
+      "study": "ERP114453",
+      "value": 117.9999771118164,
+      "distance_to_integer": 2.288818359375e-05,
+      "gene": "SFTPA1"
+    },
+    {
+      "study": "ERP114453",
+      "value": 105.99998474121094,
+      "distance_to_integer": 1.52587890625e-05,
+      "gene": "SFTPA2"
+    },
+    {
+      "study": "ERP114453",
+      "value": 281.0000305175781,
+      "distance_to_integer": 3.0517578125e-05,
+      "gene": "SFTPB"
+    },
+    {
+      "study": "ERP114453",
+      "value": 233.0000457763672,
+      "distance_to_integer": 4.57763671875e-05,
+      "gene": "SFTPC"
+    }
+  ],
+  "study_distribution": [
+    {
+      "study": "ERP114453",
+      "stored_nonzero_values": 83348774,
+      "values_not_integer_like_at_1e-5": 258093,
+      "fractional_percent": 0.309654
+    },
+    {
+      "study": "GSE122960",
+      "stored_nonzero_values": 147476905,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE128033",
+      "stored_nonzero_values": 94734831,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE128169",
+      "stored_nonzero_values": 111215290,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE132771",
+      "stored_nonzero_values": 122048578,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE135893",
+      "stored_nonzero_values": 263166842,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE136831",
+      "stored_nonzero_values": 522780211,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE150068",
+      "stored_nonzero_values": 4580871,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE150247",
+      "stored_nonzero_values": 48707027,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE158127",
+      "stored_nonzero_values": 271705634,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE168191",
+      "stored_nonzero_values": 231102928,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE171541",
+      "stored_nonzero_values": 39146791,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE171668",
+      "stored_nonzero_values": 6509247,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE173896",
+      "stored_nonzero_values": 61903714,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE196341",
+      "stored_nonzero_values": 111605646,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    },
+    {
+      "study": "GSE227136",
+      "stored_nonzero_values": 658258346,
+      "values_not_integer_like_at_1e-5": 0,
+      "fractional_percent": 0.0
+    }
+  ],
+  "interpretation": "Full-matrix scale audit only. Non-integer values require source/provenance review before treating the matrix as raw counts or applying count-based normalization."
+}

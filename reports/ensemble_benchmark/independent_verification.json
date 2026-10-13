@@ -1,0 +1,277 @@
+{
+  "status": "passed",
+  "method": "metrics recomputed directly from one out-of-fold row per study-scoped profile",
+  "prediction_file": "/Users/nisarg/Desktop/ml project/reports/ensemble_benchmark/out_of_fold_predictions.csv",
+  "profile_count": 372,
+  "study_count": 16,
+  "class_counts": {
+    "Donor": 128,
+    "COPD": 46,
+    "PF": 179,
+    "COVID19": 19
+  },
+  "selected_procedure_metrics": {
+    "accuracy": 0.6344086021505376,
+    "balanced_accuracy": 0.5612510416932999,
+    "macro_f1": 0.5218717979243988,
+    "weighted_f1": 0.6665634450114054
+  },
+  "per_class_metrics": {
+    "Donor": {
+      "precision": 0.8252427184466019,
+      "recall": 0.6640625,
+      "f1": 0.7359307359307359,
+      "support": 128
+    },
+    "COPD": {
+      "precision": 0.2833333333333333,
+      "recall": 0.7391304347826086,
+      "f1": 0.40963855421686746,
+      "support": 46
+    },
+    "PF": {
+      "precision": 0.8692307692307693,
+      "recall": 0.6312849162011173,
+      "f1": 0.7313915857605178,
+      "support": 179
+    },
+    "COVID19": {
+      "precision": 0.21052631578947367,
+      "recall": 0.21052631578947367,
+      "f1": 0.21052631578947367,
+      "support": 19
+    }
+  },
+  "confusion_matrix_labels_rows_true_columns_predicted": [
+    "Donor",
+    "COPD",
+    "PF",
+    "COVID19"
+  ],
+  "confusion_matrix": [
+    [
+      85,
+      36,
+      4,
+      3
+    ],
+    [
+      3,
+      34,
+      5,
+      4
+    ],
+    [
+      9,
+      49,
+      113,
+      8
+    ],
+    [
+      6,
+      1,
+      8,
+      4
+    ]
+  ],
+  "fixed_candidate_metrics_verified": {
+    "Logistic Regression": {
+      "accuracy": {
+        "computed": 0.6451612903225806,
+        "recorded": 0.6451612903225806,
+        "matches": true
+      },
+      "balanced_accuracy": {
+        "computed": 0.5650254071292969,
+        "recorded": 0.565025407129297,
+        "matches": true
+      },
+      "macro_f1": {
+        "computed": 0.5405271199388846,
+        "recorded": 0.5405271199388846,
+        "matches": true
+      },
+      "weighted_f1": {
+        "computed": 0.6761424217780954,
+        "recorded": 0.6761424217780954,
+        "matches": true
+      }
+    },
+    "Linear SVM": {
+      "accuracy": {
+        "computed": 0.6478494623655914,
+        "recorded": 0.6478494623655914,
+        "matches": true
+      },
+      "balanced_accuracy": {
+        "computed": 0.5792357316981578,
+        "recorded": 0.5792357316981578,
+        "matches": true
+      },
+      "macro_f1": {
+        "computed": 0.5349221807404156,
+        "recorded": 0.5349221807404156,
+        "matches": true
+      },
+      "weighted_f1": {
+        "computed": 0.6789924083148192,
+        "recorded": 0.6789924083148192,
+        "matches": true
+      }
+    },
+    "RBF SVM": {
+      "accuracy": {
+        "computed": 0.5994623655913979,
+        "recorded": 0.5994623655913979,
+        "matches": true
+      },
+      "balanced_accuracy": {
+        "computed": 0.4613758501335924,
+        "recorded": 0.4613758501335924,
+        "matches": true
+      },
+      "macro_f1": {
+        "computed": 0.43506263406263407,
+        "recorded": 0.43506263406263407,
+        "matches": true
+      },
+      "weighted_f1": {
+        "computed": 0.6200763805279934,
+        "recorded": 0.6200763805279934,
+        "matches": true
+      }
+    },
+    "Random Forest": {
+      "accuracy": {
+        "computed": 0.5672043010752689,
+        "recorded": 0.5672043010752689,
+        "matches": true
+      },
+      "balanced_accuracy": {
+        "computed": 0.4423901657760505,
+        "recorded": 0.4423901657760505,
+        "matches": true
+      },
+      "macro_f1": {
+        "computed": 0.4198946853131751,
+        "recorded": 0.4198946853131751,
+        "matches": true
+      },
+      "weighted_f1": {
+        "computed": 0.5986736954418264,
+        "recorded": 0.5986736954418264,
+        "matches": true
+      }
+    },
+    "Extra Trees": {
+      "accuracy": {
+        "computed": 0.5725806451612904,
+        "recorded": 0.5725806451612904,
+        "matches": true
+      },
+      "balanced_accuracy": {
+        "computed": 0.4244363120901141,
+        "recorded": 0.4244363120901141,
+        "matches": true
+      },
+      "macro_f1": {
+        "computed": 0.4091395962054547,
+        "recorded": 0.4091395962054547,
+        "matches": true
+      },
+      "weighted_f1": {
+        "computed": 0.5953722437973907,
+        "recorded": 0.5953722437973907,
+        "matches": true
+      }
+    },
+    "AdaBoost": {
+      "accuracy": {
+        "computed": 0.5698924731182796,
+        "recorded": 0.5698924731182796,
+        "matches": true
+      },
+      "balanced_accuracy": {
+        "computed": 0.45687137554651447,
+        "recorded": 0.45687137554651447,
+        "matches": true
+      },
+      "macro_f1": {
+        "computed": 0.4216100960586254,
+        "recorded": 0.4216100960586254,
+        "matches": true
+      },
+      "weighted_f1": {
+        "computed": 0.5908207762848813,
+        "recorded": 0.5908207762848813,
+        "matches": true
+      }
+    },
+    "Histogram Gradient Boosting": {
+      "accuracy": {
+        "computed": 0.553763440860215,
+        "recorded": 0.553763440860215,
+        "matches": true
+      },
+      "balanced_accuracy": {
+        "computed": 0.44257356072542603,
+        "recorded": 0.44257356072542603,
+        "matches": true
+      },
+      "macro_f1": {
+        "computed": 0.4253625203943102,
+        "recorded": 0.4253625203943102,
+        "matches": true
+      },
+      "weighted_f1": {
+        "computed": 0.5905125354366629,
+        "recorded": 0.5905125354366629,
+        "matches": true
+      }
+    },
+    "Neural Network (MLP)": {
+      "accuracy": {
+        "computed": 0.5913978494623656,
+        "recorded": 0.5913978494623656,
+        "matches": true
+      },
+      "balanced_accuracy": {
+        "computed": 0.4826634220034389,
+        "recorded": 0.4826634220034388,
+        "matches": true
+      },
+      "macro_f1": {
+        "computed": 0.46062247141698676,
+        "recorded": 0.46062247141698676,
+        "matches": true
+      },
+      "weighted_f1": {
+        "computed": 0.6239972505267972,
+        "recorded": 0.6239972505267972,
+        "matches": true
+      }
+    },
+    "Hard Voting Ensemble": {
+      "accuracy": {
+        "computed": 0.6370967741935484,
+        "recorded": 0.6370967741935484,
+        "matches": true
+      },
+      "balanced_accuracy": {
+        "computed": 0.5251985659189113,
+        "recorded": 0.5251985659189113,
+        "matches": true
+      },
+      "macro_f1": {
+        "computed": 0.4979811956287074,
+        "recorded": 0.4979811956287074,
+        "matches": true
+      },
+      "weighted_f1": {
+        "computed": 0.6646318486433536,
+        "recorded": 0.6646318486433536,
+        "matches": true
+      }
+    }
+  }
+}

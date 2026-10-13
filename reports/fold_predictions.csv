@@ -1,0 +1,9 @@
+donor_id,true_label,predicted_label,probability_covid,fold
+CNAG_20,healthy,healthy,0.38736813,2
+CNAG_22,healthy,healthy,0.35570309,4
+CNAG_24,healthy,healthy,0.37786639,1
+CNAG_26,healthy,healthy,0.46831240,3
+SPAU_11,COVID,COVID,0.58019258,2
+SPAU_12,COVID,COVID,0.60108688,4
+SPAU_13,COVID,COVID,0.53534014,1
+SPAU_14,COVID,COVID,0.59546988,3
