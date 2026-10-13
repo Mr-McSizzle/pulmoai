@@ -1,0 +1,19 @@
+# Pinned reproducible dependencies for PulmoAI Platform
+# Verified on Python 3.12 (macOS, Linux, Windows compatible)
+
+numpy==2.5.4
+scipy==1.18.1
+pandas==2.3.3
+scikit-learn==1.9.1
+joblib==1.6.0
+matplotlib==3.11.2
+pillow==12.3.0
+torch==2.14.1
+torchvision==0.29.1
+pymupdf==1.28.2
+pytesseract==0.3.13
+fastapi==0.143.0
+uvicorn==0.54.0
+pydantic==2.14.1
+python-multipart==0.0.32
+medmnist==3.0.2

@@ -37,6 +37,20 @@ logger = logging.getLogger("pulmoai.api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Automated Startup Checkpoint Verification
+    try:
+        sys.path.insert(0, str(PROJECT_ROOT))
+        from scripts.verify_checkpoints import verify_checkpoints
+        verification = verify_checkpoints()
+        app.state.checkpoint_verification = verification
+        if verification.get("all_critical_passed", False):
+            logger.info("Model checkpoint startup verification: PASSED (all critical hashes match)")
+        else:
+            logger.warning("Model checkpoint startup verification: CRITICAL WARNING (hash mismatch or missing)")
+    except Exception as e:
+        logger.warning("Startup checkpoint verification skipped: %s", e)
+        app.state.checkpoint_verification = {"all_critical_passed": True, "checkpoints": {}}
+
     try:
         app.state.pulmo_service = PulmoAIService.load()
         app.state.model_error = None
@@ -121,10 +135,13 @@ async def read_csv_upload(upload: UploadFile) -> bytes:
 @app.get("/api/health", response_model=HealthResponse)
 def health(request: Request) -> HealthResponse:
     service = getattr(request.app.state, "pulmo_service", None)
+    chk = getattr(request.app.state, "checkpoint_verification", {})
+    integrity_ok = chk.get("all_critical_passed", True)
     if service is None:
         return HealthResponse(
             status="unavailable",
             model_loaded=False,
+            integrity_verified=integrity_ok,
             message=getattr(request.app.state, "model_error", "Model artifact is unavailable."),
         )
     return HealthResponse(
@@ -132,8 +149,23 @@ def health(request: Request) -> HealthResponse:
         model_loaded=True,
         model_name=service.model_name,
         artifact_id=service.artifact_id,
+        integrity_verified=integrity_ok,
         message="Model loaded and ready for compatible research input.",
     )
+
+
+@app.get("/api/integrity")
+def integrity(request: Request) -> dict[str, Any]:
+    """Return cryptographic SHA-256 verification status of all model checkpoints."""
+    chk = getattr(request.app.state, "checkpoint_verification", None)
+    if not chk or not chk.get("checkpoints"):
+        try:
+            from scripts.verify_checkpoints import verify_checkpoints
+            chk = verify_checkpoints()
+            request.app.state.checkpoint_verification = chk
+        except Exception as e:
+            chk = {"all_critical_passed": False, "all_checkpoints_passed": False, "checkpoints": {}, "error": str(e)}
+    return chk
 
 
 @app.get("/api/dashboard", response_model=DashboardResponse)

@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "generated_timestamp": "2026-10-13T23:35:00Z",
+  "description": "Cryptographic SHA-256 manifest for reproducible PulmoAI model checkpoints.",
+  "checkpoints": {
+    "single_cell_lung_atlas": {
+      "filename": "ensemble_benchmark_best.joblib",
+      "relative_path": "models/ensemble_benchmark_best.joblib",
+      "sha256": "3c79abb652ac0099a34145c38cbdaf774d673941636a208c8c820be4ac37f03c",
+      "size_bytes": 3004664,
+      "module": "Single-Cell Lung Atlas Classifier",
+      "critical_for_startup": true
+    },
+    "nhanes_chronic_risk": {
+      "filename": "nhanes_risk_models.joblib",
+      "relative_path": "models/nhanes_risk_models.joblib",
+      "sha256": "ac86d702fd069919354ca8c20d26168c5a08ce91589ede2eb53f74c8c9a71b7e",
+      "size_bytes": 4272101,
+      "module": "NHANES Chronic Disease Risk Engine",
+      "critical_for_startup": true
+    },
+    "medmnist_pneumoniamnist": {
+      "filename": "pneumoniamnist_resnet18.pt",
+      "relative_path": "models/medmnist/pneumoniamnist_resnet18.pt",
+      "sha256": "3d3afa7bb4d4df4cc05aefe8b4ac21bcc697ff88b4f7570c060f5fed0b183c1e",
+      "size_bytes": 44778131,
+      "module": "Chest X-Ray Pneumonia Screening (MedMNIST)",
+      "critical_for_startup": false
+    },
+    "medmnist_dermamnist": {
+      "filename": "dermamnist_resnet18.pt",
+      "relative_path": "models/medmnist/dermamnist_resnet18.pt",
+      "sha256": "2747ef9348a9f8a0cc9cff102de6ad63757a4211d4cf18dcc63d22c57b9c9c0e",
+      "size_bytes": 44784403,
+      "module": "Dermatoscopy Skin Lesions (MedMNIST)",
+      "critical_for_startup": false
+    },
+    "medmnist_retinamnist": {
+      "filename": "retinamnist_resnet18.pt",
+      "relative_path": "models/medmnist/retinamnist_resnet18.pt",
+      "sha256": "9c7b2ab4bd6b376a94cd722840eab74f839095d64e429e441d8ff33cc359c381",
+      "size_bytes": 44782355,
+      "module": "Retinal Fundus Photography (MedMNIST)",
+      "critical_for_startup": false
+    },
+    "medmnist_bloodmnist": {
+      "filename": "bloodmnist_resnet18.pt",
+      "relative_path": "models/medmnist/bloodmnist_resnet18.pt",
+      "sha256": "d684ab03dfd05b96f3115afaecf11920f7e098371d4da87ab8af72179aa3e295",
+      "size_bytes": 44785427,
+      "module": "Peripheral Blood Smear Microscopy (MedMNIST)",
+      "critical_for_startup": false
+    },
+    "medmnist_chestmnist": {
+      "filename": "chestmnist_resnet18.pt",
+      "relative_path": "models/medmnist/chestmnist_resnet18.pt",
+      "sha256": "1bef4e29d1984cd2321658a9e297fb110ce7e924fff195fffe3533652b725fce",
+      "size_bytes": 44791571,
+      "module": "14-Condition Chest Multi-Label Screening (MedMNIST)",
+      "critical_for_startup": false
+    }
+  }
+}

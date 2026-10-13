@@ -1,95 +1,199 @@
 {
   "module": "MedMNIST Medical Image Screening Engine",
-  "version": "1.0.0",
-  "architecture": "ResNet18 (ImageNet Pretrained, Fine-Tuned at 64x64)",
-  "datasets": {
+  "version": "1.1.0",
+  "architecture": "ResNet18 (Standardized 64x64 biomedical benchmark tensors)",
+  "modalities": {
     "pneumoniamnist": {
-      "name": "Chest X-Ray (Pneumonia Screening)",
+      "display_name": "Chest X-Ray (Pneumonia Screening)",
       "task": "binary-class",
-      "classes": {
-        "0": "normal",
-        "1": "pneumonia"
-      },
       "test_accuracy": 0.8814,
-      "test_macro_f1": 0.8631,
       "test_macro_auc": 0.9757,
-      "training_time_sec": 24.98
+      "test_macro_f1": 0.8631
     },
     "dermamnist": {
-      "name": "Dermatoscopy (Skin Lesion)",
-      "task": "multi-class",
-      "classes": {
-        "0": "actinic keratoses and intraepithelial carcinoma",
-        "1": "basal cell carcinoma",
-        "2": "benign keratosis-like lesions",
-        "3": "dermatofibroma",
-        "4": "melanoma",
-        "5": "melanocytic nevi",
-        "6": "vascular lesions"
-      },
+      "display_name": "Dermatoscopy (Skin Lesion)",
+      "task": "multi-class (7 categories)",
       "test_accuracy": 0.788,
-      "test_macro_f1": 0.5575,
       "test_macro_auc": 0.937,
-      "training_time_sec": 35.76
+      "test_macro_f1": 0.5575
     },
     "retinamnist": {
-      "name": "Retinal Fundus (Diabetic Retinopathy)",
-      "task": "ordinal-regression",
-      "classes": {
-        "0": "0",
-        "1": "1",
-        "2": "2",
-        "3": "3",
-        "4": "4"
-      },
+      "display_name": "Retinal Fundus Photography",
+      "task": "ordinal-regression (5 stages)",
       "test_accuracy": 0.5125,
-      "test_macro_f1": 0.3665,
       "test_macro_auc": 0.7438,
-      "training_time_sec": 13.68
+      "test_macro_f1": 0.3665
     },
     "bloodmnist": {
-      "name": "Blood Smear Microscopy",
-      "task": "multi-class",
-      "classes": {
-        "0": "basophil",
-        "1": "eosinophil",
-        "2": "erythroblast",
-        "3": "immature granulocytes(myelocytes, metamyelocytes and promyelocytes)",
-        "4": "lymphocyte",
-        "5": "monocyte",
-        "6": "neutrophil",
-        "7": "platelet"
-      },
+      "display_name": "Peripheral Blood Smear Microscopy",
+      "task": "multi-class (8 cell types)",
       "test_accuracy": 0.958,
-      "test_macro_f1": 0.945,
       "test_macro_auc": 0.998,
-      "training_time_sec": 38.5
+      "test_macro_f1": 0.945
     },
     "chestmnist": {
-      "name": "Chest X-Ray (14 Thoracic Conditions)",
+      "display_name": "Chest X-Ray (14 Thoracic Conditions)",
       "task": "multi-label, binary-class",
-      "classes": {
-        "0": "atelectasis",
-        "1": "cardiomegaly",
-        "2": "effusion",
-        "3": "infiltration",
-        "4": "mass",
-        "5": "nodule",
-        "6": "pneumonia",
-        "7": "pneumothorax",
-        "8": "consolidation",
-        "9": "edema",
-        "10": "emphysema",
-        "11": "fibrosis",
-        "12": "pleural",
-        "13": "hernia"
-      },
       "test_accuracy": 0.947,
-      "test_macro_f1": 0.38,
       "test_macro_auc": 0.773,
-      "training_time_sec": 54.2
+      "test_macro_f1": 0.38
     }
   },
-  "critical_limitations_and_disclaimer": "CRITICAL MEDICAL LIMITATION: These models are trained strictly on standardized, cropped, low-resolution 64x64 benchmark biomedical images (MedMNIST v2). They will NOT work reliably on arbitrary smartphone photos, poor-contrast uncalibrated images, or full-resolution clinical PACS radiology scans without standardized preprocessing. This module provides educational screening and research triaging only, NOT a clinical radiology or pathology diagnosis.",
-  "out_of_distribution_guard": "An OOD guard rejects images where maximum prediction confidence falls below 0.50, returning 'image not recognised / low confidence' rather than generating a spurious diagnostic label."
+  "ood_rejection_benchmark": {
+    "pneumoniamnist": {
+      "modality_id": "pneumoniamnist",
+      "display_name": "Chest X-Ray (Pneumonia Screening)",
+      "in_distribution_samples": 624,
+      "mean_in_distribution_confidence": 0.9663,
+      "total_ood_samples": 2405,
+      "mean_cross_modality_ood_confidence": 0.9958,
+      "overall_ood_auroc": 0.5058,
+      "far_at_95_tar": 0.9992,
+      "tar_95_threshold": 0.749,
+      "noise_far_at_050": 1.0,
+      "threshold_profiles": {
+        "0.50": {
+          "true_accept_rate": 1.0,
+          "false_accept_rate": 1.0
+        },
+        "0.70": {
+          "true_accept_rate": 0.9551,
+          "false_accept_rate": 1.0
+        },
+        "0.85": {
+          "true_accept_rate": 0.9119,
+          "false_accept_rate": 0.9971
+        },
+        "0.95": {
+          "true_accept_rate": 0.8622,
+          "false_accept_rate": 0.9913
+        }
+      },
+      "cross_modality_breakdown": {
+        "dermamnist": {
+          "sample_count": 2005,
+          "mean_confidence": 0.9973863363265991,
+          "ood_auroc": 0.4534,
+          "false_accept_rate_at_050": 1.0,
+          "false_accept_rate_at_070": 1.0,
+          "false_accept_rate_at_085": 0.9965,
+          "false_accept_rate_at_095": 0.9925
+        },
+        "retinamnist": {
+          "sample_count": 400,
+          "mean_confidence": 0.9876596331596375,
+          "ood_auroc": 0.7683,
+          "false_accept_rate_at_050": 1.0,
+          "false_accept_rate_at_070": 1.0,
+          "false_accept_rate_at_085": 1.0,
+          "false_accept_rate_at_095": 0.985
+        }
+      },
+      "scientific_limitation_statement": "Confidence-based rejection (MSP) on Chest X-Ray (Pneumonia Screening) achieves an OOD detection AUROC of 0.506. At the default 0.50 threshold, the empirical False Accept Rate across genuinely out-of-distribution medical datasets is 100.0%. Increasing the threshold to 0.85 reduces the False Accept Rate to 99.7%, at a True Accept Rate cost of 91.2%. MSP confidence thresholding does NOT guarantee complete OOD separation; high-confidence errors can still occur on out-of-domain images."
+    },
+    "dermamnist": {
+      "modality_id": "dermamnist",
+      "display_name": "Dermatoscopy (Skin Lesions)",
+      "in_distribution_samples": 2005,
+      "mean_in_distribution_confidence": 0.7687,
+      "total_ood_samples": 1024,
+      "mean_cross_modality_ood_confidence": 0.8363,
+      "overall_ood_auroc": 0.3539,
+      "far_at_95_tar": 0.9541,
+      "tar_95_threshold": 0.3999,
+      "noise_far_at_050": 1.0,
+      "threshold_profiles": {
+        "0.50": {
+          "true_accept_rate": 0.8748,
+          "false_accept_rate": 0.9141
+        },
+        "0.70": {
+          "true_accept_rate": 0.6743,
+          "false_accept_rate": 0.7852
+        },
+        "0.85": {
+          "true_accept_rate": 0.4554,
+          "false_accept_rate": 0.6299
+        },
+        "0.95": {
+          "true_accept_rate": 0.1815,
+          "false_accept_rate": 0.457
+        }
+      },
+      "cross_modality_breakdown": {
+        "pneumoniamnist": {
+          "sample_count": 624,
+          "mean_confidence": 0.7474848628044128,
+          "ood_auroc": 0.5323,
+          "false_accept_rate_at_050": 0.859,
+          "false_accept_rate_at_070": 0.6474,
+          "false_accept_rate_at_085": 0.3942,
+          "false_accept_rate_at_095": 0.1554
+        },
+        "retinamnist": {
+          "sample_count": 400,
+          "mean_confidence": 0.9747914671897888,
+          "ood_auroc": 0.0757,
+          "false_accept_rate_at_050": 1.0,
+          "false_accept_rate_at_070": 1.0,
+          "false_accept_rate_at_085": 0.9975,
+          "false_accept_rate_at_095": 0.9275
+        }
+      },
+      "scientific_limitation_statement": "Confidence-based rejection (MSP) on Dermatoscopy (Skin Lesions) achieves an OOD detection AUROC of 0.354. At the default 0.50 threshold, the empirical False Accept Rate across genuinely out-of-distribution medical datasets is 91.4%. Increasing the threshold to 0.85 reduces the False Accept Rate to 63.0%, at a True Accept Rate cost of 45.5%. MSP confidence thresholding does NOT guarantee complete OOD separation; high-confidence errors can still occur on out-of-domain images."
+    },
+    "retinamnist": {
+      "modality_id": "retinamnist",
+      "display_name": "Retinal Fundus Photography",
+      "in_distribution_samples": 400,
+      "mean_in_distribution_confidence": 0.3772,
+      "total_ood_samples": 2629,
+      "mean_cross_modality_ood_confidence": 0.5198,
+      "overall_ood_auroc": 0.2383,
+      "far_at_95_tar": 0.9878,
+      "tar_95_threshold": 0.2682,
+      "noise_far_at_050": 0.305,
+      "threshold_profiles": {
+        "0.50": {
+          "true_accept_rate": 0.075,
+          "false_accept_rate": 0.4701
+        },
+        "0.70": {
+          "true_accept_rate": 0.0,
+          "false_accept_rate": 0.1609
+        },
+        "0.85": {
+          "true_accept_rate": 0.0,
+          "false_accept_rate": 0.051
+        },
+        "0.95": {
+          "true_accept_rate": 0.0,
+          "false_accept_rate": 0.0118
+        }
+      },
+      "cross_modality_breakdown": {
+        "pneumoniamnist": {
+          "sample_count": 624,
+          "mean_confidence": 0.5385891199111938,
+          "ood_auroc": 0.2009,
+          "false_accept_rate_at_050": 0.4904,
+          "false_accept_rate_at_070": 0.1779,
+          "false_accept_rate_at_085": 0.0785,
+          "false_accept_rate_at_095": 0.0369
+        },
+        "dermamnist": {
+          "sample_count": 2005,
+          "mean_confidence": 0.5139724612236023,
+          "ood_auroc": 0.25,
+          "false_accept_rate_at_050": 0.4638,
+          "false_accept_rate_at_070": 0.1556,
+          "false_accept_rate_at_085": 0.0424,
+          "false_accept_rate_at_095": 0.004
+        }
+      },
+      "scientific_limitation_statement": "Confidence-based rejection (MSP) on Retinal Fundus Photography achieves an OOD detection AUROC of 0.238. At the default 0.50 threshold, the empirical False Accept Rate across genuinely out-of-distribution medical datasets is 47.0%. Increasing the threshold to 0.85 reduces the False Accept Rate to 5.1%, at a True Accept Rate cost of 0.0%. MSP confidence thresholding does NOT guarantee complete OOD separation; high-confidence errors can still occur on out-of-domain images."
+    }
+  },
+  "ood_methodology_clarification": "Maximum Softmax Probability (MSP) confidence thresholding is evaluated against genuine cross-modality medical datasets (e.g. testing dermatology and retinal images against chest models). Benchmark results reveal that deep networks exhibit semantic overconfidence on out-of-domain images, resulting in non-trivial False Accept Rates at default thresholds. Rejection thresholds serve as preliminary triage heuristics, not an absolute out-of-distribution barrier.",
+  "critical_limitations": "Models are trained strictly on standardized 64x64 benchmark images. They will NOT work reliably on arbitrary smartphone photos or unstandardized PACS radiographs. Screening prototype only; NOT a clinical radiology diagnosis."
 }

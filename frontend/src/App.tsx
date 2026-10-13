@@ -35,6 +35,7 @@ import { api } from "./api";
 import { LabReportPage } from "./components/LabReportPage";
 import { RiskCalculatorPage } from "./components/RiskCalculatorPage";
 import { ImageScreeningPage } from "./components/ImageScreeningPage";
+import generatedMetrics from "./generated_metrics.json";
 import type {
   DashboardData,
   GeneInsights,
@@ -610,63 +611,63 @@ function PerformancePage({ data, error }: { data: DashboardData | null; error: s
 
       {/* 2. NHANES Risk Engine Benchmarks */}
       <div className="mb-8 space-y-4">
-        <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-          <Heart size={18} className="text-rose-600" /> Module 2: NHANES Chronic Disease Risk Engine (Forward Test Set)
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+            <Heart size={18} className="text-rose-600" /> Module 2: NHANES Chronic Disease Risk Engine (Forward Test Set)
+          </h2>
+          <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+            Source: CDC NHANES 2017-2018 (Cycle J)
+          </span>
+        </div>
+
+        {/* Estimand Clarification Callout */}
+        <div className="p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 leading-relaxed flex items-start gap-2.5">
+          <ShieldAlert size={18} className="shrink-0 text-rose-600 mt-0.5" />
+          <div className="space-y-1">
+            <div className="font-semibold text-slate-900">
+              Risk Estimand Clarification: Cross-Sectional Status & Survey History
+            </div>
+            <p className="text-[11px] text-slate-600">
+              {generatedMetrics.modules.nhanes_chronic_risk.estimand_clarification}
+            </p>
+          </div>
+        </div>
+
         <div className="content-panel overflow-x-auto p-0 border border-slate-200">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-700">
               <tr>
                 <th className="py-3 px-4 font-semibold">Condition Target</th>
-                <th className="py-3 px-4 font-semibold">Cohort Participants</th>
+                <th className="py-3 px-4 font-semibold">Estimand Classification</th>
+                <th className="py-3 px-4 font-semibold">Time Horizon</th>
                 <th className="py-3 px-4 font-semibold">Test AUROC</th>
                 <th className="py-3 px-4 font-semibold">Test Accuracy</th>
-                <th className="py-3 px-4 font-semibold">Methodological Safeguard</th>
+                <th className="py-3 px-4 font-semibold">Brier Score</th>
+                <th className="py-3 px-4 font-semibold">Estimand Specification</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Type 2 Diabetes</td>
-                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">85.3% AUROC</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">86.6%</td>
-                <td className="py-2.5 px-4 text-slate-500">HbA1c & Fasting Glucose strictly excluded</td>
-              </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Hypertension</td>
-                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">83.8% AUROC</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">77.2%</td>
-                <td className="py-2.5 px-4 text-slate-500">Triplicate averaged blood pressure measurements</td>
-              </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Hypercholesterolemia</td>
-                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">84.1% AUROC</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">77.8%</td>
-                <td className="py-2.5 px-4 text-slate-500">Lipid ratio calibrated without medication bias</td>
-              </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Cardiovascular Disease (CVD)</td>
-                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">79.0% AUROC</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">89.4%</td>
-                <td className="py-2.5 px-4 text-slate-500">Framingham cardiovascular risk proxy model</td>
-              </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Stroke</td>
-                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">77.3% AUROC</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">95.8%</td>
-                <td className="py-2.5 px-4 text-slate-500">Cerebrovascular risk calibrated with age and BP</td>
-              </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">COPD / Chronic Bronchitis</td>
-                <td className="py-2.5 px-4 text-slate-600">17,961 US adults</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">74.8% AUROC</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">92.6%</td>
-                <td className="py-2.5 px-4 text-slate-500">Combined smoking pack-years and respiratory vitals</td>
-              </tr>
+              {Object.entries(generatedMetrics.modules.nhanes_chronic_risk.targets).map(([key, target]) => (
+                <tr key={key} className="hover:bg-slate-50/60">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">{target.display_name}</td>
+                  <td className="py-2.5 px-4">
+                    <span className="text-[10px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                      {target.estimand_label}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-4 text-slate-600 font-mono text-[11px]">{target.time_horizon}</td>
+                  <td className="py-2.5 px-4 font-bold text-emerald-700 font-mono">
+                    {(target.auroc * 100).toFixed(1)}%
+                  </td>
+                  <td className="py-2.5 px-4 font-semibold text-slate-800 font-mono">
+                    {(target.accuracy * 100).toFixed(1)}%
+                  </td>
+                  <td className="py-2.5 px-4 text-slate-600 font-mono text-[11px]">{target.brier_score.toFixed(4)}</td>
+                  <td className="py-2.5 px-4 text-slate-500 max-w-xs truncate" title={target.estimand_description}>
+                    {target.estimand_description}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -690,46 +691,83 @@ function PerformancePage({ data, error }: { data: DashboardData | null; error: s
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Chest X-Ray (PneumoniaMNIST)</td>
-                <td className="py-2.5 px-4 text-slate-600">Binary (Normal vs Pneumonia)</td>
-                <td className="py-2.5 px-4 text-slate-600">64×64 (1-ch)</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">88.14%</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">0.8631</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">97.57%</td>
+              {Object.entries(generatedMetrics.modules.medmnist_image_screening.modalities).map(([key, mod]) => (
+                <tr key={key} className="hover:bg-slate-50/60">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">{mod.display_name}</td>
+                  <td className="py-2.5 px-4 text-slate-600">{mod.task}</td>
+                  <td className="py-2.5 px-4 text-slate-600 font-mono">64×64</td>
+                  <td className="py-2.5 px-4 font-semibold text-slate-800 font-mono">
+                    {(mod.test_accuracy * 100).toFixed(2)}%
+                  </td>
+                  <td className="py-2.5 px-4 font-semibold text-slate-800 font-mono">
+                    {mod.test_macro_f1.toFixed(4)}
+                  </td>
+                  <td className="py-2.5 px-4 font-bold text-emerald-700 font-mono">
+                    {(mod.test_macro_auc * 100).toFixed(2)}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 4. Empirical Cross-Modality OOD Benchmark */}
+      <div className="mb-8 space-y-4">
+        <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+          <ShieldAlert size={18} className="text-amber-600" /> Module 4: Empirical Out-of-Distribution (OOD) Benchmark
+        </h2>
+
+        {/* Methodology statement */}
+        <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-900 leading-relaxed space-y-1">
+          <div className="font-semibold text-amber-950 flex items-center gap-1.5">
+            Empirical Rejection Behavior on Genuine Medical Modalities
+          </div>
+          <p className="text-[11px] text-amber-800">
+            {generatedMetrics.modules.medmnist_image_screening.ood_methodology_clarification}
+          </p>
+        </div>
+
+        <div className="content-panel overflow-x-auto p-0 border border-slate-200">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-700">
+              <tr>
+                <th className="py-3 px-4 font-semibold">Evaluated In-Domain Model</th>
+                <th className="py-3 px-4 font-semibold">Cross-Modality OOD Datasets</th>
+                <th className="py-3 px-4 font-semibold">OOD AUROC</th>
+                <th className="py-3 px-4 font-semibold">False Accept @ 0.50</th>
+                <th className="py-3 px-4 font-semibold">False Accept @ 0.70</th>
+                <th className="py-3 px-4 font-semibold">False Accept @ 0.85</th>
+                <th className="py-3 px-4 font-semibold">False Accept @ 0.95</th>
               </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Dermatoscopy (DermaMNIST)</td>
-                <td className="py-2.5 px-4 text-slate-600">7 Skin Lesion Classes</td>
-                <td className="py-2.5 px-4 text-slate-600">64×64 (3-ch)</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">78.80%</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">0.5575</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">93.70%</td>
-              </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Retinal Fundus (RetinaMNIST)</td>
-                <td className="py-2.5 px-4 text-slate-600">5 Diabetic Retinopathy Grades</td>
-                <td className="py-2.5 px-4 text-slate-600">64×64 (3-ch)</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">51.25%</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">0.3665</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">74.38%</td>
-              </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Blood Smear (BloodMNIST)</td>
-                <td className="py-2.5 px-4 text-slate-600">8 Hematopoietic Cell Types</td>
-                <td className="py-2.5 px-4 text-slate-600">64×64 (3-ch)</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">95.80%</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">0.9450</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">99.80%</td>
-              </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="py-2.5 px-4 font-bold text-slate-900">Chest Radiograph (ChestMNIST)</td>
-                <td className="py-2.5 px-4 text-slate-600">14 Thoracic Conditions (Multi-label)</td>
-                <td className="py-2.5 px-4 text-slate-600">64×64 (1-ch)</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">94.70%</td>
-                <td className="py-2.5 px-4 font-semibold text-slate-800">0.3800</td>
-                <td className="py-2.5 px-4 font-bold text-emerald-700">77.30%</td>
-              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {Object.entries(generatedMetrics.modules.medmnist_image_screening.ood_rejection_benchmark || {}).map(([key, ood]) => {
+                const oodAny = ood as any;
+                const testSets = Object.keys(oodAny.cross_modality_breakdown || {}).join(", ");
+                const profs = oodAny.threshold_profiles || {};
+                return (
+                  <tr key={key} className="hover:bg-slate-50/60">
+                    <td className="py-2.5 px-4 font-bold text-slate-900">{oodAny.display_name}</td>
+                    <td className="py-2.5 px-4 text-slate-600 font-mono text-[11px]">{testSets || "Cross-modality"}</td>
+                    <td className="py-2.5 px-4 font-bold text-slate-800 font-mono">
+                      {(oodAny.overall_ood_auroc * 100).toFixed(1)}%
+                    </td>
+                    <td className="py-2.5 px-4 font-mono text-rose-700 font-bold">
+                      {profs["0.50"] ? `${(profs["0.50"].false_accept_rate * 100).toFixed(1)}%` : "N/A"}
+                    </td>
+                    <td className="py-2.5 px-4 font-mono text-amber-700 font-semibold">
+                      {profs["0.70"] ? `${(profs["0.70"].false_accept_rate * 100).toFixed(1)}%` : "N/A"}
+                    </td>
+                    <td className="py-2.5 px-4 font-mono text-slate-700">
+                      {profs["0.85"] ? `${(profs["0.85"].false_accept_rate * 100).toFixed(1)}%` : "N/A"}
+                    </td>
+                    <td className="py-2.5 px-4 font-mono text-emerald-700 font-semibold">
+                      {profs["0.95"] ? `${(profs["0.95"].false_accept_rate * 100).toFixed(1)}%` : "N/A"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

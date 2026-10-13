@@ -1,52 +1,85 @@
 {
-  "module": "NHANES Chronic Condition Risk Engine",
-  "version": "1.0.0",
-  "training_data": "CDC National Health and Nutrition Examination Survey (NHANES) 2013-2016",
-  "validation_data": "CDC NHANES 2017-2018 (Temporal out-of-sample forward evaluation)",
-  "population": "U.S. non-institutionalized civilian adult population (aged 18+)",
-  "intended_use": "Screening-level chronic disease risk estimation to support preventive health triaging; NOT a standalone diagnostic device.",
-  "algorithms": {
-    "baseline": "L2-penalized Logistic Regression with Platt scaling",
-    "clinical": "Histogram-based Gradient Boosted Trees with Platt scaling"
-  },
-  "performance_summary": {
+  "module": "NHANES Chronic Disease Risk Engine",
+  "version": "2.0.0",
+  "training_data": "2013-2016 (Cycles G & H, n=12,056)",
+  "validation_data": "CDC NHANES 2017-2018 (Cycle J, n=5,905)",
+  "population": "U.S. civilian non-institutionalized adult population (aged 18+)",
+  "intended_use": "Screening-level chronic condition risk estimation; NOT a standalone diagnostic device.",
+  "estimand_clarification": "All outputs predict cross-sectional prevalent condition status or survey-reported lifetime doctor-diagnosed history in civilian adults; they do NOT predict 10-year prospective future incidence.",
+  "targets": {
     "diabetes": {
-      "name": "Type 2 / Diagnosed Diabetes",
+      "display_name": "Type 2 Diabetes",
+      "estimand_type": "current_prevalent_status",
+      "estimand_label": "Current Prevalent Status (Biomarker Phenotype)",
+      "estimand_description": "Cross-sectional probability of current undiagnosed or diagnosed Type 2 diabetes based on phenotypic and lipid markers with fasting glucose and HbA1c strictly withheld.",
+      "time_horizon": "Current cross-sectional status",
       "auroc": 0.8525,
       "auprc": 0.5184,
-      "brier_score": 0.0968
+      "accuracy": 0.866,
+      "brier_score": 0.0968,
+      "prevalence": 0.15
     },
     "hypertension": {
-      "name": "Essential Hypertension",
+      "display_name": "Essential Hypertension",
+      "estimand_type": "survey_reported_history",
+      "estimand_label": "Survey-Reported Clinical Diagnosis History",
+      "estimand_description": "Probability of existing or doctor-diagnosed high blood pressure based on resting blood pressure measurements, body measures, and demographics.",
+      "time_horizon": "Lifetime doctor diagnosis",
       "auroc": 0.8405,
       "auprc": 0.7374,
-      "brier_score": 0.1574
+      "accuracy": 0.7694,
+      "brier_score": 0.1574,
+      "prevalence": 0.3644
     },
     "high_cholesterol": {
-      "name": "Hypercholesterolemia",
+      "display_name": "Hypercholesterolemia",
+      "estimand_type": "survey_reported_history",
+      "estimand_label": "Survey-Reported Clinical Diagnosis History",
+      "estimand_description": "Probability of doctor-diagnosed elevated blood cholesterol or active dyslipidemia based on measured lipid panel and patient history.",
+      "time_horizon": "Lifetime doctor diagnosis",
       "auroc": 0.7887,
       "auprc": 0.6106,
-      "brier_score": 0.1734
+      "accuracy": 0.7323,
+      "brier_score": 0.1734,
+      "prevalence": 0.3368
     },
     "heart_disease": {
-      "name": "Cardiovascular / Coronary Heart Disease",
+      "display_name": "Coronary Heart Disease",
+      "estimand_type": "survey_reported_history",
+      "estimand_label": "Survey-Reported Prior Clinical Event",
+      "estimand_description": "Probability of prior doctor-diagnosed coronary heart disease, angina, or myocardial infarction; NOT a future incident event forecaster.",
+      "time_horizon": "Prior clinical event history",
       "auroc": 0.8357,
       "auprc": 0.3136,
-      "brier_score": 0.0652
+      "accuracy": 0.919,
+      "brier_score": 0.0652,
+      "prevalence": 0.0826
     },
     "stroke": {
-      "name": "Cerebrovascular Disease (Stroke)",
+      "display_name": "Cerebrovascular Disease (Stroke)",
+      "estimand_type": "survey_reported_history",
+      "estimand_label": "Survey-Reported Prior Clinical Event",
+      "estimand_description": "Probability of prior doctor-diagnosed stroke or cerebrovascular accident history.",
+      "time_horizon": "Prior clinical event history",
       "auroc": 0.7862,
       "auprc": 0.1304,
-      "brier_score": 0.0447
+      "accuracy": 0.9509,
+      "brier_score": 0.0447,
+      "prevalence": 0.0491
     },
     "copd": {
-      "name": "Chronic Obstructive Pulmonary Disease (COPD)",
+      "display_name": "COPD / Chronic Bronchitis",
+      "estimand_type": "survey_reported_history",
+      "estimand_label": "Survey-Reported Clinical Diagnosis History",
+      "estimand_description": "Probability of doctor-diagnosed emphysema or chronic bronchitis history.",
+      "time_horizon": "Lifetime doctor diagnosis",
       "auroc": 0.7491,
       "auprc": 0.2339,
-      "brier_score": 0.069
+      "accuracy": 0.919,
+      "brier_score": 0.069,
+      "prevalence": 0.081
     }
   },
-  "leakage_safeguards": "Self-defining diagnostic questionnaires strictly excluded from feature space. Glycemic diagnostic tests (HbA1c/Glucose) excluded from diabetes prediction.",
-  "disclaimer": "This algorithm produces statistical risk estimates for educational and clinical decision support only. It does not replace medical consultation, clinical diagnosis, or lab-confirmed pathology."
+  "leakage_safeguards": "Self-defining diagnostic questionnaires strictly excluded. Glycemic diagnostic tests (HbA1c/Glucose) excluded from diabetes prediction.",
+  "disclaimer": "These models estimate cross-sectional prevalence and survey-reported clinical history. They do not predict prospective 10-year future incidence and cannot replace medical diagnosis."
 }

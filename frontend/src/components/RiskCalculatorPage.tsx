@@ -429,7 +429,9 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
 
                       <div className="mt-3.5 flex items-baseline justify-between">
                         <span className="text-2xl font-black text-slate-900">{percentStr}</span>
-                        <span className="text-[10px] font-medium text-slate-500">10-yr predicted probability</span>
+                        <span className="text-[10px] font-medium text-slate-500">
+                          {condData.time_horizon || "Prevalent condition / survey history"}
+                        </span>
                       </div>
 
                       {/* Progress Bar */}
@@ -441,6 +443,16 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                           style={{ width: `${Math.min(100, Math.max(4, prob * 100))}%` }}
                         />
                       </div>
+
+                      {/* Estimand Clarification Badge */}
+                      <div className="mt-2.5 text-[10px] bg-slate-50 border border-slate-200/80 rounded px-2 py-1 text-slate-600">
+                        <div className="font-semibold text-slate-700">
+                          {condData.estimand_label || "Estimand: Cross-Sectional Survey"}
+                        </div>
+                        <div className="text-[9px] text-slate-500 mt-0.5 leading-snug">
+                          {condData.estimand_description}
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
@@ -449,10 +461,15 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
               {/* Disclaimer Banner */}
               <div className="p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-[11px] text-slate-600 leading-relaxed flex items-start gap-2.5">
                 <ShieldCheck size={18} className="shrink-0 text-teal-600 mt-0.5" />
-                <div>
-                  <strong>Epidemiological Calibration:</strong> Probabilities are calibrated on CDC NHANES out-of-sample forward test cycles.
-                  HbA1c and fasting glucose are strictly withheld to prevent tautological self-diagnosis.
-                  This output provides personalized health risk screening, not a definitive clinical diagnosis.
+                <div className="space-y-1">
+                  <div>
+                    <strong>Estimand Clarification:</strong>{" "}
+                    {result.estimand_clarification ||
+                      "All outputs predict cross-sectional prevalent condition status or survey-reported lifetime history in civilian adults; they do NOT predict 10-year prospective future incidence."}
+                  </div>
+                  <div className="text-[10px] text-slate-500">
+                    <strong>Safeguards:</strong> Fasting glucose and HbA1c are strictly withheld from diabetes modeling to avoid diagnostic circularity. Screening triage only; not a clinical diagnosis.
+                  </div>
                 </div>
               </div>
             </div>

@@ -10,6 +10,7 @@ class HealthResponse(BaseModel):
     model_loaded: bool
     model_name: str | None = None
     artifact_id: str | None = None
+    integrity_verified: bool = True
     message: str
 
 
@@ -94,6 +95,10 @@ class ConditionRiskResult(BaseModel):
     target_id: str
     display_name: str
     description: str
+    estimand_type: Literal["current_prevalent_status", "survey_reported_history"] = "survey_reported_history"
+    estimand_label: str
+    estimand_description: str
+    time_horizon: str
     calibrated_risk: float | None = None
     risk_category: str
     model_auroc: float | None = None
@@ -105,6 +110,7 @@ class RiskPredictionResponse(BaseModel):
     risk_predictions: dict[str, ConditionRiskResult]
     contributing_factors: list[str] = Field(default_factory=list)
     features_provided_count: int
+    estimand_clarification: str
     disclaimer: str
 
 
@@ -122,11 +128,22 @@ class ImagePredictionResponse(BaseModel):
     confidence: float | None = None
     max_confidence: float | None = None
     threshold_applied: float | None = None
+    empirical_false_accept_rate: float | None = None
+    ood_benchmark: dict[str, Any] | None = None
+    ood_methodology_statement: str | None = None
     class_probabilities: dict[str, float] | None = None
     multilabel: bool = False
     active_conditions: list[str] | None = None
     probabilities: dict[str, float] | None = None
     model_metrics: dict[str, float] | None = None
     disclaimer: str
+
+
+class IntegrityResponse(BaseModel):
+    all_critical_passed: bool
+    all_checkpoints_passed: bool
+    verified_at: str
+    checkpoints: dict[str, dict[str, Any]]
+
 
 

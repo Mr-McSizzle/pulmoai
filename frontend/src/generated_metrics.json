@@ -1,0 +1,351 @@
+{
+  "schema_version": "2.0.0",
+  "last_updated": "2026-10-13T23:35:00Z",
+  "description": "Canonical single source of truth for all evaluated PulmoAI benchmarks.",
+  "modules": {
+    "single_cell_lung_atlas": {
+      "name": "Single-Cell Lung Atlas Classifier",
+      "version": "1.2.0",
+      "cohort_scale": {
+        "total_single_cells": 1470730,
+        "studies_evaluated": 16,
+        "donor_profiles": 372,
+        "gene_features": 30566,
+        "classes": [
+          "Donor",
+          "COPD",
+          "PF",
+          "COVID19"
+        ],
+        "class_distribution": {
+          "Donor": 128,
+          "COPD": 46,
+          "PF": 179,
+          "COVID19": 19
+        }
+      },
+      "validation_protocol": "Nested Leave-One-Study-Out (LOSO) Outer Cross-Validation (outer group = gse_alias)",
+      "primary_model": {
+        "algorithm": "Linear Support Vector Machine (LinearSVC)",
+        "calibration": "Platt scaling (sigmoid) via CalibratedClassifierCV with 5-fold CV",
+        "accuracy": 0.6344,
+        "balanced_accuracy": 0.5613,
+        "macro_f1": 0.5219,
+        "weighted_f1": 0.6666,
+        "baseline_dummy_prior_accuracy": 0.3441,
+        "class_recall": {
+          "Donor": 0.6641,
+          "COPD": 0.7391,
+          "PF": 0.6313,
+          "COVID19": 0.2105
+        },
+        "fixed_linear_svm_accuracy": 0.6478,
+        "fixed_linear_svm_balanced_accuracy": 0.5792,
+        "fixed_linear_svm_macro_f1": 0.5349
+      },
+      "key_limitations": [
+        "Lethal COVID-19 autopsy whole-lung tissue (Melms cohort) exhibits severe post-mortem batch effects resulting in lower cross-study transfer recall (21.1%).",
+        "Pseudobulk donor aggregation dilutes rare pulmonary cell subsets (e.g. ionocytes, neuroendocrine cells).",
+        "Designated for exploratory research and hypothesis generation only; not for clinical diagnostic decisions."
+      ]
+    },
+    "nhanes_chronic_risk": {
+      "name": "NHANES Chronic Disease Risk Engine",
+      "version": "2.0.0",
+      "cohort_scale": {
+        "total_participants": 17961,
+        "training_cycles": "2013-2016 (Cycles G & H, n=12,056)",
+        "prospective_forward_test_cycle": "2017-2018 (Cycle J, n=5,905)",
+        "input_features": 43
+      },
+      "validation_protocol": "Temporal prospective forward wave test on Cycle J (2017-2018)",
+      "leakage_safeguards": "Self-defining diagnostic questionnaires strictly excluded. Glycemic diagnostic tests (HbA1c/Glucose) excluded from diabetes prediction.",
+      "estimand_clarification": "All outputs predict cross-sectional prevalent condition status or survey-reported lifetime doctor-diagnosed history in civilian adults; they do NOT predict 10-year prospective future incidence.",
+      "targets": {
+        "diabetes": {
+          "display_name": "Type 2 Diabetes",
+          "estimand_type": "current_prevalent_status",
+          "estimand_label": "Current Prevalent Status (Biomarker Phenotype)",
+          "estimand_description": "Cross-sectional probability of current undiagnosed or diagnosed Type 2 diabetes based on phenotypic and lipid markers with fasting glucose and HbA1c strictly withheld.",
+          "time_horizon": "Current cross-sectional status",
+          "auroc": 0.8525,
+          "auprc": 0.5184,
+          "accuracy": 0.866,
+          "brier_score": 0.0968,
+          "prevalence": 0.15
+        },
+        "hypertension": {
+          "display_name": "Essential Hypertension",
+          "estimand_type": "survey_reported_history",
+          "estimand_label": "Survey-Reported Clinical Diagnosis History",
+          "estimand_description": "Probability of existing or doctor-diagnosed high blood pressure based on resting blood pressure measurements, body measures, and demographics.",
+          "time_horizon": "Lifetime doctor diagnosis",
+          "auroc": 0.8405,
+          "auprc": 0.7374,
+          "accuracy": 0.7694,
+          "brier_score": 0.1574,
+          "prevalence": 0.3644
+        },
+        "high_cholesterol": {
+          "display_name": "Hypercholesterolemia",
+          "estimand_type": "survey_reported_history",
+          "estimand_label": "Survey-Reported Clinical Diagnosis History",
+          "estimand_description": "Probability of doctor-diagnosed elevated blood cholesterol or active dyslipidemia based on measured lipid panel and patient history.",
+          "time_horizon": "Lifetime doctor diagnosis",
+          "auroc": 0.7887,
+          "auprc": 0.6106,
+          "accuracy": 0.7323,
+          "brier_score": 0.1734,
+          "prevalence": 0.3368
+        },
+        "heart_disease": {
+          "display_name": "Coronary Heart Disease",
+          "estimand_type": "survey_reported_history",
+          "estimand_label": "Survey-Reported Prior Clinical Event",
+          "estimand_description": "Probability of prior doctor-diagnosed coronary heart disease, angina, or myocardial infarction; NOT a future incident event forecaster.",
+          "time_horizon": "Prior clinical event history",
+          "auroc": 0.8357,
+          "auprc": 0.3136,
+          "accuracy": 0.919,
+          "brier_score": 0.0652,
+          "prevalence": 0.0826
+        },
+        "stroke": {
+          "display_name": "Cerebrovascular Disease (Stroke)",
+          "estimand_type": "survey_reported_history",
+          "estimand_label": "Survey-Reported Prior Clinical Event",
+          "estimand_description": "Probability of prior doctor-diagnosed stroke or cerebrovascular accident history.",
+          "time_horizon": "Prior clinical event history",
+          "auroc": 0.7862,
+          "auprc": 0.1304,
+          "accuracy": 0.9509,
+          "brier_score": 0.0447,
+          "prevalence": 0.0491
+        },
+        "copd": {
+          "display_name": "COPD / Chronic Bronchitis",
+          "estimand_type": "survey_reported_history",
+          "estimand_label": "Survey-Reported Clinical Diagnosis History",
+          "estimand_description": "Probability of doctor-diagnosed emphysema or chronic bronchitis history.",
+          "time_horizon": "Lifetime doctor diagnosis",
+          "auroc": 0.7491,
+          "auprc": 0.2339,
+          "accuracy": 0.919,
+          "brier_score": 0.069,
+          "prevalence": 0.081
+        }
+      }
+    },
+    "medmnist_image_screening": {
+      "name": "MedMNIST Medical Image Screening Engine",
+      "version": "1.1.0",
+      "architecture": "ResNet18 (Standardized 64x64 biomedical benchmark tensors)",
+      "modalities": {
+        "pneumoniamnist": {
+          "display_name": "Chest X-Ray (Pneumonia Screening)",
+          "task": "binary-class",
+          "test_accuracy": 0.8814,
+          "test_macro_auc": 0.9757,
+          "test_macro_f1": 0.8631
+        },
+        "dermamnist": {
+          "display_name": "Dermatoscopy (Skin Lesion)",
+          "task": "multi-class (7 categories)",
+          "test_accuracy": 0.788,
+          "test_macro_auc": 0.937,
+          "test_macro_f1": 0.5575
+        },
+        "retinamnist": {
+          "display_name": "Retinal Fundus Photography",
+          "task": "ordinal-regression (5 stages)",
+          "test_accuracy": 0.5125,
+          "test_macro_auc": 0.7438,
+          "test_macro_f1": 0.3665
+        },
+        "bloodmnist": {
+          "display_name": "Peripheral Blood Smear Microscopy",
+          "task": "multi-class (8 cell types)",
+          "test_accuracy": 0.958,
+          "test_macro_auc": 0.998,
+          "test_macro_f1": 0.945
+        },
+        "chestmnist": {
+          "display_name": "Chest X-Ray (14 Thoracic Conditions)",
+          "task": "multi-label, binary-class",
+          "test_accuracy": 0.947,
+          "test_macro_auc": 0.773,
+          "test_macro_f1": 0.38
+        }
+      },
+      "ood_rejection_benchmark": {
+        "pneumoniamnist": {
+          "modality_id": "pneumoniamnist",
+          "display_name": "Chest X-Ray (Pneumonia Screening)",
+          "in_distribution_samples": 624,
+          "mean_in_distribution_confidence": 0.9663,
+          "total_ood_samples": 2405,
+          "mean_cross_modality_ood_confidence": 0.9958,
+          "overall_ood_auroc": 0.5058,
+          "far_at_95_tar": 0.9992,
+          "tar_95_threshold": 0.749,
+          "noise_far_at_050": 1.0,
+          "threshold_profiles": {
+            "0.50": {
+              "true_accept_rate": 1.0,
+              "false_accept_rate": 1.0
+            },
+            "0.70": {
+              "true_accept_rate": 0.9551,
+              "false_accept_rate": 1.0
+            },
+            "0.85": {
+              "true_accept_rate": 0.9119,
+              "false_accept_rate": 0.9971
+            },
+            "0.95": {
+              "true_accept_rate": 0.8622,
+              "false_accept_rate": 0.9913
+            }
+          },
+          "cross_modality_breakdown": {
+            "dermamnist": {
+              "sample_count": 2005,
+              "mean_confidence": 0.9973863363265991,
+              "ood_auroc": 0.4534,
+              "false_accept_rate_at_050": 1.0,
+              "false_accept_rate_at_070": 1.0,
+              "false_accept_rate_at_085": 0.9965,
+              "false_accept_rate_at_095": 0.9925
+            },
+            "retinamnist": {
+              "sample_count": 400,
+              "mean_confidence": 0.9876596331596375,
+              "ood_auroc": 0.7683,
+              "false_accept_rate_at_050": 1.0,
+              "false_accept_rate_at_070": 1.0,
+              "false_accept_rate_at_085": 1.0,
+              "false_accept_rate_at_095": 0.985
+            }
+          },
+          "scientific_limitation_statement": "Confidence-based rejection (MSP) on Chest X-Ray (Pneumonia Screening) achieves an OOD detection AUROC of 0.506. At the default 0.50 threshold, the empirical False Accept Rate across genuinely out-of-distribution medical datasets is 100.0%. Increasing the threshold to 0.85 reduces the False Accept Rate to 99.7%, at a True Accept Rate cost of 91.2%. MSP confidence thresholding does NOT guarantee complete OOD separation; high-confidence errors can still occur on out-of-domain images."
+        },
+        "dermamnist": {
+          "modality_id": "dermamnist",
+          "display_name": "Dermatoscopy (Skin Lesions)",
+          "in_distribution_samples": 2005,
+          "mean_in_distribution_confidence": 0.7687,
+          "total_ood_samples": 1024,
+          "mean_cross_modality_ood_confidence": 0.8363,
+          "overall_ood_auroc": 0.3539,
+          "far_at_95_tar": 0.9541,
+          "tar_95_threshold": 0.3999,
+          "noise_far_at_050": 1.0,
+          "threshold_profiles": {
+            "0.50": {
+              "true_accept_rate": 0.8748,
+              "false_accept_rate": 0.9141
+            },
+            "0.70": {
+              "true_accept_rate": 0.6743,
+              "false_accept_rate": 0.7852
+            },
+            "0.85": {
+              "true_accept_rate": 0.4554,
+              "false_accept_rate": 0.6299
+            },
+            "0.95": {
+              "true_accept_rate": 0.1815,
+              "false_accept_rate": 0.457
+            }
+          },
+          "cross_modality_breakdown": {
+            "pneumoniamnist": {
+              "sample_count": 624,
+              "mean_confidence": 0.7474848628044128,
+              "ood_auroc": 0.5323,
+              "false_accept_rate_at_050": 0.859,
+              "false_accept_rate_at_070": 0.6474,
+              "false_accept_rate_at_085": 0.3942,
+              "false_accept_rate_at_095": 0.1554
+            },
+            "retinamnist": {
+              "sample_count": 400,
+              "mean_confidence": 0.9747914671897888,
+              "ood_auroc": 0.0757,
+              "false_accept_rate_at_050": 1.0,
+              "false_accept_rate_at_070": 1.0,
+              "false_accept_rate_at_085": 0.9975,
+              "false_accept_rate_at_095": 0.9275
+            }
+          },
+          "scientific_limitation_statement": "Confidence-based rejection (MSP) on Dermatoscopy (Skin Lesions) achieves an OOD detection AUROC of 0.354. At the default 0.50 threshold, the empirical False Accept Rate across genuinely out-of-distribution medical datasets is 91.4%. Increasing the threshold to 0.85 reduces the False Accept Rate to 63.0%, at a True Accept Rate cost of 45.5%. MSP confidence thresholding does NOT guarantee complete OOD separation; high-confidence errors can still occur on out-of-domain images."
+        },
+        "retinamnist": {
+          "modality_id": "retinamnist",
+          "display_name": "Retinal Fundus Photography",
+          "in_distribution_samples": 400,
+          "mean_in_distribution_confidence": 0.3772,
+          "total_ood_samples": 2629,
+          "mean_cross_modality_ood_confidence": 0.5198,
+          "overall_ood_auroc": 0.2383,
+          "far_at_95_tar": 0.9878,
+          "tar_95_threshold": 0.2682,
+          "noise_far_at_050": 0.305,
+          "threshold_profiles": {
+            "0.50": {
+              "true_accept_rate": 0.075,
+              "false_accept_rate": 0.4701
+            },
+            "0.70": {
+              "true_accept_rate": 0.0,
+              "false_accept_rate": 0.1609
+            },
+            "0.85": {
+              "true_accept_rate": 0.0,
+              "false_accept_rate": 0.051
+            },
+            "0.95": {
+              "true_accept_rate": 0.0,
+              "false_accept_rate": 0.0118
+            }
+          },
+          "cross_modality_breakdown": {
+            "pneumoniamnist": {
+              "sample_count": 624,
+              "mean_confidence": 0.5385891199111938,
+              "ood_auroc": 0.2009,
+              "false_accept_rate_at_050": 0.4904,
+              "false_accept_rate_at_070": 0.1779,
+              "false_accept_rate_at_085": 0.0785,
+              "false_accept_rate_at_095": 0.0369
+            },
+            "dermamnist": {
+              "sample_count": 2005,
+              "mean_confidence": 0.5139724612236023,
+              "ood_auroc": 0.25,
+              "false_accept_rate_at_050": 0.4638,
+              "false_accept_rate_at_070": 0.1556,
+              "false_accept_rate_at_085": 0.0424,
+              "false_accept_rate_at_095": 0.004
+            }
+          },
+          "scientific_limitation_statement": "Confidence-based rejection (MSP) on Retinal Fundus Photography achieves an OOD detection AUROC of 0.238. At the default 0.50 threshold, the empirical False Accept Rate across genuinely out-of-distribution medical datasets is 47.0%. Increasing the threshold to 0.85 reduces the False Accept Rate to 5.1%, at a True Accept Rate cost of 0.0%. MSP confidence thresholding does NOT guarantee complete OOD separation; high-confidence errors can still occur on out-of-domain images."
+        }
+      },
+      "ood_methodology_clarification": "Maximum Softmax Probability (MSP) confidence thresholding is evaluated against genuine cross-modality medical datasets (e.g. testing dermatology and retinal images against chest models). Benchmark results reveal that deep networks exhibit semantic overconfidence on out-of-domain images, resulting in non-trivial False Accept Rates at default thresholds. Rejection thresholds serve as preliminary triage heuristics, not an absolute out-of-distribution barrier."
+    },
+    "lab_report_ocr": {
+      "name": "Clinical Lab Report OCR & Biomarker Normalizer",
+      "version": "1.0.0",
+      "ingestion_tiers": [
+        "Tier 1: Native PyMuPDF text layer",
+        "Tier 2: Tesseract OCR fallback with OpenCV thresholding"
+      ],
+      "biomarkers_supported": 20,
+      "unit_normalization": "SI to US conventional clinical units (mmol/L to mg/dL, umol/L to mg/dL)",
+      "digital_pdf_accuracy": 0.995,
+      "scanned_ocr_character_accuracy": 0.912,
+      "scanned_ocr_biomarker_accuracy": 0.874
+    }
+  }
+}

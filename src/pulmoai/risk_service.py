@@ -21,32 +21,56 @@ DEFAULT_MODEL_PATH = PROJECT_ROOT / "models" / "nhanes_risk_models.joblib"
 CONDITION_METADATA = {
     "diabetes": {
         "display_name": "Type 2 Diabetes",
-        "description": "Risk of diagnosed Type 2 diabetes (phenotypic prediction with HbA1c/glucose excluded to prevent circularity).",
+        "description": "Cross-sectional probability of prevalent Type 2 diabetes from clinical markers (HbA1c/glucose withheld).",
+        "estimand_type": "current_prevalent_status",
+        "estimand_label": "Current Prevalent Status (Biomarker Phenotype)",
+        "estimand_description": "Estimates cross-sectional probability of current undiagnosed or diagnosed Type 2 diabetes from metabolic and lipid markers; NOT a prospective 10-year incident risk.",
+        "time_horizon": "Current cross-sectional status",
         "icon": "activity",
     },
     "hypertension": {
         "display_name": "Essential Hypertension",
-        "description": "Risk of persistent high blood pressure / chronic hypertension.",
+        "description": "Probability of doctor-diagnosed high blood pressure / chronic hypertension.",
+        "estimand_type": "survey_reported_history",
+        "estimand_label": "Survey-Reported Clinical Diagnosis History",
+        "estimand_description": "Estimates probability of existing or doctor-diagnosed hypertension in adult survey examination cohorts. Not a future incident risk.",
+        "time_horizon": "Lifetime doctor diagnosis",
         "icon": "heart",
     },
     "high_cholesterol": {
         "display_name": "Hypercholesterolemia",
-        "description": "Risk of dyslipidemia and high blood cholesterol.",
+        "description": "Probability of doctor-diagnosed dyslipidemia and high blood cholesterol.",
+        "estimand_type": "survey_reported_history",
+        "estimand_label": "Survey-Reported Clinical Diagnosis History",
+        "estimand_description": "Estimates probability of doctor-diagnosed hypercholesterolemia or active dyslipidemia from measured lipid panel and history.",
+        "time_horizon": "Lifetime doctor diagnosis",
         "icon": "droplet",
     },
     "heart_disease": {
         "display_name": "Cardiovascular Disease",
-        "description": "Risk of coronary heart disease, angina, or myocardial infarction.",
+        "description": "Probability of prior doctor-diagnosed coronary heart disease, angina, or heart attack.",
+        "estimand_type": "survey_reported_history",
+        "estimand_label": "Survey-Reported Prior Clinical Event",
+        "estimand_description": "Estimates probability of prior doctor-diagnosed ischemic heart disease or myocardial infarction history; NOT a future event forecaster.",
+        "time_horizon": "Prior clinical event history",
         "icon": "shield-alert",
     },
     "stroke": {
         "display_name": "Cerebrovascular Disease (Stroke)",
-        "description": "Risk of cerebrovascular event / ischemic stroke.",
+        "description": "Probability of prior doctor-diagnosed cerebrovascular accident / ischemic stroke.",
+        "estimand_type": "survey_reported_history",
+        "estimand_label": "Survey-Reported Prior Clinical Event",
+        "estimand_description": "Estimates probability of prior doctor-diagnosed cerebrovascular accident history. Not a future incident event forecaster.",
+        "time_horizon": "Prior clinical event history",
         "icon": "alert-circle",
     },
     "copd": {
         "display_name": "Chronic Obstructive Pulmonary Disease (COPD)",
-        "description": "Risk of chronic bronchitis, emphysema, or irreversible airflow obstruction.",
+        "description": "Probability of doctor-diagnosed chronic bronchitis, emphysema, or irreversible airflow obstruction.",
+        "estimand_type": "survey_reported_history",
+        "estimand_label": "Survey-Reported Clinical Diagnosis History",
+        "estimand_description": "Estimates probability of doctor-diagnosed chronic bronchitis or emphysema history in civilian adults.",
+        "time_horizon": "Lifetime doctor diagnosis",
         "icon": "wind",
     },
 }
@@ -143,6 +167,10 @@ class HealthRiskService:
                 "target_id": target_id,
                 "display_name": meta.get("display_name", target_id.capitalize()),
                 "description": meta.get("description", ""),
+                "estimand_type": meta.get("estimand_type", "survey_reported_history"),
+                "estimand_label": meta.get("estimand_label", "Survey-Reported Clinical Diagnosis History"),
+                "estimand_description": meta.get("estimand_description", ""),
+                "time_horizon": meta.get("time_horizon", "Lifetime doctor diagnosis"),
                 "calibrated_risk": calibrated_risk,
                 "risk_category": risk_category,
                 "model_auroc": metrics.get("auroc"),
@@ -157,9 +185,13 @@ class HealthRiskService:
             "risk_predictions": results,
             "contributing_factors": contributing_factors,
             "features_provided_count": non_null_count,
+            "estimand_clarification": (
+                "All outputs estimate cross-sectional prevalence or survey-reported lifetime doctor diagnoses "
+                "in adult examination cohorts; they do NOT forecast 10-year prospective future incidence."
+            ),
             "disclaimer": (
                 "Exploratory statistical health screening only. This model estimates population-level "
-                "risk calibrated from CDC NHANES cohorts. It is NOT a medical diagnosis, clinical prognosis, "
+                "prevalence calibrated from CDC NHANES cohorts. It is NOT a medical diagnosis, clinical prognosis, "
                 "or treatment plan. Always consult a licensed healthcare professional for medical advice."
             ),
         }

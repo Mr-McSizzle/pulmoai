@@ -113,6 +113,10 @@ export interface ConditionRiskResult {
   target_id: string;
   display_name: string;
   description: string;
+  estimand_type?: "current_prevalent_status" | "survey_reported_history";
+  estimand_label?: string;
+  estimand_description?: string;
+  time_horizon?: string;
   calibrated_risk: number | null;
   risk_category: string;
   model_auroc?: number | null;
@@ -124,6 +128,7 @@ export interface RiskPredictionResponse {
   risk_predictions: Record<string, ConditionRiskResult>;
   contributing_factors: string[];
   features_provided_count: number;
+  estimand_clarification?: string;
   disclaimer: string;
 }
 
@@ -135,11 +140,14 @@ export interface ImagePredictionResponse {
   image_type: string;
   modality_name: string;
   recognized: boolean;
-  status: "success" | "low_confidence";
+  status: "success" | "low_confidence" | "error";
   predicted_class?: string | null;
   confidence?: number;
   max_confidence?: number;
   threshold_applied?: number;
+  empirical_false_accept_rate?: number | null;
+  ood_benchmark?: any;
+  ood_methodology_statement?: string | null;
   message?: string;
   multilabel?: boolean;
   active_conditions?: string[];
