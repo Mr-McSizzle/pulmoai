@@ -1,0 +1,128 @@
+{
+  "cell_count_by_disease": {
+    "COPD": 69456,
+    "Control": 96303,
+    "IPF": 147169
+  },
+  "dataset": "GSE136831 (Adams IPF Cell Atlas)",
+  "donor_count": 78,
+  "donor_count_by_disease": {
+    "COPD": 18,
+    "Control": 28,
+    "IPF": 32
+  },
+  "donor_level_nested_cv": {
+    "confusion_matrix": [
+      [
+        27,
+        1,
+        0
+      ],
+      [
+        3,
+        15,
+        0
+      ],
+      [
+        0,
+        0,
+        32
+      ]
+    ],
+    "confusion_matrix_labels_order": [
+      "Control",
+      "COPD",
+      "IPF"
+    ],
+    "inner_folds": "up to 3, stratified, within outer training fold",
+    "metrics": {
+      "accuracy": 0.9487179487179487,
+      "balanced_accuracy": 0.9325396825396824,
+      "macro_f1": 0.9377958079783637,
+      "weighted_f1": 0.9480938263899724
+    },
+    "outer_folds": 5,
+    "selected_models_by_outer_fold": [
+      "Linear SVM",
+      "RBF SVM",
+      "Logistic Regression",
+      "Logistic Regression",
+      "Linear SVM"
+    ]
+  },
+  "full_data_cv_algorithm_selection": {
+    "candidates": [
+      {
+        "algorithm": "Logistic Regression",
+        "cv_accuracy_mean": 0.975,
+        "cv_balanced_accuracy_mean": 0.9722222222222221,
+        "cv_macro_f1_mean": 0.9718799718799719,
+        "cv_macro_f1_sd": 0.03856177866774383
+      },
+      {
+        "algorithm": "Linear SVM",
+        "cv_accuracy_mean": 0.9741666666666667,
+        "cv_balanced_accuracy_mean": 0.9793650793650794,
+        "cv_macro_f1_mean": 0.9718799718799719,
+        "cv_macro_f1_sd": 0.03856177866774383
+      },
+      {
+        "algorithm": "RBF SVM",
+        "cv_accuracy_mean": 0.9625,
+        "cv_balanced_accuracy_mean": 0.9555555555555555,
+        "cv_macro_f1_mean": 0.9572279572279573,
+        "cv_macro_f1_sd": 0.039120081553596406
+      },
+      {
+        "algorithm": "Extra Trees",
+        "cv_accuracy_mean": 0.95,
+        "cv_balanced_accuracy_mean": 0.9388888888888889,
+        "cv_macro_f1_mean": 0.9401339401339401,
+        "cv_macro_f1_sd": 0.06553102447410725
+      }
+    ],
+    "selected_algorithm": "Linear SVM",
+    "selection_metric": "mean macro-F1; balanced accuracy used as tie-break"
+  },
+  "gene_ids_sidecar_available": false,
+  "interpretation_note": "Single-study exploratory cohort; donor-level CV prevents cell leakage but does not establish external clinical generalization. Algorithm ranking on this small cohort is uncertain. Feature selection was fit inside every evaluation fold.",
+  "matrix_nonzero_entries": 692789348,
+  "matrix_shape_features_by_cells": [
+    45947,
+    312928
+  ],
+  "model_configuration": {
+    "candidate_algorithms": [
+      "Logistic Regression",
+      "Linear SVM",
+      "RBF SVM",
+      "Extra Trees"
+    ],
+    "normalization": "donor-summed raw counts -> counts per million -> log1p",
+    "seed": 42,
+    "top_features": 500
+  },
+  "model_file": "/Users/nisarg/Desktop/ml project/models/lung_disease_classifier.joblib",
+  "project": "PulmoAI \u2014 exploratory lung disease classification",
+  "software_versions": {
+    "numpy": "2.5.4",
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "python": "3.12.4",
+    "scikit_learn": "1.9.1"
+  },
+  "source_files": {
+    "barcodes": {
+      "bytes": 1392307,
+      "path": "/Users/nisarg/Downloads/GSE136831_AllCells.cellBarcodes.txt.gz"
+    },
+    "gene_ids": null,
+    "matrix": {
+      "bytes": 9715422046,
+      "path": "/Users/nisarg/Downloads/GSE136831_RawCounts_Sparse.mtx"
+    },
+    "metadata": {
+      "bytes": 4308752,
+      "path": "/Users/nisarg/Downloads/GSE136831_AllCells.Samples.CellType.MetadataTable.txt.gz"
+    }
+  }
+}

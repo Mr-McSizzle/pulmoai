@@ -1,0 +1,12 @@
+Nested donor-level out-of-fold classification report
+Each donor is held out once; model selection occurs inside each outer training fold.
+
+              precision    recall  f1-score   support
+
+     Control      0.900     0.964     0.931        28
+        COPD      0.938     0.833     0.882        18
+         IPF      1.000     1.000     1.000        32
+
+    accuracy                          0.949        78
+   macro avg      0.946     0.933     0.938        78
+weighted avg      0.950     0.949     0.948        78

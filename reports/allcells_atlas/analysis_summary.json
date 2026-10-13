@@ -1,0 +1,278 @@
+{
+  "status": "trained and evaluated; exploratory research model",
+  "source_file": "/Users/nisarg/Downloads/atlas-001.h5ad",
+  "dimensions": [
+    372,
+    30566
+  ],
+  "total_cells": 1470730,
+  "studies": [
+    "ERP114453",
+    "GSE122960",
+    "GSE128033",
+    "GSE128169",
+    "GSE132771",
+    "GSE135893",
+    "GSE136831",
+    "GSE150068",
+    "GSE150247",
+    "GSE158127",
+    "GSE168191",
+    "GSE171541",
+    "GSE171668",
+    "GSE173896",
+    "GSE196341",
+    "GSE227136"
+  ],
+  "study_count": 16,
+  "sample_group_count": 372,
+  "label_order": [
+    "Donor",
+    "COPD",
+    "PF",
+    "COVID19"
+  ],
+  "sample_group_counts": {
+    "Donor": 128,
+    "COPD": 46,
+    "PF": 179,
+    "COVID19": 19
+  },
+  "cell_counts_by_disease": {
+    "Donor": 501843,
+    "COPD": 254763,
+    "PF": 635173,
+    "COVID19": 78951
+  },
+  "primary_evaluation": {
+    "design": "nested study-held-out evaluation: each outer fold holds out one entire source study; model selection uses stratified sample-group folds only inside the training studies",
+    "metrics_for_selected_procedure": {
+      "accuracy": 0.6505376344086021,
+      "balanced_accuracy": 0.6012296924737609,
+      "macro_f1": 0.5599907308608443,
+      "weighted_f1": 0.6825430806942421
+    },
+    "confusion_matrix_labels_rows_true_columns_predicted": [
+      "Donor",
+      "COPD",
+      "PF",
+      "COVID19"
+    ],
+    "confusion_matrix": [
+      [
+        85,
+        36,
+        4,
+        3
+      ],
+      [
+        3,
+        36,
+        5,
+        2
+      ],
+      [
+        9,
+        49,
+        115,
+        6
+      ],
+      [
+        9,
+        2,
+        2,
+        6
+      ]
+    ],
+    "classification_report": {
+      "Donor": {
+        "precision": 0.8018867924528302,
+        "recall": 0.6640625,
+        "f1-score": 0.7264957264957265,
+        "support": 128.0
+      },
+      "COPD": {
+        "precision": 0.2926829268292683,
+        "recall": 0.782608695652174,
+        "f1-score": 0.4260355029585799,
+        "support": 46.0
+      },
+      "PF": {
+        "precision": 0.9126984126984127,
+        "recall": 0.6424581005586593,
+        "f1-score": 0.7540983606557377,
+        "support": 179.0
+      },
+      "COVID19": {
+        "precision": 0.35294117647058826,
+        "recall": 0.3157894736842105,
+        "f1-score": 0.3333333333333333,
+        "support": 19.0
+      },
+      "accuracy": 0.6505376344086021,
+      "macro avg": {
+        "precision": 0.5900523271127749,
+        "recall": 0.6012296924737609,
+        "f1-score": 0.5599907308608444,
+        "support": 372.0
+      },
+      "weighted avg": {
+        "precision": 0.7693113502528646,
+        "recall": 0.6505376344086021,
+        "f1-score": 0.6825430806942421,
+        "support": 372.0
+      }
+    },
+    "candidate_heldout_study_metrics_descriptive": [
+      {
+        "model": "Logistic Regression",
+        "accuracy": 0.6424731182795699,
+        "balanced_accuracy": 0.5595906245206014,
+        "macro_f1": 0.5356797984352986,
+        "weighted_f1": 0.6744599021424957
+      },
+      {
+        "model": "Linear SVM",
+        "accuracy": 0.6478494623655914,
+        "balanced_accuracy": 0.5792357316981578,
+        "macro_f1": 0.5349221807404156,
+        "weighted_f1": 0.6789924083148192
+      },
+      {
+        "model": "RBF SVM",
+        "accuracy": 0.5994623655913979,
+        "balanced_accuracy": 0.4613758501335924,
+        "macro_f1": 0.435769461371871,
+        "weighted_f1": 0.6210492181149002
+      },
+      {
+        "model": "Extra Trees",
+        "accuracy": 0.6021505376344086,
+        "balanced_accuracy": 0.4489886636203546,
+        "macro_f1": 0.4316817973597634,
+        "weighted_f1": 0.625823489874884
+      }
+    ],
+    "selected_model_by_outer_fold": [
+      {
+        "study": "ERP114453",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE122960",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE128033",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE128169",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE132771",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE135893",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE136831",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE150068",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE150247",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE158127",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE168191",
+        "model": "Logistic Regression"
+      },
+      {
+        "study": "GSE171541",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE171668",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE173896",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE196341",
+        "model": "Linear SVM"
+      },
+      {
+        "study": "GSE227136",
+        "model": "Linear SVM"
+      }
+    ]
+  },
+  "final_development_model": {
+    "algorithm": "Linear SVM",
+    "selection_rule": "highest mean inner-CV macro-F1 across outer training folds; balanced accuracy breaks ties",
+    "mean_inner_cv_scores_across_outer_training_folds": {
+      "Logistic Regression": {
+        "accuracy": 0.929064419,
+        "balanced_accuracy": 0.891858226,
+        "macro_f1": 0.899751197,
+        "weighted_f1": 0.928949687
+      },
+      "Linear SVM": {
+        "accuracy": 0.93882813,
+        "balanced_accuracy": 0.902605782,
+        "macro_f1": 0.903419972,
+        "weighted_f1": 0.938733681
+      },
+      "RBF SVM": {
+        "accuracy": 0.8832948,
+        "balanced_accuracy": 0.825347321,
+        "macro_f1": 0.827238703,
+        "weighted_f1": 0.883319878
+      },
+      "Extra Trees": {
+        "accuracy": 0.87864911,
+        "balanced_accuracy": 0.806442815,
+        "macro_f1": 0.831589664,
+        "weighted_f1": 0.877229351
+      }
+    },
+    "path": "/Users/nisarg/Desktop/ml project/models/allcells_lung_disease_classifier.joblib",
+    "fit_on_all_sample_groups": true,
+    "performance_source": "Do not report training-set performance; use the held-out-study metrics above."
+  },
+  "outputs": {
+    "report_dir": "/Users/nisarg/Desktop/ml project/reports/allcells_atlas",
+    "pseudobulk_counts": "/Users/nisarg/Desktop/ml project/data/processed/allcells_pseudobulk_counts.npz",
+    "model": "/Users/nisarg/Desktop/ml project/models/allcells_lung_disease_classifier.joblib"
+  },
+  "limitations": [
+    "The H5AD provides orig.ident, Disease, gse_alias, and celltypeuse, but no verified biological patient identifier.",
+    "The number of orig.ident groups is a count of source sample/library groups, not a verified patient count.",
+    "The Zenodo record describes 16 studies and 1,470,730 cells; study-held-out evaluation reduces source-study leakage but cannot establish patient-level or clinical validity.",
+    "Disease and source study are imbalanced; disease-study confounding may limit transfer even with whole-study holdout.",
+    "This is a retrospective research classifier, not a diagnostic tool.",
+    "Feature rankings are exploratory and must not be presented as validated biomarkers."
+  ],
+  "environment": {
+    "python": "3.12.4",
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "anndata": "0.13.4",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "scikit_learn": "1.9.1"
+  }
+}

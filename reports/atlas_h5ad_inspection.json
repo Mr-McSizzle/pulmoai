@@ -1,0 +1,3412 @@
+{
+  "source_file": "/Users/nisarg/Downloads/atlas-001.h5ad",
+  "file_size_bytes": 6310632229,
+  "file_size_gib": 5.877,
+  "backed_mode": "read-only",
+  "n_obs_cells": 1470730,
+  "n_vars_features": 30566,
+  "obs_columns": [
+    {
+      "name": "orig.ident",
+      "dtype": "category",
+      "missing": 0,
+      "unique_nonmissing": 372,
+      "top_values": [
+        {
+          "value": "GSM5873142",
+          "count": 39258
+        },
+        {
+          "value": "GSM4792472",
+          "count": 22262
+        },
+        {
+          "value": "390C",
+          "count": 14738
+        },
+        {
+          "value": "JK02",
+          "count": 14715
+        },
+        {
+          "value": "356C",
+          "count": 13542
+        },
+        {
+          "value": "367C",
+          "count": 13282
+        },
+        {
+          "value": "GSM3891630",
+          "count": 12602
+        },
+        {
+          "value": "GSM4792476",
+          "count": 12087
+        },
+        {
+          "value": "GSM4058959",
+          "count": 11332
+        },
+        {
+          "value": "GSM7103261",
+          "count": 11187
+        },
+        {
+          "value": "GSM5133604",
+          "count": 11076
+        },
+        {
+          "value": "GSM4792478",
+          "count": 9899
+        },
+        {
+          "value": "GSM4058904",
+          "count": 9776
+        },
+        {
+          "value": "GSM5133595",
+          "count": 9770
+        },
+        {
+          "value": "GSM5133594",
+          "count": 9515
+        },
+        {
+          "value": "GSM4058911",
+          "count": 9209
+        },
+        {
+          "value": "GSM3891620",
+          "count": 9204
+        },
+        {
+          "value": "GSM5133589",
+          "count": 9017
+        },
+        {
+          "value": "GSM7103287",
+          "count": 9008
+        },
+        {
+          "value": "GSM5873140",
+          "count": 8991
+        },
+        {
+          "value": "GSM5133596",
+          "count": 8939
+        },
+        {
+          "value": "GSM5133588",
+          "count": 8782
+        },
+        {
+          "value": "GSM3891632",
+          "count": 8679
+        },
+        {
+          "value": "GSM5873137",
+          "count": 8512
+        },
+        {
+          "value": "GSM4544006",
+          "count": 8495
+        },
+        {
+          "value": "GSM4792475",
+          "count": 8460
+        },
+        {
+          "value": "GSM4544007",
+          "count": 8337
+        },
+        {
+          "value": "GSM4037307",
+          "count": 8318
+        },
+        {
+          "value": "GSM7103314",
+          "count": 8126
+        },
+        {
+          "value": "GSM4058900",
+          "count": 8081
+        },
+        {
+          "value": "GSM4058906",
+          "count": 8077
+        },
+        {
+          "value": "GSM4058958",
+          "count": 7982
+        },
+        {
+          "value": "343B",
+          "count": 7871
+        },
+        {
+          "value": "GSM3891631",
+          "count": 7839
+        },
+        {
+          "value": "GSM4792466",
+          "count": 7788
+        },
+        {
+          "value": "copd.o1",
+          "count": 7633
+        },
+        {
+          "value": "GSM5133599",
+          "count": 7607
+        },
+        {
+          "value": "GSM5873135",
+          "count": 7597
+        },
+        {
+          "value": "GSM4037305",
+          "count": 7556
+        },
+        {
+          "value": "GSM4792474",
+          "count": 7503
+        },
+        {
+          "value": "GSM3489195",
+          "count": 7416
+        },
+        {
+          "value": "GSM5133590",
+          "count": 7378
+        },
+        {
+          "value": "GSM7103337",
+          "count": 7356
+        },
+        {
+          "value": "GSM4792459",
+          "count": 7279
+        },
+        {
+          "value": "368C",
+          "count": 7235
+        },
+        {
+          "value": "GSM4037314",
+          "count": 7188
+        },
+        {
+          "value": "GSM5133600",
+          "count": 7150
+        },
+        {
+          "value": "copd.o3",
+          "count": 7069
+        },
+        {
+          "value": "GSM7103341",
+          "count": 7065
+        },
+        {
+          "value": "GSM7103326",
+          "count": 7001
+        },
+        {
+          "value": "GSM5133591",
+          "count": 6934
+        },
+        {
+          "value": "copd.o2",
+          "count": 6880
+        },
+        {
+          "value": "GSM5133592",
+          "count": 6799
+        },
+        {
+          "value": "GSM3909673",
+          "count": 6754
+        },
+        {
+          "value": "GSM4037304",
+          "count": 6714
+        },
+        {
+          "value": "GSM3489196",
+          "count": 6696
+        },
+        {
+          "value": "GSM7103322",
+          "count": 6695
+        },
+        {
+          "value": "GSM3489197",
+          "count": 6683
+        },
+        {
+          "value": "GSM4058950",
+          "count": 6663
+        },
+        {
+          "value": "GSM7103317",
+          "count": 6474
+        },
+        {
+          "value": "GSM7103321",
+          "count": 6465
+        },
+        {
+          "value": "GSM7103304",
+          "count": 6433
+        },
+        {
+          "value": "GSM4058930",
+          "count": 6413
+        },
+        {
+          "value": "GSM4058914",
+          "count": 6408
+        },
+        {
+          "value": "GSM7135589",
+          "count": 6403
+        },
+        {
+          "value": "GSM4037319",
+          "count": 6378
+        },
+        {
+          "value": "GSM7103286",
+          "count": 6377
+        },
+        {
+          "value": "GSM7103316",
+          "count": 6357
+        },
+        {
+          "value": "GSM5133603",
+          "count": 6354
+        },
+        {
+          "value": "GSM4037308",
+          "count": 6334
+        },
+        {
+          "value": "GSM7103344",
+          "count": 6304
+        },
+        {
+          "value": "GSM3489198",
+          "count": 6293
+        },
+        {
+          "value": "GSM5873146",
+          "count": 6242
+        },
+        {
+          "value": "GSM4058962",
+          "count": 6217
+        },
+        {
+          "value": "GSM4058976",
+          "count": 6179
+        },
+        {
+          "value": "GSM4058933",
+          "count": 6104
+        },
+        {
+          "value": "GSM7103335",
+          "count": 6045
+        },
+        {
+          "value": "GSM4058934",
+          "count": 6008
+        },
+        {
+          "value": "GSM3891628",
+          "count": 5936
+        },
+        {
+          "value": "GSM4792477",
+          "count": 5931
+        },
+        {
+          "value": "GSM4058947",
+          "count": 5920
+        },
+        {
+          "value": "GSM4037310",
+          "count": 5909
+        },
+        {
+          "value": "GSM4037306",
+          "count": 5804
+        },
+        {
+          "value": "GSM7103325",
+          "count": 5748
+        },
+        {
+          "value": "GSM4792465",
+          "count": 5661
+        },
+        {
+          "value": "GSM4058931",
+          "count": 5606
+        },
+        {
+          "value": "GSM4058952",
+          "count": 5569
+        },
+        {
+          "value": "GSM3909675",
+          "count": 5561
+        },
+        {
+          "value": "GSM5873145",
+          "count": 5463
+        },
+        {
+          "value": "GSM7103260",
+          "count": 5447
+        },
+        {
+          "value": "GSM7103291",
+          "count": 5366
+        },
+        {
+          "value": "GSM4058977",
+          "count": 5345
+        },
+        {
+          "value": "GSM3489182",
+          "count": 5335
+        },
+        {
+          "value": "GSM3489191",
+          "count": 5312
+        },
+        {
+          "value": "GSM3660651",
+          "count": 5298
+        },
+        {
+          "value": "GSM4544005",
+          "count": 5286
+        },
+        {
+          "value": "GSM5133597",
+          "count": 5227
+        },
+        {
+          "value": "GSM3489187",
+          "count": 5205
+        },
+        {
+          "value": "GSM3660648",
+          "count": 5168
+        },
+        {
+          "value": "GSM3489189",
+          "count": 5157
+        },
+        {
+          "value": "GSM4792460",
+          "count": 5128
+        },
+        {
+          "value": "GSM4792467",
+          "count": 5113
+        },
+        {
+          "value": "GSM7103284",
+          "count": 5090
+        },
+        {
+          "value": "GSM3489194",
+          "count": 5067
+        },
+        {
+          "value": "GSM4792470",
+          "count": 5000
+        },
+        {
+          "value": "GSM4792461",
+          "count": 4991
+        },
+        {
+          "value": "GSM5133598",
+          "count": 4990
+        },
+        {
+          "value": "GSM7103340",
+          "count": 4964
+        },
+        {
+          "value": "GSM7103315",
+          "count": 4943
+        },
+        {
+          "value": "GSM5133593",
+          "count": 4905
+        },
+        {
+          "value": "GSM7135584",
+          "count": 4863
+        },
+        {
+          "value": "GSM5873143",
+          "count": 4860
+        },
+        {
+          "value": "GSM4058951",
+          "count": 4834
+        },
+        {
+          "value": "GSM3891635",
+          "count": 4794
+        },
+        {
+          "value": "GSM4058957",
+          "count": 4789
+        },
+        {
+          "value": "GSM7103319",
+          "count": 4769
+        },
+        {
+          "value": "GSM3666106",
+          "count": 4757
+        },
+        {
+          "value": "GSM7135588",
+          "count": 4743
+        },
+        {
+          "value": "GSM3909674",
+          "count": 4721
+        },
+        {
+          "value": "GSM5873141",
+          "count": 4718
+        },
+        {
+          "value": "GSM3891622",
+          "count": 4652
+        },
+        {
+          "value": "GSM3666105",
+          "count": 4627
+        },
+        {
+          "value": "GSM3660653",
+          "count": 4566
+        },
+        {
+          "value": "GSM7103324",
+          "count": 4563
+        },
+        {
+          "value": "GSM4058964",
+          "count": 4543
+        },
+        {
+          "value": "GSM3660652",
+          "count": 4514
+        },
+        {
+          "value": "GSM4058968",
+          "count": 4485
+        },
+        {
+          "value": "GSM4058966",
+          "count": 4398
+        },
+        {
+          "value": "GSM3489190",
+          "count": 4387
+        },
+        {
+          "value": "GSM4037329",
+          "count": 4379
+        },
+        {
+          "value": "GSM4058949",
+          "count": 4365
+        },
+        {
+          "value": "GSM7103285",
+          "count": 4313
+        },
+        {
+          "value": "GSM3891626",
+          "count": 4312
+        },
+        {
+          "value": "GSM4058970",
+          "count": 4307
+        },
+        {
+          "value": "GSM4058954",
+          "count": 4298
+        },
+        {
+          "value": "GSM4058953",
+          "count": 4292
+        },
+        {
+          "value": "GSM7103323",
+          "count": 4290
+        },
+        {
+          "value": "GSM3489193",
+          "count": 4255
+        },
+        {
+          "value": "GSM4058903",
+          "count": 4207
+        },
+        {
+          "value": "GSM4058928",
+          "count": 4178
+        },
+        {
+          "value": "GSM3891625",
+          "count": 4162
+        },
+        {
+          "value": "GSM4058913",
+          "count": 4151
+        },
+        {
+          "value": "GSM7103279",
+          "count": 4136
+        },
+        {
+          "value": "JK09",
+          "count": 4107
+        },
+        {
+          "value": "GSM4058912",
+          "count": 4101
+        },
+        {
+          "value": "GSM7103305",
+          "count": 4073
+        },
+        {
+          "value": "GSM7103320",
+          "count": 4045
+        },
+        {
+          "value": "GSM7103342",
+          "count": 4042
+        },
+        {
+          "value": "GSM4792469",
+          "count": 4038
+        },
+        {
+          "value": "GSM3891623",
+          "count": 4024
+        },
+        {
+          "value": "GSM3660645",
+          "count": 4020
+        },
+        {
+          "value": "GSM4037330",
+          "count": 4002
+        },
+        {
+          "value": "GSM4058955",
+          "count": 3986
+        },
+        {
+          "value": "GSM7103313",
+          "count": 3977
+        },
+        {
+          "value": "GSM7103289",
+          "count": 3963
+        },
+        {
+          "value": "GSM7103290",
+          "count": 3931
+        },
+        {
+          "value": "GSM3660647",
+          "count": 3927
+        },
+        {
+          "value": "GSM4792471",
+          "count": 3926
+        },
+        {
+          "value": "GSM4058901",
+          "count": 3915
+        },
+        {
+          "value": "GSM3489188",
+          "count": 3914
+        },
+        {
+          "value": "GSM4058974",
+          "count": 3893
+        },
+        {
+          "value": "GSM3660658",
+          "count": 3886
+        },
+        {
+          "value": "GSM3666102",
+          "count": 3874
+        },
+        {
+          "value": "GSM3489185",
+          "count": 3813
+        },
+        {
+          "value": "GSM3666104",
+          "count": 3713
+        },
+        {
+          "value": "GSM7135570",
+          "count": 3696
+        },
+        {
+          "value": "GSM4058944",
+          "count": 3695
+        },
+        {
+          "value": "GSM4058939",
+          "count": 3663
+        },
+        {
+          "value": "GSM3891621",
+          "count": 3626
+        },
+        {
+          "value": "GSM3666108",
+          "count": 3597
+        },
+        {
+          "value": "GSM4058917",
+          "count": 3594
+        },
+        {
+          "value": "GSM4058971",
+          "count": 3540
+        },
+        {
+          "value": "GSM3666101",
+          "count": 3533
+        },
+        {
+          "value": "GSM7103277",
+          "count": 3436
+        },
+        {
+          "value": "GSM4058967",
+          "count": 3434
+        },
+        {
+          "value": "GSM3891629",
+          "count": 3432
+        },
+        {
+          "value": "GSM4792480",
+          "count": 3416
+        },
+        {
+          "value": "GSM4037325",
+          "count": 3348
+        },
+        {
+          "value": "GSM7103332",
+          "count": 3339
+        },
+        {
+          "value": "GSM4037326",
+          "count": 3306
+        },
+        {
+          "value": "GSM4058948",
+          "count": 3304
+        },
+        {
+          "value": "GSM7103300",
+          "count": 3250
+        },
+        {
+          "value": "GSM3660644",
+          "count": 3239
+        },
+        {
+          "value": "GSM7135577",
+          "count": 3225
+        },
+        {
+          "value": "GSM3666107",
+          "count": 3221
+        },
+        {
+          "value": "GSM4037322",
+          "count": 3175
+        },
+        {
+          "value": "GSM4058932",
+          "count": 3173
+        },
+        {
+          "value": "GSM4058921",
+          "count": 3171
+        },
+        {
+          "value": "GSM4058943",
+          "count": 3108
+        },
+        {
+          "value": "GSM7103336",
+          "count": 3107
+        },
+        {
+          "value": "GSM4058973",
+          "count": 3103
+        },
+        {
+          "value": "GSM7103303",
+          "count": 3095
+        },
+        {
+          "value": "GSM3660646",
+          "count": 3093
+        },
+        {
+          "value": "GSM7103302",
+          "count": 3093
+        },
+        {
+          "value": "GSM4792473",
+          "count": 3086
+        },
+        {
+          "value": "GSM4037328",
+          "count": 3081
+        },
+        {
+          "value": "GSM3660657",
+          "count": 3080
+        },
+        {
+          "value": "GSM4058940",
+          "count": 3062
+        },
+        {
+          "value": "GSM7103301",
+          "count": 3052
+        },
+        {
+          "value": "GSM7135583",
+          "count": 3045
+        },
+        {
+          "value": "GSM3660654",
+          "count": 2986
+        },
+        {
+          "value": "GSM3666103",
+          "count": 2983
+        },
+        {
+          "value": "GSM7103259",
+          "count": 2935
+        },
+        {
+          "value": "GSM7103262",
+          "count": 2935
+        },
+        {
+          "value": "GSM7135595",
+          "count": 2911
+        },
+        {
+          "value": "GSM4058963",
+          "count": 2906
+        },
+        {
+          "value": "GSM7103333",
+          "count": 2876
+        },
+        {
+          "value": "GSM4037318",
+          "count": 2856
+        },
+        {
+          "value": "GSM7135592",
+          "count": 2851
+        },
+        {
+          "value": "GSM4058909",
+          "count": 2843
+        },
+        {
+          "value": "GSM4058960",
+          "count": 2810
+        },
+        {
+          "value": "GSM3489192",
+          "count": 2806
+        },
+        {
+          "value": "GSM4058936",
+          "count": 2803
+        },
+        {
+          "value": "JK07",
+          "count": 2793
+        },
+        {
+          "value": "GSM4058935",
+          "count": 2731
+        },
+        {
+          "value": "GSM4058965",
+          "count": 2730
+        },
+        {
+          "value": "GSM7103276",
+          "count": 2722
+        },
+        {
+          "value": "GSM7103311",
+          "count": 2712
+        },
+        {
+          "value": "GSM4058929",
+          "count": 2710
+        },
+        {
+          "value": "GSM7103288",
+          "count": 2683
+        },
+        {
+          "value": "GSM4037300",
+          "count": 2671
+        },
+        {
+          "value": "GSM4792468",
+          "count": 2667
+        },
+        {
+          "value": "GSM4037317",
+          "count": 2653
+        },
+        {
+          "value": "GSM4037302",
+          "count": 2650
+        },
+        {
+          "value": "GSM3891633",
+          "count": 2628
+        },
+        {
+          "value": "GSM4037324",
+          "count": 2628
+        },
+        {
+          "value": "GSM3660656",
+          "count": 2625
+        },
+        {
+          "value": "GSM7103338",
+          "count": 2623
+        },
+        {
+          "value": "GSM7103263",
+          "count": 2618
+        },
+        {
+          "value": "GSM7103329",
+          "count": 2593
+        },
+        {
+          "value": "JK08",
+          "count": 2570
+        },
+        {
+          "value": "GSM7103278",
+          "count": 2567
+        },
+        {
+          "value": "GSM7135587",
+          "count": 2563
+        },
+        {
+          "value": "GSM4037301",
+          "count": 2532
+        },
+        {
+          "value": "GSM4037311",
+          "count": 2517
+        },
+        {
+          "value": "GSM7135593",
+          "count": 2505
+        },
+        {
+          "value": "GSM5873139",
+          "count": 2503
+        },
+        {
+          "value": "GSM7103299",
+          "count": 2501
+        },
+        {
+          "value": "GSM7103312",
+          "count": 2465
+        },
+        {
+          "value": "GSM7135578",
+          "count": 2447
+        },
+        {
+          "value": "GSM4058946",
+          "count": 2409
+        },
+        {
+          "value": "GSM4058907",
+          "count": 2389
+        },
+        {
+          "value": "GSM3891634",
+          "count": 2379
+        },
+        {
+          "value": "JK05",
+          "count": 2368
+        },
+        {
+          "value": "GSM7135582",
+          "count": 2364
+        },
+        {
+          "value": "GSM7103293",
+          "count": 2356
+        },
+        {
+          "value": "GSM5873136",
+          "count": 2340
+        },
+        {
+          "value": "GSM4058969",
+          "count": 2316
+        },
+        {
+          "value": "GSM7135571",
+          "count": 2291
+        },
+        {
+          "value": "GSM7135576",
+          "count": 2290
+        },
+        {
+          "value": "GSM7135590",
+          "count": 2286
+        },
+        {
+          "value": "GSM7103318",
+          "count": 2277
+        },
+        {
+          "value": "GSM7103334",
+          "count": 2268
+        },
+        {
+          "value": "GSM7103310",
+          "count": 2265
+        },
+        {
+          "value": "GSM3891624",
+          "count": 2264
+        },
+        {
+          "value": "GSM7103280",
+          "count": 2256
+        },
+        {
+          "value": "GSM4792479",
+          "count": 2242
+        },
+        {
+          "value": "GSM4058937",
+          "count": 2221
+        },
+        {
+          "value": "GSM4037313",
+          "count": 2210
+        },
+        {
+          "value": "GSM7103292",
+          "count": 2199
+        },
+        {
+          "value": "GSM7135575",
+          "count": 2195
+        },
+        {
+          "value": "GSM4037323",
+          "count": 2194
+        },
+        {
+          "value": "GSM3489184",
+          "count": 2189
+        },
+        {
+          "value": "GSM7135579",
+          "count": 2178
+        },
+        {
+          "value": "GSM3489183",
+          "count": 2169
+        },
+        {
+          "value": "GSM7103268",
+          "count": 2165
+        },
+        {
+          "value": "GSM7103306",
+          "count": 2156
+        },
+        {
+          "value": "GSM3660655",
+          "count": 2138
+        },
+        {
+          "value": "GSM4037312",
+          "count": 2124
+        },
+        {
+          "value": "GSM4037320",
+          "count": 2113
+        },
+        {
+          "value": "GSM7103328",
+          "count": 2025
+        },
+        {
+          "value": "GSM7103343",
+          "count": 2002
+        },
+        {
+          "value": "GSM4522991",
+          "count": 1982
+        },
+        {
+          "value": "GSM5230007",
+          "count": 1915
+        },
+        {
+          "value": "JK10",
+          "count": 1902
+        },
+        {
+          "value": "GSM4058916",
+          "count": 1869
+        },
+        {
+          "value": "GSM4058918",
+          "count": 1856
+        },
+        {
+          "value": "GSM7135574",
+          "count": 1837
+        },
+        {
+          "value": "GSM4058938",
+          "count": 1816
+        },
+        {
+          "value": "GSM4058910",
+          "count": 1786
+        },
+        {
+          "value": "GSM4058975",
+          "count": 1777
+        },
+        {
+          "value": "GSM4522990",
+          "count": 1768
+        },
+        {
+          "value": "GSM7103267",
+          "count": 1759
+        },
+        {
+          "value": "GSM4037303",
+          "count": 1737
+        },
+        {
+          "value": "GSM4058941",
+          "count": 1735
+        },
+        {
+          "value": "GSM7103330",
+          "count": 1723
+        },
+        {
+          "value": "GSM7135594",
+          "count": 1654
+        },
+        {
+          "value": "GSM4058915",
+          "count": 1617
+        },
+        {
+          "value": "GSM7103275",
+          "count": 1611
+        },
+        {
+          "value": "GSM4037327",
+          "count": 1579
+        },
+        {
+          "value": "GSM4058919",
+          "count": 1561
+        },
+        {
+          "value": "GSM5230027",
+          "count": 1546
+        },
+        {
+          "value": "GSM3891627",
+          "count": 1539
+        },
+        {
+          "value": "GSM7103297",
+          "count": 1503
+        },
+        {
+          "value": "GSM4037316",
+          "count": 1501
+        },
+        {
+          "value": "GSM7103258",
+          "count": 1452
+        },
+        {
+          "value": "GSM3489186",
+          "count": 1445
+        },
+        {
+          "value": "GSM4037321",
+          "count": 1407
+        },
+        {
+          "value": "GSM7103282",
+          "count": 1364
+        },
+        {
+          "value": "GSM7135572",
+          "count": 1356
+        },
+        {
+          "value": "GSM7135586",
+          "count": 1343
+        },
+        {
+          "value": "GSM7103339",
+          "count": 1315
+        },
+        {
+          "value": "GSM7103271",
+          "count": 1273
+        },
+        {
+          "value": "GSM7103264",
+          "count": 1261
+        },
+        {
+          "value": "GSM7103309",
+          "count": 1253
+        },
+        {
+          "value": "GSM4058961",
+          "count": 1213
+        },
+        {
+          "value": "GSM7103270",
+          "count": 1196
+        },
+        {
+          "value": "GSM4037315",
+          "count": 1188
+        },
+        {
+          "value": "GSM7103307",
+          "count": 1172
+        },
+        {
+          "value": "GSM7103331",
+          "count": 1141
+        },
+        {
+          "value": "GSM7135591",
+          "count": 1124
+        },
+        {
+          "value": "GSM4037299",
+          "count": 1112
+        },
+        {
+          "value": "GSM4058972",
+          "count": 1106
+        },
+        {
+          "value": "GSM7103294",
+          "count": 1097
+        },
+        {
+          "value": "GSM7135580",
+          "count": 1076
+        },
+        {
+          "value": "GSM7135568",
+          "count": 1071
+        },
+        {
+          "value": "GSM4058922",
+          "count": 1034
+        },
+        {
+          "value": "GSM7135569",
+          "count": 1009
+        },
+        {
+          "value": "GSM7103269",
+          "count": 993
+        },
+        {
+          "value": "GSM4058924",
+          "count": 977
+        },
+        {
+          "value": "GSM4058926",
+          "count": 950
+        },
+        {
+          "value": "GSM3660643",
+          "count": 899
+        },
+        {
+          "value": "GSM5873144",
+          "count": 899
+        },
+        {
+          "value": "GSM3660649",
+          "count": 882
+        },
+        {
+          "value": "GSM4058908",
+          "count": 861
+        },
+        {
+          "value": "GSM4058923",
+          "count": 853
+        },
+        {
+          "value": "GSM4058956",
+          "count": 814
+        },
+        {
+          "value": "GSM7135602",
+          "count": 814
+        },
+        {
+          "value": "GSM4037309",
+          "count": 795
+        },
+        {
+          "value": "GSM3660642",
+          "count": 793
+        },
+        {
+          "value": "GSM7135581",
+          "count": 789
+        },
+        {
+          "value": "GSM4058925",
+          "count": 759
+        },
+        {
+          "value": "GSM4037298",
+          "count": 745
+        },
+        {
+          "value": "GSM7135604",
+          "count": 745
+        },
+        {
+          "value": "GSM7103296",
+          "count": 743
+        },
+        {
+          "value": "GSM7103308",
+          "count": 678
+        },
+        {
+          "value": "GSM4058920",
+          "count": 643
+        },
+        {
+          "value": "GSM7103295",
+          "count": 642
+        },
+        {
+          "value": "GSM4058902",
+          "count": 641
+        },
+        {
+          "value": "GSM3660641",
+          "count": 637
+        },
+        {
+          "value": "GSM7135585",
+          "count": 612
+        },
+        {
+          "value": "GSM7135573",
+          "count": 605
+        },
+        {
+          "value": "GSM5230006",
+          "count": 563
+        },
+        {
+          "value": "GSM5873138",
+          "count": 530
+        },
+        {
+          "value": "GSM7135596",
+          "count": 465
+        },
+        {
+          "value": "GSM7103298",
+          "count": 428
+        },
+        {
+          "value": "GSM7103257",
+          "count": 421
+        },
+        {
+          "value": "GSM4058927",
+          "count": 416
+        },
+        {
+          "value": "GSM4058942",
+          "count": 413
+        },
+        {
+          "value": "GSM4037297",
+          "count": 375
+        },
+        {
+          "value": "GSM5229979",
+          "count": 344
+        },
+        {
+          "value": "GSM7135606",
+          "count": 337
+        },
+        {
+          "value": "GSM7135601",
+          "count": 314
+        },
+        {
+          "value": "GSM5230028",
+          "count": 298
+        },
+        {
+          "value": "GSM5229980",
+          "count": 295
+        },
+        {
+          "value": "GSM7135605",
+          "count": 287
+        },
+        {
+          "value": "GSM7103283",
+          "count": 263
+        },
+        {
+          "value": "GSM7135600",
+          "count": 245
+        },
+        {
+          "value": "GSM7135603",
+          "count": 238
+        },
+        {
+          "value": "GSM5230026",
+          "count": 137
+        },
+        {
+          "value": "GSM4058905",
+          "count": 118
+        },
+        {
+          "value": "GSM7135598",
+          "count": 108
+        },
+        {
+          "value": "GSM7135597",
+          "count": 102
+        },
+        {
+          "value": "GSM7135599",
+          "count": 100
+        },
+        {
+          "value": "GSM4058945",
+          "count": 44
+        },
+        {
+          "value": "GSM7103273",
+          "count": 39
+        },
+        {
+          "value": "GSM7103274",
+          "count": 29
+        },
+        {
+          "value": "GSM7103266",
+          "count": 22
+        },
+        {
+          "value": "GSM7103272",
+          "count": 18
+        },
+        {
+          "value": "GSM7103265",
+          "count": 17
+        },
+        {
+          "value": "GSM7103281",
+          "count": 6
+        },
+        {
+          "value": "GSM7103327",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "name": "Disease",
+      "dtype": "category",
+      "missing": 0,
+      "unique_nonmissing": 4,
+      "top_values": [
+        {
+          "value": "PF",
+          "count": 635173
+        },
+        {
+          "value": "Donor",
+          "count": 501843
+        },
+        {
+          "value": "COPD",
+          "count": 254763
+        },
+        {
+          "value": "COVID19",
+          "count": 78951
+        }
+      ]
+    },
+    {
+      "name": "gse_alias",
+      "dtype": "category",
+      "missing": 0,
+      "unique_nonmissing": 16,
+      "top_values": [
+        {
+          "value": "GSE227136",
+          "count": 347636
+        },
+        {
+          "value": "GSE136831",
+          "count": 280205
+        },
+        {
+          "value": "GSE158127",
+          "count": 126477
+        },
+        {
+          "value": "GSE168191",
+          "count": 114443
+        },
+        {
+          "value": "GSE135893",
+          "count": 113079
+        },
+        {
+          "value": "GSE196341",
+          "count": 91913
+        },
+        {
+          "value": "GSE132771",
+          "count": 82072
+        },
+        {
+          "value": "GSE122960",
+          "count": 78142
+        },
+        {
+          "value": "ERP114453",
+          "count": 56668
+        },
+        {
+          "value": "GSE128033",
+          "count": 51751
+        },
+        {
+          "value": "GSE128169",
+          "count": 47341
+        },
+        {
+          "value": "GSE173896",
+          "count": 28455
+        },
+        {
+          "value": "GSE150247",
+          "count": 22118
+        },
+        {
+          "value": "GSE171541",
+          "count": 21582
+        },
+        {
+          "value": "GSE171668",
+          "count": 5098
+        },
+        {
+          "value": "GSE150068",
+          "count": 3750
+        }
+      ]
+    },
+    {
+      "name": "celltypeuse",
+      "dtype": "category",
+      "missing": 0,
+      "unique_nonmissing": 18,
+      "top_values": [
+        {
+          "value": "Macrophage",
+          "count": 368060
+        },
+        {
+          "value": "Monocyte",
+          "count": 197358
+        },
+        {
+          "value": "AT2",
+          "count": 153976
+        },
+        {
+          "value": "Ciliated",
+          "count": 119113
+        },
+        {
+          "value": "Endothelial",
+          "count": 106368
+        },
+        {
+          "value": "Fibroblast",
+          "count": 100947
+        },
+        {
+          "value": "Secretory",
+          "count": 70114
+        },
+        {
+          "value": "CD4",
+          "count": 60313
+        },
+        {
+          "value": "NK",
+          "count": 47516
+        },
+        {
+          "value": "CD8",
+          "count": 45475
+        },
+        {
+          "value": "SMC_Pericytes",
+          "count": 44965
+        },
+        {
+          "value": "B_Plasma",
+          "count": 36581
+        },
+        {
+          "value": "AT1",
+          "count": 32842
+        },
+        {
+          "value": "DC",
+          "count": 29716
+        },
+        {
+          "value": "Basal",
+          "count": 24789
+        },
+        {
+          "value": "Mast",
+          "count": 15725
+        },
+        {
+          "value": "Dividing",
+          "count": 9540
+        },
+        {
+          "value": "Mesothelial",
+          "count": 7332
+        }
+      ]
+    }
+  ],
+  "candidate_metadata_columns": {
+    "orig.ident": {
+      "name": "orig.ident",
+      "dtype": "category",
+      "missing": 0,
+      "unique_nonmissing": 372,
+      "top_values": [
+        {
+          "value": "GSM5873142",
+          "count": 39258
+        },
+        {
+          "value": "GSM4792472",
+          "count": 22262
+        },
+        {
+          "value": "390C",
+          "count": 14738
+        },
+        {
+          "value": "JK02",
+          "count": 14715
+        },
+        {
+          "value": "356C",
+          "count": 13542
+        },
+        {
+          "value": "367C",
+          "count": 13282
+        },
+        {
+          "value": "GSM3891630",
+          "count": 12602
+        },
+        {
+          "value": "GSM4792476",
+          "count": 12087
+        },
+        {
+          "value": "GSM4058959",
+          "count": 11332
+        },
+        {
+          "value": "GSM7103261",
+          "count": 11187
+        },
+        {
+          "value": "GSM5133604",
+          "count": 11076
+        },
+        {
+          "value": "GSM4792478",
+          "count": 9899
+        },
+        {
+          "value": "GSM4058904",
+          "count": 9776
+        },
+        {
+          "value": "GSM5133595",
+          "count": 9770
+        },
+        {
+          "value": "GSM5133594",
+          "count": 9515
+        },
+        {
+          "value": "GSM4058911",
+          "count": 9209
+        },
+        {
+          "value": "GSM3891620",
+          "count": 9204
+        },
+        {
+          "value": "GSM5133589",
+          "count": 9017
+        },
+        {
+          "value": "GSM7103287",
+          "count": 9008
+        },
+        {
+          "value": "GSM5873140",
+          "count": 8991
+        },
+        {
+          "value": "GSM5133596",
+          "count": 8939
+        },
+        {
+          "value": "GSM5133588",
+          "count": 8782
+        },
+        {
+          "value": "GSM3891632",
+          "count": 8679
+        },
+        {
+          "value": "GSM5873137",
+          "count": 8512
+        },
+        {
+          "value": "GSM4544006",
+          "count": 8495
+        },
+        {
+          "value": "GSM4792475",
+          "count": 8460
+        },
+        {
+          "value": "GSM4544007",
+          "count": 8337
+        },
+        {
+          "value": "GSM4037307",
+          "count": 8318
+        },
+        {
+          "value": "GSM7103314",
+          "count": 8126
+        },
+        {
+          "value": "GSM4058900",
+          "count": 8081
+        },
+        {
+          "value": "GSM4058906",
+          "count": 8077
+        },
+        {
+          "value": "GSM4058958",
+          "count": 7982
+        },
+        {
+          "value": "343B",
+          "count": 7871
+        },
+        {
+          "value": "GSM3891631",
+          "count": 7839
+        },
+        {
+          "value": "GSM4792466",
+          "count": 7788
+        },
+        {
+          "value": "copd.o1",
+          "count": 7633
+        },
+        {
+          "value": "GSM5133599",
+          "count": 7607
+        },
+        {
+          "value": "GSM5873135",
+          "count": 7597
+        },
+        {
+          "value": "GSM4037305",
+          "count": 7556
+        },
+        {
+          "value": "GSM4792474",
+          "count": 7503
+        },
+        {
+          "value": "GSM3489195",
+          "count": 7416
+        },
+        {
+          "value": "GSM5133590",
+          "count": 7378
+        },
+        {
+          "value": "GSM7103337",
+          "count": 7356
+        },
+        {
+          "value": "GSM4792459",
+          "count": 7279
+        },
+        {
+          "value": "368C",
+          "count": 7235
+        },
+        {
+          "value": "GSM4037314",
+          "count": 7188
+        },
+        {
+          "value": "GSM5133600",
+          "count": 7150
+        },
+        {
+          "value": "copd.o3",
+          "count": 7069
+        },
+        {
+          "value": "GSM7103341",
+          "count": 7065
+        },
+        {
+          "value": "GSM7103326",
+          "count": 7001
+        },
+        {
+          "value": "GSM5133591",
+          "count": 6934
+        },
+        {
+          "value": "copd.o2",
+          "count": 6880
+        },
+        {
+          "value": "GSM5133592",
+          "count": 6799
+        },
+        {
+          "value": "GSM3909673",
+          "count": 6754
+        },
+        {
+          "value": "GSM4037304",
+          "count": 6714
+        },
+        {
+          "value": "GSM3489196",
+          "count": 6696
+        },
+        {
+          "value": "GSM7103322",
+          "count": 6695
+        },
+        {
+          "value": "GSM3489197",
+          "count": 6683
+        },
+        {
+          "value": "GSM4058950",
+          "count": 6663
+        },
+        {
+          "value": "GSM7103317",
+          "count": 6474
+        },
+        {
+          "value": "GSM7103321",
+          "count": 6465
+        },
+        {
+          "value": "GSM7103304",
+          "count": 6433
+        },
+        {
+          "value": "GSM4058930",
+          "count": 6413
+        },
+        {
+          "value": "GSM4058914",
+          "count": 6408
+        },
+        {
+          "value": "GSM7135589",
+          "count": 6403
+        },
+        {
+          "value": "GSM4037319",
+          "count": 6378
+        },
+        {
+          "value": "GSM7103286",
+          "count": 6377
+        },
+        {
+          "value": "GSM7103316",
+          "count": 6357
+        },
+        {
+          "value": "GSM5133603",
+          "count": 6354
+        },
+        {
+          "value": "GSM4037308",
+          "count": 6334
+        },
+        {
+          "value": "GSM7103344",
+          "count": 6304
+        },
+        {
+          "value": "GSM3489198",
+          "count": 6293
+        },
+        {
+          "value": "GSM5873146",
+          "count": 6242
+        },
+        {
+          "value": "GSM4058962",
+          "count": 6217
+        },
+        {
+          "value": "GSM4058976",
+          "count": 6179
+        },
+        {
+          "value": "GSM4058933",
+          "count": 6104
+        },
+        {
+          "value": "GSM7103335",
+          "count": 6045
+        },
+        {
+          "value": "GSM4058934",
+          "count": 6008
+        },
+        {
+          "value": "GSM3891628",
+          "count": 5936
+        },
+        {
+          "value": "GSM4792477",
+          "count": 5931
+        },
+        {
+          "value": "GSM4058947",
+          "count": 5920
+        },
+        {
+          "value": "GSM4037310",
+          "count": 5909
+        },
+        {
+          "value": "GSM4037306",
+          "count": 5804
+        },
+        {
+          "value": "GSM7103325",
+          "count": 5748
+        },
+        {
+          "value": "GSM4792465",
+          "count": 5661
+        },
+        {
+          "value": "GSM4058931",
+          "count": 5606
+        },
+        {
+          "value": "GSM4058952",
+          "count": 5569
+        },
+        {
+          "value": "GSM3909675",
+          "count": 5561
+        },
+        {
+          "value": "GSM5873145",
+          "count": 5463
+        },
+        {
+          "value": "GSM7103260",
+          "count": 5447
+        },
+        {
+          "value": "GSM7103291",
+          "count": 5366
+        },
+        {
+          "value": "GSM4058977",
+          "count": 5345
+        },
+        {
+          "value": "GSM3489182",
+          "count": 5335
+        },
+        {
+          "value": "GSM3489191",
+          "count": 5312
+        },
+        {
+          "value": "GSM3660651",
+          "count": 5298
+        },
+        {
+          "value": "GSM4544005",
+          "count": 5286
+        },
+        {
+          "value": "GSM5133597",
+          "count": 5227
+        },
+        {
+          "value": "GSM3489187",
+          "count": 5205
+        },
+        {
+          "value": "GSM3660648",
+          "count": 5168
+        },
+        {
+          "value": "GSM3489189",
+          "count": 5157
+        },
+        {
+          "value": "GSM4792460",
+          "count": 5128
+        },
+        {
+          "value": "GSM4792467",
+          "count": 5113
+        },
+        {
+          "value": "GSM7103284",
+          "count": 5090
+        },
+        {
+          "value": "GSM3489194",
+          "count": 5067
+        },
+        {
+          "value": "GSM4792470",
+          "count": 5000
+        },
+        {
+          "value": "GSM4792461",
+          "count": 4991
+        },
+        {
+          "value": "GSM5133598",
+          "count": 4990
+        },
+        {
+          "value": "GSM7103340",
+          "count": 4964
+        },
+        {
+          "value": "GSM7103315",
+          "count": 4943
+        },
+        {
+          "value": "GSM5133593",
+          "count": 4905
+        },
+        {
+          "value": "GSM7135584",
+          "count": 4863
+        },
+        {
+          "value": "GSM5873143",
+          "count": 4860
+        },
+        {
+          "value": "GSM4058951",
+          "count": 4834
+        },
+        {
+          "value": "GSM3891635",
+          "count": 4794
+        },
+        {
+          "value": "GSM4058957",
+          "count": 4789
+        },
+        {
+          "value": "GSM7103319",
+          "count": 4769
+        },
+        {
+          "value": "GSM3666106",
+          "count": 4757
+        },
+        {
+          "value": "GSM7135588",
+          "count": 4743
+        },
+        {
+          "value": "GSM3909674",
+          "count": 4721
+        },
+        {
+          "value": "GSM5873141",
+          "count": 4718
+        },
+        {
+          "value": "GSM3891622",
+          "count": 4652
+        },
+        {
+          "value": "GSM3666105",
+          "count": 4627
+        },
+        {
+          "value": "GSM3660653",
+          "count": 4566
+        },
+        {
+          "value": "GSM7103324",
+          "count": 4563
+        },
+        {
+          "value": "GSM4058964",
+          "count": 4543
+        },
+        {
+          "value": "GSM3660652",
+          "count": 4514
+        },
+        {
+          "value": "GSM4058968",
+          "count": 4485
+        },
+        {
+          "value": "GSM4058966",
+          "count": 4398
+        },
+        {
+          "value": "GSM3489190",
+          "count": 4387
+        },
+        {
+          "value": "GSM4037329",
+          "count": 4379
+        },
+        {
+          "value": "GSM4058949",
+          "count": 4365
+        },
+        {
+          "value": "GSM7103285",
+          "count": 4313
+        },
+        {
+          "value": "GSM3891626",
+          "count": 4312
+        },
+        {
+          "value": "GSM4058970",
+          "count": 4307
+        },
+        {
+          "value": "GSM4058954",
+          "count": 4298
+        },
+        {
+          "value": "GSM4058953",
+          "count": 4292
+        },
+        {
+          "value": "GSM7103323",
+          "count": 4290
+        },
+        {
+          "value": "GSM3489193",
+          "count": 4255
+        },
+        {
+          "value": "GSM4058903",
+          "count": 4207
+        },
+        {
+          "value": "GSM4058928",
+          "count": 4178
+        },
+        {
+          "value": "GSM3891625",
+          "count": 4162
+        },
+        {
+          "value": "GSM4058913",
+          "count": 4151
+        },
+        {
+          "value": "GSM7103279",
+          "count": 4136
+        },
+        {
+          "value": "JK09",
+          "count": 4107
+        },
+        {
+          "value": "GSM4058912",
+          "count": 4101
+        },
+        {
+          "value": "GSM7103305",
+          "count": 4073
+        },
+        {
+          "value": "GSM7103320",
+          "count": 4045
+        },
+        {
+          "value": "GSM7103342",
+          "count": 4042
+        },
+        {
+          "value": "GSM4792469",
+          "count": 4038
+        },
+        {
+          "value": "GSM3891623",
+          "count": 4024
+        },
+        {
+          "value": "GSM3660645",
+          "count": 4020
+        },
+        {
+          "value": "GSM4037330",
+          "count": 4002
+        },
+        {
+          "value": "GSM4058955",
+          "count": 3986
+        },
+        {
+          "value": "GSM7103313",
+          "count": 3977
+        },
+        {
+          "value": "GSM7103289",
+          "count": 3963
+        },
+        {
+          "value": "GSM7103290",
+          "count": 3931
+        },
+        {
+          "value": "GSM3660647",
+          "count": 3927
+        },
+        {
+          "value": "GSM4792471",
+          "count": 3926
+        },
+        {
+          "value": "GSM4058901",
+          "count": 3915
+        },
+        {
+          "value": "GSM3489188",
+          "count": 3914
+        },
+        {
+          "value": "GSM4058974",
+          "count": 3893
+        },
+        {
+          "value": "GSM3660658",
+          "count": 3886
+        },
+        {
+          "value": "GSM3666102",
+          "count": 3874
+        },
+        {
+          "value": "GSM3489185",
+          "count": 3813
+        },
+        {
+          "value": "GSM3666104",
+          "count": 3713
+        },
+        {
+          "value": "GSM7135570",
+          "count": 3696
+        },
+        {
+          "value": "GSM4058944",
+          "count": 3695
+        },
+        {
+          "value": "GSM4058939",
+          "count": 3663
+        },
+        {
+          "value": "GSM3891621",
+          "count": 3626
+        },
+        {
+          "value": "GSM3666108",
+          "count": 3597
+        },
+        {
+          "value": "GSM4058917",
+          "count": 3594
+        },
+        {
+          "value": "GSM4058971",
+          "count": 3540
+        },
+        {
+          "value": "GSM3666101",
+          "count": 3533
+        },
+        {
+          "value": "GSM7103277",
+          "count": 3436
+        },
+        {
+          "value": "GSM4058967",
+          "count": 3434
+        },
+        {
+          "value": "GSM3891629",
+          "count": 3432
+        },
+        {
+          "value": "GSM4792480",
+          "count": 3416
+        },
+        {
+          "value": "GSM4037325",
+          "count": 3348
+        },
+        {
+          "value": "GSM7103332",
+          "count": 3339
+        },
+        {
+          "value": "GSM4037326",
+          "count": 3306
+        },
+        {
+          "value": "GSM4058948",
+          "count": 3304
+        },
+        {
+          "value": "GSM7103300",
+          "count": 3250
+        },
+        {
+          "value": "GSM3660644",
+          "count": 3239
+        },
+        {
+          "value": "GSM7135577",
+          "count": 3225
+        },
+        {
+          "value": "GSM3666107",
+          "count": 3221
+        },
+        {
+          "value": "GSM4037322",
+          "count": 3175
+        },
+        {
+          "value": "GSM4058932",
+          "count": 3173
+        },
+        {
+          "value": "GSM4058921",
+          "count": 3171
+        },
+        {
+          "value": "GSM4058943",
+          "count": 3108
+        },
+        {
+          "value": "GSM7103336",
+          "count": 3107
+        },
+        {
+          "value": "GSM4058973",
+          "count": 3103
+        },
+        {
+          "value": "GSM7103303",
+          "count": 3095
+        },
+        {
+          "value": "GSM3660646",
+          "count": 3093
+        },
+        {
+          "value": "GSM7103302",
+          "count": 3093
+        },
+        {
+          "value": "GSM4792473",
+          "count": 3086
+        },
+        {
+          "value": "GSM4037328",
+          "count": 3081
+        },
+        {
+          "value": "GSM3660657",
+          "count": 3080
+        },
+        {
+          "value": "GSM4058940",
+          "count": 3062
+        },
+        {
+          "value": "GSM7103301",
+          "count": 3052
+        },
+        {
+          "value": "GSM7135583",
+          "count": 3045
+        },
+        {
+          "value": "GSM3660654",
+          "count": 2986
+        },
+        {
+          "value": "GSM3666103",
+          "count": 2983
+        },
+        {
+          "value": "GSM7103259",
+          "count": 2935
+        },
+        {
+          "value": "GSM7103262",
+          "count": 2935
+        },
+        {
+          "value": "GSM7135595",
+          "count": 2911
+        },
+        {
+          "value": "GSM4058963",
+          "count": 2906
+        },
+        {
+          "value": "GSM7103333",
+          "count": 2876
+        },
+        {
+          "value": "GSM4037318",
+          "count": 2856
+        },
+        {
+          "value": "GSM7135592",
+          "count": 2851
+        },
+        {
+          "value": "GSM4058909",
+          "count": 2843
+        },
+        {
+          "value": "GSM4058960",
+          "count": 2810
+        },
+        {
+          "value": "GSM3489192",
+          "count": 2806
+        },
+        {
+          "value": "GSM4058936",
+          "count": 2803
+        },
+        {
+          "value": "JK07",
+          "count": 2793
+        },
+        {
+          "value": "GSM4058935",
+          "count": 2731
+        },
+        {
+          "value": "GSM4058965",
+          "count": 2730
+        },
+        {
+          "value": "GSM7103276",
+          "count": 2722
+        },
+        {
+          "value": "GSM7103311",
+          "count": 2712
+        },
+        {
+          "value": "GSM4058929",
+          "count": 2710
+        },
+        {
+          "value": "GSM7103288",
+          "count": 2683
+        },
+        {
+          "value": "GSM4037300",
+          "count": 2671
+        },
+        {
+          "value": "GSM4792468",
+          "count": 2667
+        },
+        {
+          "value": "GSM4037317",
+          "count": 2653
+        },
+        {
+          "value": "GSM4037302",
+          "count": 2650
+        },
+        {
+          "value": "GSM3891633",
+          "count": 2628
+        },
+        {
+          "value": "GSM4037324",
+          "count": 2628
+        },
+        {
+          "value": "GSM3660656",
+          "count": 2625
+        },
+        {
+          "value": "GSM7103338",
+          "count": 2623
+        },
+        {
+          "value": "GSM7103263",
+          "count": 2618
+        },
+        {
+          "value": "GSM7103329",
+          "count": 2593
+        },
+        {
+          "value": "JK08",
+          "count": 2570
+        },
+        {
+          "value": "GSM7103278",
+          "count": 2567
+        },
+        {
+          "value": "GSM7135587",
+          "count": 2563
+        },
+        {
+          "value": "GSM4037301",
+          "count": 2532
+        },
+        {
+          "value": "GSM4037311",
+          "count": 2517
+        },
+        {
+          "value": "GSM7135593",
+          "count": 2505
+        },
+        {
+          "value": "GSM5873139",
+          "count": 2503
+        },
+        {
+          "value": "GSM7103299",
+          "count": 2501
+        },
+        {
+          "value": "GSM7103312",
+          "count": 2465
+        },
+        {
+          "value": "GSM7135578",
+          "count": 2447
+        },
+        {
+          "value": "GSM4058946",
+          "count": 2409
+        },
+        {
+          "value": "GSM4058907",
+          "count": 2389
+        },
+        {
+          "value": "GSM3891634",
+          "count": 2379
+        },
+        {
+          "value": "JK05",
+          "count": 2368
+        },
+        {
+          "value": "GSM7135582",
+          "count": 2364
+        },
+        {
+          "value": "GSM7103293",
+          "count": 2356
+        },
+        {
+          "value": "GSM5873136",
+          "count": 2340
+        },
+        {
+          "value": "GSM4058969",
+          "count": 2316
+        },
+        {
+          "value": "GSM7135571",
+          "count": 2291
+        },
+        {
+          "value": "GSM7135576",
+          "count": 2290
+        },
+        {
+          "value": "GSM7135590",
+          "count": 2286
+        },
+        {
+          "value": "GSM7103318",
+          "count": 2277
+        },
+        {
+          "value": "GSM7103334",
+          "count": 2268
+        },
+        {
+          "value": "GSM7103310",
+          "count": 2265
+        },
+        {
+          "value": "GSM3891624",
+          "count": 2264
+        },
+        {
+          "value": "GSM7103280",
+          "count": 2256
+        },
+        {
+          "value": "GSM4792479",
+          "count": 2242
+        },
+        {
+          "value": "GSM4058937",
+          "count": 2221
+        },
+        {
+          "value": "GSM4037313",
+          "count": 2210
+        },
+        {
+          "value": "GSM7103292",
+          "count": 2199
+        },
+        {
+          "value": "GSM7135575",
+          "count": 2195
+        },
+        {
+          "value": "GSM4037323",
+          "count": 2194
+        },
+        {
+          "value": "GSM3489184",
+          "count": 2189
+        },
+        {
+          "value": "GSM7135579",
+          "count": 2178
+        },
+        {
+          "value": "GSM3489183",
+          "count": 2169
+        },
+        {
+          "value": "GSM7103268",
+          "count": 2165
+        },
+        {
+          "value": "GSM7103306",
+          "count": 2156
+        },
+        {
+          "value": "GSM3660655",
+          "count": 2138
+        },
+        {
+          "value": "GSM4037312",
+          "count": 2124
+        },
+        {
+          "value": "GSM4037320",
+          "count": 2113
+        },
+        {
+          "value": "GSM7103328",
+          "count": 2025
+        },
+        {
+          "value": "GSM7103343",
+          "count": 2002
+        },
+        {
+          "value": "GSM4522991",
+          "count": 1982
+        },
+        {
+          "value": "GSM5230007",
+          "count": 1915
+        },
+        {
+          "value": "JK10",
+          "count": 1902
+        },
+        {
+          "value": "GSM4058916",
+          "count": 1869
+        },
+        {
+          "value": "GSM4058918",
+          "count": 1856
+        },
+        {
+          "value": "GSM7135574",
+          "count": 1837
+        },
+        {
+          "value": "GSM4058938",
+          "count": 1816
+        },
+        {
+          "value": "GSM4058910",
+          "count": 1786
+        },
+        {
+          "value": "GSM4058975",
+          "count": 1777
+        },
+        {
+          "value": "GSM4522990",
+          "count": 1768
+        },
+        {
+          "value": "GSM7103267",
+          "count": 1759
+        },
+        {
+          "value": "GSM4037303",
+          "count": 1737
+        },
+        {
+          "value": "GSM4058941",
+          "count": 1735
+        },
+        {
+          "value": "GSM7103330",
+          "count": 1723
+        },
+        {
+          "value": "GSM7135594",
+          "count": 1654
+        },
+        {
+          "value": "GSM4058915",
+          "count": 1617
+        },
+        {
+          "value": "GSM7103275",
+          "count": 1611
+        },
+        {
+          "value": "GSM4037327",
+          "count": 1579
+        },
+        {
+          "value": "GSM4058919",
+          "count": 1561
+        },
+        {
+          "value": "GSM5230027",
+          "count": 1546
+        },
+        {
+          "value": "GSM3891627",
+          "count": 1539
+        },
+        {
+          "value": "GSM7103297",
+          "count": 1503
+        },
+        {
+          "value": "GSM4037316",
+          "count": 1501
+        },
+        {
+          "value": "GSM7103258",
+          "count": 1452
+        },
+        {
+          "value": "GSM3489186",
+          "count": 1445
+        },
+        {
+          "value": "GSM4037321",
+          "count": 1407
+        },
+        {
+          "value": "GSM7103282",
+          "count": 1364
+        },
+        {
+          "value": "GSM7135572",
+          "count": 1356
+        },
+        {
+          "value": "GSM7135586",
+          "count": 1343
+        },
+        {
+          "value": "GSM7103339",
+          "count": 1315
+        },
+        {
+          "value": "GSM7103271",
+          "count": 1273
+        },
+        {
+          "value": "GSM7103264",
+          "count": 1261
+        },
+        {
+          "value": "GSM7103309",
+          "count": 1253
+        },
+        {
+          "value": "GSM4058961",
+          "count": 1213
+        },
+        {
+          "value": "GSM7103270",
+          "count": 1196
+        },
+        {
+          "value": "GSM4037315",
+          "count": 1188
+        },
+        {
+          "value": "GSM7103307",
+          "count": 1172
+        },
+        {
+          "value": "GSM7103331",
+          "count": 1141
+        },
+        {
+          "value": "GSM7135591",
+          "count": 1124
+        },
+        {
+          "value": "GSM4037299",
+          "count": 1112
+        },
+        {
+          "value": "GSM4058972",
+          "count": 1106
+        },
+        {
+          "value": "GSM7103294",
+          "count": 1097
+        },
+        {
+          "value": "GSM7135580",
+          "count": 1076
+        },
+        {
+          "value": "GSM7135568",
+          "count": 1071
+        },
+        {
+          "value": "GSM4058922",
+          "count": 1034
+        },
+        {
+          "value": "GSM7135569",
+          "count": 1009
+        },
+        {
+          "value": "GSM7103269",
+          "count": 993
+        },
+        {
+          "value": "GSM4058924",
+          "count": 977
+        },
+        {
+          "value": "GSM4058926",
+          "count": 950
+        },
+        {
+          "value": "GSM3660643",
+          "count": 899
+        },
+        {
+          "value": "GSM5873144",
+          "count": 899
+        },
+        {
+          "value": "GSM3660649",
+          "count": 882
+        },
+        {
+          "value": "GSM4058908",
+          "count": 861
+        },
+        {
+          "value": "GSM4058923",
+          "count": 853
+        },
+        {
+          "value": "GSM4058956",
+          "count": 814
+        },
+        {
+          "value": "GSM7135602",
+          "count": 814
+        },
+        {
+          "value": "GSM4037309",
+          "count": 795
+        },
+        {
+          "value": "GSM3660642",
+          "count": 793
+        },
+        {
+          "value": "GSM7135581",
+          "count": 789
+        },
+        {
+          "value": "GSM4058925",
+          "count": 759
+        },
+        {
+          "value": "GSM4037298",
+          "count": 745
+        },
+        {
+          "value": "GSM7135604",
+          "count": 745
+        },
+        {
+          "value": "GSM7103296",
+          "count": 743
+        },
+        {
+          "value": "GSM7103308",
+          "count": 678
+        },
+        {
+          "value": "GSM4058920",
+          "count": 643
+        },
+        {
+          "value": "GSM7103295",
+          "count": 642
+        },
+        {
+          "value": "GSM4058902",
+          "count": 641
+        },
+        {
+          "value": "GSM3660641",
+          "count": 637
+        },
+        {
+          "value": "GSM7135585",
+          "count": 612
+        },
+        {
+          "value": "GSM7135573",
+          "count": 605
+        },
+        {
+          "value": "GSM5230006",
+          "count": 563
+        },
+        {
+          "value": "GSM5873138",
+          "count": 530
+        },
+        {
+          "value": "GSM7135596",
+          "count": 465
+        },
+        {
+          "value": "GSM7103298",
+          "count": 428
+        },
+        {
+          "value": "GSM7103257",
+          "count": 421
+        },
+        {
+          "value": "GSM4058927",
+          "count": 416
+        },
+        {
+          "value": "GSM4058942",
+          "count": 413
+        },
+        {
+          "value": "GSM4037297",
+          "count": 375
+        },
+        {
+          "value": "GSM5229979",
+          "count": 344
+        },
+        {
+          "value": "GSM7135606",
+          "count": 337
+        },
+        {
+          "value": "GSM7135601",
+          "count": 314
+        },
+        {
+          "value": "GSM5230028",
+          "count": 298
+        },
+        {
+          "value": "GSM5229980",
+          "count": 295
+        },
+        {
+          "value": "GSM7135605",
+          "count": 287
+        },
+        {
+          "value": "GSM7103283",
+          "count": 263
+        },
+        {
+          "value": "GSM7135600",
+          "count": 245
+        },
+        {
+          "value": "GSM7135603",
+          "count": 238
+        },
+        {
+          "value": "GSM5230026",
+          "count": 137
+        },
+        {
+          "value": "GSM4058905",
+          "count": 118
+        },
+        {
+          "value": "GSM7135598",
+          "count": 108
+        },
+        {
+          "value": "GSM7135597",
+          "count": 102
+        },
+        {
+          "value": "GSM7135599",
+          "count": 100
+        },
+        {
+          "value": "GSM4058945",
+          "count": 44
+        },
+        {
+          "value": "GSM7103273",
+          "count": 39
+        },
+        {
+          "value": "GSM7103274",
+          "count": 29
+        },
+        {
+          "value": "GSM7103266",
+          "count": 22
+        },
+        {
+          "value": "GSM7103272",
+          "count": 18
+        },
+        {
+          "value": "GSM7103265",
+          "count": 17
+        },
+        {
+          "value": "GSM7103281",
+          "count": 6
+        },
+        {
+          "value": "GSM7103327",
+          "count": 6
+        }
+      ]
+    },
+    "Disease": {
+      "name": "Disease",
+      "dtype": "category",
+      "missing": 0,
+      "unique_nonmissing": 4,
+      "top_values": [
+        {
+          "value": "PF",
+          "count": 635173
+        },
+        {
+          "value": "Donor",
+          "count": 501843
+        },
+        {
+          "value": "COPD",
+          "count": 254763
+        },
+        {
+          "value": "COVID19",
+          "count": 78951
+        }
+      ]
+    },
+    "gse_alias": {
+      "name": "gse_alias",
+      "dtype": "category",
+      "missing": 0,
+      "unique_nonmissing": 16,
+      "top_values": [
+        {
+          "value": "GSE227136",
+          "count": 347636
+        },
+        {
+          "value": "GSE136831",
+          "count": 280205
+        },
+        {
+          "value": "GSE158127",
+          "count": 126477
+        },
+        {
+          "value": "GSE168191",
+          "count": 114443
+        },
+        {
+          "value": "GSE135893",
+          "count": 113079
+        },
+        {
+          "value": "GSE196341",
+          "count": 91913
+        },
+        {
+          "value": "GSE132771",
+          "count": 82072
+        },
+        {
+          "value": "GSE122960",
+          "count": 78142
+        },
+        {
+          "value": "ERP114453",
+          "count": 56668
+        },
+        {
+          "value": "GSE128033",
+          "count": 51751
+        },
+        {
+          "value": "GSE128169",
+          "count": 47341
+        },
+        {
+          "value": "GSE173896",
+          "count": 28455
+        },
+        {
+          "value": "GSE150247",
+          "count": 22118
+        },
+        {
+          "value": "GSE171541",
+          "count": 21582
+        },
+        {
+          "value": "GSE171668",
+          "count": 5098
+        },
+        {
+          "value": "GSE150068",
+          "count": 3750
+        }
+      ]
+    },
+    "celltypeuse": {
+      "name": "celltypeuse",
+      "dtype": "category",
+      "missing": 0,
+      "unique_nonmissing": 18,
+      "top_values": [
+        {
+          "value": "Macrophage",
+          "count": 368060
+        },
+        {
+          "value": "Monocyte",
+          "count": 197358
+        },
+        {
+          "value": "AT2",
+          "count": 153976
+        },
+        {
+          "value": "Ciliated",
+          "count": 119113
+        },
+        {
+          "value": "Endothelial",
+          "count": 106368
+        },
+        {
+          "value": "Fibroblast",
+          "count": 100947
+        },
+        {
+          "value": "Secretory",
+          "count": 70114
+        },
+        {
+          "value": "CD4",
+          "count": 60313
+        },
+        {
+          "value": "NK",
+          "count": 47516
+        },
+        {
+          "value": "CD8",
+          "count": 45475
+        },
+        {
+          "value": "SMC_Pericytes",
+          "count": 44965
+        },
+        {
+          "value": "B_Plasma",
+          "count": 36581
+        },
+        {
+          "value": "AT1",
+          "count": 32842
+        },
+        {
+          "value": "DC",
+          "count": 29716
+        },
+        {
+          "value": "Basal",
+          "count": 24789
+        },
+        {
+          "value": "Mast",
+          "count": 15725
+        },
+        {
+          "value": "Dividing",
+          "count": 9540
+        },
+        {
+          "value": "Mesothelial",
+          "count": 7332
+        }
+      ]
+    }
+  },
+  "var_columns": [],
+  "var_names_first_10": [
+    "A1BG",
+    "A1BG-AS1",
+    "A1CF",
+    "A2M",
+    "A2M-AS1",
+    "A2ML1",
+    "A2ML1-AS1",
+    "A2ML1-AS2",
+    "A3GALT2",
+    "A4GALT"
+  ],
+  "var_names_last_10": [
+    "ZXDA",
+    "ZXDB",
+    "ZXDC",
+    "ZYG11A",
+    "ZYG11B",
+    "ZYX",
+    "ZZEF1",
+    "ZZZ3",
+    "bP-21264C1.2",
+    "bP-2189O9.3"
+  ],
+  "var_names_unique": true,
+  "layer_names": [
+    "None"
+  ],
+  "has_raw_slot": false,
+  "raw_var_columns": [],
+  "uns_keys": [],
+  "expression_matrix": {
+    "shape": [
+      1470730,
+      30566
+    ],
+    "backed_type": "anndata._core.sparse_dataset._CSRDataset",
+    "dtype": "float32",
+    "loaded_into_memory": false
+  },
+  "expression_sample_summary": {
+    "rows_sampled": 128,
+    "nonzero_values_sampled": 245742,
+    "nonzero_fraction": 0.06281029166394032,
+    "minimum_nonzero": 1.0,
+    "median_nonzero": 1.0,
+    "p90_nonzero": 5.0,
+    "p99_nonzero": 38.0,
+    "p99_9_nonzero": 173.77700000006007,
+    "maximum_nonzero": 5112.0,
+    "integer_like_fraction": 1.0,
+    "negative_value_count": 0
+  },
+  "expression_scale": "inference must be based on source documentation and the sampled value summary; do not treat the sample alone as proof",
+  "training_status": "not handled by this inspection script; consult reports/allcells_atlas/analysis_summary.json for training status"
+}

@@ -1,0 +1,8 @@
+numpy>=2.0,<3
+scipy>=1.13,<2
+scikit-learn>=1.5,<2
+matplotlib>=3.9,<4
+joblib>=1.4,<2
+anndata>=0.13,<0.14
+h5py>=3.10,<4
+pandas>=3.0,<4

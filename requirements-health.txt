@@ -1,0 +1,11 @@
+cellxgene-census
+pandas
+pyarrow
+requests
+medmnist
+scikit-learn
+scanpy
+anndata
+decoupler
+lifelines
+pytest
