@@ -156,5 +156,99 @@ class CanonicalEvaluationRegistryTests(unittest.TestCase):
         self.assertIn("pneumoniamnist", medmnist["ood_rejection_benchmark"])
 
 
+class FutureRiskEstimandTests(unittest.TestCase):
+    """Verify that prospective future risk predictions return correct time horizons, estimands, and published benchmarks."""
+
+    def setUp(self) -> None:
+        self.client = TestClient(app)
+
+    def test_future_risk_endpoints_and_published_scores(self) -> None:
+        payload = {
+            "inputs": {
+                "age": 58,
+                "sex_male": 1,
+                "race_black": 0,
+                "bmi": 28.5,
+                "waist_cm": 98,
+                "systolic_bp": 138,
+                "diastolic_bp": 84,
+                "total_cholesterol": 220,
+                "hdl_cholesterol": 45,
+                "current_smoker": 1,
+                "bp_medication": 1,
+                "target_diabetes": 1,
+                "physically_active": 0,
+                "family_history_diabetes": 1,
+            }
+        }
+        resp = self.client.post("/api/risk/future", json=payload)
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+
+        # Check estimand distinction
+        self.assertIn("estimand_clarification", data)
+        self.assertIn("prospective future incidence", data["estimand_clarification"].lower())
+        self.assertIn("5-year", data["estimand_clarification"])
+        self.assertIn("10-year", data["estimand_clarification"])
+
+        # Check future mortality endpoints
+        endpoints = data["future_endpoints"]
+        self.assertIn("all_cause_mortality", endpoints)
+        self.assertIn("cardiovascular_mortality", endpoints)
+
+        all_cause = endpoints["all_cause_mortality"]
+        self.assertEqual(all_cause["estimand_type"], "prospective_incidence")
+        self.assertIn("5_year", all_cause["time_horizons"])
+        self.assertIn("10_year", all_cause["time_horizons"])
+        self.assertGreater(all_cause["time_horizons"]["10_year"]["risk_probability"], all_cause["time_horizons"]["5_year"]["risk_probability"])
+
+        cvd = endpoints["cardiovascular_mortality"]
+        self.assertEqual(cvd["estimand_type"], "prospective_incidence")
+        self.assertIn("5_year", cvd["time_horizons"])
+        self.assertIn("10_year", cvd["time_horizons"])
+
+        # Check published scores
+        scores = data["published_scores"]
+        self.assertIn("pooled_cohort_equations_pce", scores)
+        self.assertIn("indian_diabetes_risk_score_idrs", scores)
+
+        pce = scores["pooled_cohort_equations_pce"]
+        self.assertTrue(pce["eligible"])
+        self.assertGreater(pce["estimated_10yr_ascvd_risk_pct"], 0.0)
+
+        idrs = scores["indian_diabetes_risk_score_idrs"]
+        self.assertEqual(idrs["score"], 80)
+        self.assertEqual(idrs["risk_tier"], "High")
+
+    def test_pce_unit_test_worked_examples(self) -> None:
+        """Verify PCE calculation matches 2013 ACC/AHA published worked examples."""
+        from pulmoai.future_risk_service import compute_pce_10yr
+        # 55yo, TC 210, HDL 50, SBP 140 treated, non-smoker, non-diabetic
+        w_f = compute_pce_10yr(False, False, False, True, False, 55, 140, 210, 50)
+        b_f = compute_pce_10yr(False, True, False, True, False, 55, 140, 210, 50)
+        w_m = compute_pce_10yr(True, False, False, True, False, 55, 140, 210, 50)
+        b_m = compute_pce_10yr(True, True, False, True, False, 55, 140, 210, 50)
+        self.assertEqual(round(w_f, 1), 3.7)
+        self.assertEqual(round(b_f, 1), 7.6)
+        self.assertEqual(round(w_m, 1), 8.1)
+        self.assertEqual(round(b_m, 1), 13.0)
+
+    def test_idrs_unit_test_worked_examples(self) -> None:
+        """Verify IDRS scoring matches Mohan et al. 2005 published worked examples."""
+        from pulmoai.future_risk_service import compute_idrs
+        tc1 = compute_idrs(52, 102, True, 2, 1)
+        self.assertEqual(tc1["score"], 90)
+        self.assertEqual(tc1["tier"], "High")
+
+        tc2 = compute_idrs(28, 75, False, 0, 0)
+        self.assertEqual(tc2["score"], 0)
+        self.assertEqual(tc2["tier"], "Low")
+
+        tc3 = compute_idrs(42, 85, False, 1, 2)
+        self.assertEqual(tc3["score"], 70)
+        self.assertEqual(tc3["tier"], "High")
+
+
 if __name__ == "__main__":
     unittest.main()
+

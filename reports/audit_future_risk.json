@@ -1,0 +1,257 @@
+{
+  "metadata": {
+    "title": "PulmoAI Future Risk Survival Audit (Mortality-Linked NHANES-LMF 1999-2014)",
+    "timestamp": "2026-10-14T20:00:36Z",
+    "evaluation_design": "Temporal prospective holdout (Train: 1999-2010, Test: 2011-2014) linked to CDC Public-Use Linked Mortality Files (Dec 31, 2019 cutoff)",
+    "total_adults_evaluated": 47281,
+    "training_cohort_size": 35332,
+    "training_cycles": "1999-2000 through 2009-2010 (6 cycles, 12 survey years)",
+    "testing_cohort_size": 11949,
+    "testing_cycles": "2011-2012 through 2013-2014 (2 cycles, 4 survey years)",
+    "training_all_cause_deaths": 7733,
+    "training_cvd_deaths": 2478,
+    "testing_all_cause_deaths": 1095,
+    "testing_5yr_all_cause_deaths": 745,
+    "testing_5yr_cvd_deaths": 244
+  },
+  "published_score_unit_tests": {
+    "pce_unit_tests": {
+      "passed": true,
+      "white_female_55yo_risk_pct": 3.69,
+      "black_female_55yo_risk_pct": 7.61,
+      "white_male_55yo_risk_pct": 8.06,
+      "black_male_55yo_risk_pct": 13.03,
+      "citation": "Goff DC Jr, et al. 2013 ACC/AHA Guideline on Assessment of Cardiovascular Risk. Circulation 2014;129(25 Suppl 2):S49-S73."
+    },
+    "idrs_unit_tests": {
+      "passed": true,
+      "worked_example_high": {
+        "score": 90,
+        "tier": "High",
+        "components": {
+          "age": 30,
+          "waist": 20,
+          "activity": 30,
+          "family_history": 10
+        }
+      },
+      "worked_example_low": {
+        "score": 0,
+        "tier": "Low",
+        "components": {
+          "age": 0,
+          "waist": 0,
+          "activity": 0,
+          "family_history": 0
+        }
+      },
+      "worked_example_moderate_high": {
+        "score": 70,
+        "tier": "High",
+        "components": {
+          "age": 20,
+          "waist": 10,
+          "activity": 20,
+          "family_history": 20
+        }
+      },
+      "citation": "Mohan V, et al. A simplified Indian Diabetes Risk Score for screening for undiagnosed diabetic subjects. J Assoc Physicians India 2005;53:759-763."
+    }
+  },
+  "endpoints": {
+    "all_cause_mortality": {
+      "baseline_age_sex": {
+        "c_index": 0.8372,
+        "c_index_ci95": [
+          0.8247,
+          0.8496
+        ],
+        "holdout_5yr_auroc": 0.8488,
+        "holdout_5yr_auroc_ci95": [
+          0.8346,
+          0.8637
+        ]
+      },
+      "multivariable_cox_ph": {
+        "c_index": 0.8621,
+        "c_index_ci95": [
+          0.8509,
+          0.8738
+        ],
+        "holdout_5yr_auroc": 0.8735,
+        "holdout_5yr_auroc_ci95": [
+          0.8599,
+          0.8854
+        ],
+        "holdout_5yr_brier_score": 0.0468,
+        "holdout_5yr_brier_skill": 0.2024,
+        "holdout_5yr_calibration_slope": 1.0352,
+        "holdout_5yr_calibration_intercept": 0.0651,
+        "within_cohort_10yr_c_index": 0.878,
+        "within_cohort_10yr_auroc": 0.9056,
+        "within_cohort_10yr_brier_score": 0.0805,
+        "within_cohort_10yr_calibration_slope": 1.0858,
+        "risk_stratification_5yr": {
+          "cutoffs": {
+            "moderate_threshold": 0.0179,
+            "high_threshold": 0.0928
+          },
+          "observed_event_rate_low_tier": 0.77,
+          "observed_event_rate_moderate_tier": 3.5,
+          "observed_event_rate_high_tier": 24.09,
+          "relative_risk_high_vs_low": 31.15
+        }
+      },
+      "gradient_boosted_survival": {
+        "c_index": 0.8472,
+        "c_index_ci95": [
+          0.8347,
+          0.86
+        ],
+        "holdout_5yr_auroc": 0.8592,
+        "holdout_5yr_auroc_ci95": [
+          0.8449,
+          0.8736
+        ]
+      }
+    },
+    "cardiovascular_mortality": {
+      "baseline_age_sex": {
+        "c_index": 0.8631,
+        "c_index_ci95": [
+          0.8419,
+          0.8827
+        ],
+        "holdout_5yr_auroc": 0.8765,
+        "holdout_5yr_auroc_ci95": [
+          0.8549,
+          0.8982
+        ]
+      },
+      "multivariable_cox_ph": {
+        "c_index": 0.8948,
+        "c_index_ci95": [
+          0.8768,
+          0.9115
+        ],
+        "holdout_5yr_auroc": 0.9074,
+        "holdout_5yr_auroc_ci95": [
+          0.8907,
+          0.9261
+        ],
+        "holdout_5yr_brier_score": 0.0184,
+        "holdout_5yr_brier_skill": 0.1222,
+        "holdout_5yr_calibration_slope": 1.2095,
+        "holdout_5yr_calibration_intercept": 0.6018,
+        "within_cohort_10yr_c_index": 0.9059,
+        "within_cohort_10yr_auroc": 0.9311,
+        "within_cohort_10yr_brier_score": 0.04,
+        "within_cohort_10yr_calibration_slope": 1.3572,
+        "risk_stratification_5yr": {
+          "cutoffs": {
+            "moderate_threshold": 0.0059,
+            "high_threshold": 0.0309
+          },
+          "observed_event_rate_low_tier": 0.15,
+          "observed_event_rate_moderate_tier": 0.75,
+          "observed_event_rate_high_tier": 10.32,
+          "relative_risk_high_vs_low": 67.74
+        }
+      },
+      "gradient_boosted_survival": {
+        "c_index": 0.867,
+        "c_index_ci95": [
+          0.8458,
+          0.8868
+        ],
+        "holdout_5yr_auroc": 0.8826,
+        "holdout_5yr_auroc_ci95": [
+          0.8616,
+          0.9032
+        ]
+      }
+    }
+  },
+  "published_score_comparisons": {
+    "pce_vs_ml_cardiovascular_mortality": {
+      "evaluation_cohort": {
+        "description": "Temporal holdout (2011-2014) adults aged 40-79 meeting ACC/AHA guideline criteria with complete lipids and exam blood pressure",
+        "sample_size": 5632,
+        "cvd_events_5yr": 94,
+        "cvd_events_total_followup": 153
+      },
+      "models": {
+        "pooled_cohort_equations_pce_2013": {
+          "c_index": 0.7797,
+          "c_index_ci95": [
+            0.7426,
+            0.8147
+          ],
+          "holdout_5yr_auroc": 0.7684,
+          "holdout_5yr_auroc_ci95": [
+            0.7199,
+            0.8155
+          ],
+          "model_type": "Published Expert Cox Model (ACC/AHA 2013, 9 features)"
+        },
+        "multivariable_cox_ph_pulmoai": {
+          "c_index": 0.828,
+          "c_index_ci95": [
+            0.7923,
+            0.858
+          ],
+          "holdout_5yr_auroc": 0.8204,
+          "holdout_5yr_auroc_ci95": [
+            0.7758,
+            0.8621
+          ],
+          "model_type": "Trained Regularized Cox PH (25 features)"
+        },
+        "gradient_boosted_survival_pulmoai": {
+          "c_index": 0.7597,
+          "c_index_ci95": [
+            0.7179,
+            0.8029
+          ],
+          "holdout_5yr_auroc": 0.7477,
+          "holdout_5yr_auroc_ci95": [
+            0.6917,
+            0.7992
+          ],
+          "model_type": "Trained Gradient Boosted Survival (25 features)"
+        }
+      },
+      "delta_auroc_gbs_vs_pce": -0.0207,
+      "delta_c_index_gbs_vs_pce": -0.02
+    },
+    "idrs_vs_ml_diabetes": {
+      "evaluation_cohort": {
+        "description": "Temporal holdout (2011-2014) adults with complete physical activity, waist circumference, and family history questionnaires",
+        "sample_size": 10034,
+        "diabetes_cases": 1229,
+        "prevalence_pct": 12.25
+      },
+      "models": {
+        "indian_diabetes_risk_score_idrs_mohan": {
+          "holdout_auroc": 0.7798,
+          "holdout_auroc_ci95": [
+            0.7672,
+            0.79
+          ],
+          "mean_score_diabetic": 73.0,
+          "mean_score_non_diabetic": 50.5,
+          "model_type": "Published Expert Point Score (Mohan et al. 2005, 4 non-invasive features)"
+        },
+        "logistic_regression_4_feature_baseline": {
+          "holdout_auroc": 0.8303,
+          "holdout_auroc_ci95": [
+            0.819,
+            0.8402
+          ],
+          "model_type": "Trained Logistic Regression on same 4 non-invasive features"
+        }
+      },
+      "delta_auroc_lr_vs_idrs": 0.0505
+    }
+  }
+}

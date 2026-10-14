@@ -154,4 +154,33 @@ class IntegrityResponse(BaseModel):
     checkpoints: dict[str, dict[str, Any]]
 
 
+# ---------------------------------------------------------------------------
+# Phase 5: Future Risk (Mortality-Linked) Schemas
+# ---------------------------------------------------------------------------
+
+class FutureRiskTimeHorizon(BaseModel):
+    risk_probability: float
+    risk_percent: float
+
+
+class FutureRiskEndpoint(BaseModel):
+    display_name: str
+    estimand_type: str = "prospective_incidence"
+    estimand_label: str
+    estimand_description: str
+    time_horizons: dict[str, FutureRiskTimeHorizon]
+    risk_tier_5yr: str
+    tier_cutoffs_5yr: dict[str, float]
+    benchmark_metrics: dict[str, float]
+
+
+class FutureRiskResponse(BaseModel):
+    future_endpoints: dict[str, FutureRiskEndpoint]
+    published_scores: dict[str, Any]
+    features_provided_count: int
+    estimand_clarification: str
+    disclaimer: str
+
+
+
 

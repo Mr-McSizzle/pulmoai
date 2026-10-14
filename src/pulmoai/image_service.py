@@ -207,6 +207,9 @@ class ImageScreeningService:
                     "meets_below_10pct_target": True,
                 }
 
+                # Precompute empirical OOD metrics for this modality and threshold
+                ood_info = self._get_empirical_ood_metrics(image_type, ood_threshold)
+
                 # 1. Gate detects non-medical / other
                 if g_pred == "other":
                     gate_info["status"] = "REJECTED_NON_MEDICAL"
@@ -221,6 +224,12 @@ class ImageScreeningService:
                         ),
                         "predicted_class": None,
                         "confidence": None,
+                        "threshold_applied": ood_threshold,
+                        "empirical_false_accept_rate": ood_info.get("empirical_false_accept_rate"),
+                        "cifar10_false_accept_rate": ood_info.get("cifar10_false_accept_rate"),
+                        "guard_status": ood_info.get("guard_status"),
+                        "ood_benchmark": ood_info,
+                        "ood_methodology_statement": ood_info.get("methodology_statement"),
                         "modality_gate": gate_info,
                         "warning_banner": "Warning: Input was rejected by the Modality Gate as non-target/non-medical content.",
                         "clinical_notice": "Benchmark model, not for clinical use.",
@@ -241,6 +250,12 @@ class ImageScreeningService:
                         ),
                         "predicted_class": None,
                         "confidence": None,
+                        "threshold_applied": ood_threshold,
+                        "empirical_false_accept_rate": ood_info.get("empirical_false_accept_rate"),
+                        "cifar10_false_accept_rate": ood_info.get("cifar10_false_accept_rate"),
+                        "guard_status": ood_info.get("guard_status"),
+                        "ood_benchmark": ood_info,
+                        "ood_methodology_statement": ood_info.get("methodology_statement"),
                         "modality_gate": gate_info,
                         "warning_banner": f"Warning: Selected modality '{image_type}' does not match detected image modality '{g_pred}'.",
                         "clinical_notice": "Benchmark model, not for clinical use.",

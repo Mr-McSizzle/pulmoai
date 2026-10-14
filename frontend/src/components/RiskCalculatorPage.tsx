@@ -6,16 +6,25 @@ import {
   RefreshCw,
   Sliders,
   Zap,
+  Clock,
+  HeartPulse,
+  BookmarkCheck,
+  Calendar,
 } from "lucide-react";
 import { api } from "../api";
-import type { RiskPredictionResponse, ConditionRiskResult } from "../types";
+import type {
+  RiskPredictionResponse,
+  ConditionRiskResult,
+  FutureRiskResponse,
+  FutureRiskEndpoint,
+} from "../types";
 
 interface RiskCalculatorPageProps {
   initialFeatures?: Record<string, number> | null;
 }
 
 export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps) {
-  const [inputs, setInputs] = useState<Record<string, number>>({
+  const [inputs, setInputs] = useState<Record<string, any>>({
     age: 52,
     gender: 1, // 1: Male, 2: Female
     systolic_bp: 136,
@@ -27,11 +36,18 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
     triglycerides: 165,
     creatinine: 1.05,
     smoking_status: 0, // 0: Never, 1: Former, 2: Current
+    waist_circumference_cm: 92,
+    physical_activity: 1, // 0: Vigorous, 1: Moderate, 2: Sedentary
+    family_history_diabetes: 0, // 0: None, 1: One Parent, 2: Both Parents
+    bp_medication: 0, // 0: No, 1: Yes
+    history_diabetes: 0, // 0: No, 1: Yes
+    race_black: 0, // 0: Non-Black, 1: African American / Black
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<RiskPredictionResponse | null>(null);
+  const [futureResult, setFutureResult] = useState<FutureRiskResponse | null>(null);
 
   // Sync initialFeatures if passed from Lab Report transfer
   useEffect(() => {
@@ -40,34 +56,36 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
         ...prev,
         ...initialFeatures,
       }));
-      // Auto-run prediction with the transferred values
       runPrediction({ ...inputs, ...initialFeatures });
     } else {
-      // Run initial prediction on default values
       runPrediction(inputs);
     }
   }, [initialFeatures]);
 
-  const updateInput = (key: string, value: number) => {
+  const updateInput = (key: string, value: any) => {
     setInputs((prev) => ({ ...prev, [key]: value }));
   };
 
-  const runPrediction = async (customInputs?: Record<string, number>) => {
+  const runPrediction = async (customInputs?: Record<string, any>) => {
     const payload = customInputs || inputs;
     setLoading(true);
     setError(null);
     try {
-      const res = await api.predictRisk(payload);
-      setResult(res);
+      const [resRisk, resFuture] = await Promise.all([
+        api.predictRisk(payload),
+        api.predictFutureRisk(payload),
+      ]);
+      setResult(resRisk);
+      setFutureResult(resFuture);
     } catch (err: any) {
-      setError(err?.message || "Failed to calculate chronic disease risk.");
+      setError(err?.message || "Failed to calculate chronic disease and prospective survival risk.");
     } finally {
       setLoading(false);
     }
   };
 
   const loadPreset = (preset: "healthy" | "metabolic" | "senior") => {
-    let p: Record<string, number> = {};
+    let p: Record<string, any> = {};
     if (preset === "healthy") {
       p = {
         age: 32,
@@ -81,6 +99,12 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
         triglycerides: 110,
         creatinine: 0.85,
         smoking_status: 0,
+        waist_circumference_cm: 74,
+        physical_activity: 0,
+        family_history_diabetes: 0,
+        bp_medication: 0,
+        history_diabetes: 0,
+        race_black: 0,
       };
     } else if (preset === "metabolic") {
       p = {
@@ -95,6 +119,12 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
         triglycerides: 230,
         creatinine: 1.25,
         smoking_status: 2,
+        waist_circumference_cm: 104,
+        physical_activity: 2,
+        family_history_diabetes: 1,
+        bp_medication: 1,
+        history_diabetes: 1,
+        race_black: 0,
       };
     } else {
       p = {
@@ -109,6 +139,12 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
         triglycerides: 170,
         creatinine: 1.35,
         smoking_status: 1,
+        waist_circumference_cm: 96,
+        physical_activity: 1,
+        family_history_diabetes: 0,
+        bp_medication: 1,
+        history_diabetes: 0,
+        race_black: 0,
       };
     }
     setInputs(p);
@@ -120,6 +156,8 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
       case "High":
         return "bg-rose-100 text-rose-800 border-rose-200";
       case "Moderate":
+      case "Intermediate":
+      case "Borderline":
         return "bg-amber-100 text-amber-800 border-amber-200";
       default:
         return "bg-emerald-100 text-emerald-800 border-emerald-200";
@@ -131,6 +169,8 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
       case "High":
         return "bg-rose-500";
       case "Moderate":
+      case "Intermediate":
+      case "Borderline":
         return "bg-amber-500";
       default:
         return "bg-emerald-500";
@@ -141,11 +181,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
     <div className="module-page space-y-6">
       <div className="page-heading">
         <div>
-          <div className="eyebrow page-kicker">PHASE 2 · CHRONIC RISK ENGINE</div>
-          <h1>Chronic Disease Risk Engine</h1>
+          <div className="eyebrow page-kicker">PHASE 2 & PART B · CHRONIC RISK & SURVIVAL ENGINE</div>
+          <h1>Chronic Disease Risk & Prospective Survival Engine</h1>
           <p>
-            Population-calibrated risk models trained on 17,961 NHANES adult participants.
-            Achieves <strong>85.3% AUROC / 86.6% accuracy</strong> on out-of-sample forward evaluation cohorts.
+            Population-calibrated clinical risk models trained on 17,961 NHANES adult participants (cross-sectional)
+            and 47,281 adults linked to the CDC National Death Index across 16 years (prospective survival).
           </p>
         </div>
       </div>
@@ -270,7 +310,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
             {/* BMI */}
             <div>
               <label className="block text-[11px] font-medium text-slate-600 mb-1">
-                BMI: <strong className="text-slate-800">{inputs.bmi} kg/m²</strong>
+                BMI: <strong className="text-slate-800">{inputs.bmi} kg/m2</strong>
               </label>
               <input
                 type="range"
@@ -358,6 +398,50 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 className="w-full accent-teal-600"
               />
             </div>
+
+            {/* Waist Circumference (IDRS predictor) */}
+            <div>
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                Waist Circ: <strong className="text-slate-800">{inputs.waist_circumference_cm} cm</strong>
+              </label>
+              <input
+                type="range"
+                min="60"
+                max="140"
+                value={inputs.waist_circumference_cm}
+                onChange={(e) => updateInput("waist_circumference_cm", Number(e.target.value))}
+                className="w-full accent-teal-600"
+              />
+            </div>
+
+            {/* Race / Ethnicity (PCE predictor) */}
+            <div>
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">Race/Ethnicity (PCE)</label>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button
+                  type="button"
+                  className={`py-1 rounded text-center border text-[11px] font-medium ${
+                    inputs.race_black === 0
+                      ? "bg-teal-50 border-teal-500 text-teal-800 font-bold"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                  onClick={() => updateInput("race_black", 0)}
+                >
+                  Non-Black
+                </button>
+                <button
+                  type="button"
+                  className={`py-1 rounded text-center border text-[11px] font-medium ${
+                    inputs.race_black === 1
+                      ? "bg-teal-50 border-teal-500 text-teal-800 font-bold"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                  onClick={() => updateInput("race_black", 1)}
+                >
+                  Black / AA
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Smoking Status */}
@@ -380,24 +464,315 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
               ))}
             </div>
           </div>
+
+          {/* Physical Activity & Family History (IDRS inputs) */}
+          <div className="pt-2 border-t border-slate-200 grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label className="block text-[11px] font-medium text-slate-600 mb-1.5">Physical Activity (IDRS)</label>
+              <div className="grid grid-cols-3 gap-1">
+                {["Vigorous", "Moderate", "Sedentary"].map((label, idx) => (
+                  <button
+                    key={label}
+                    type="button"
+                    className={`py-1 rounded text-center border text-[10px] font-medium ${
+                      inputs.physical_activity === idx
+                        ? "bg-teal-50 border-teal-500 text-teal-800 font-bold"
+                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}
+                    onClick={() => updateInput("physical_activity", idx)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-medium text-slate-600 mb-1.5">Family History Diabetes</label>
+              <div className="grid grid-cols-3 gap-1">
+                {["None", "1 Parent", "Both Parents"].map((label, idx) => (
+                  <button
+                    key={label}
+                    type="button"
+                    className={`py-1 rounded text-center border text-[10px] font-medium ${
+                      inputs.family_history_diabetes === idx
+                        ? "bg-teal-50 border-teal-500 text-teal-800 font-bold"
+                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}
+                    onClick={() => updateInput("family_history_diabetes", idx)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Clinical Treatment History (PCE inputs) */}
+          <div className="pt-2 border-t border-slate-200 grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label className="block text-[11px] font-medium text-slate-600 mb-1.5">On BP Medication?</label>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button
+                  type="button"
+                  className={`py-1 rounded text-center border text-[11px] font-medium ${
+                    inputs.bp_medication === 0
+                      ? "bg-teal-50 border-teal-500 text-teal-800 font-bold"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                  onClick={() => updateInput("bp_medication", 0)}
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  className={`py-1 rounded text-center border text-[11px] font-medium ${
+                    inputs.bp_medication === 1
+                      ? "bg-teal-50 border-teal-500 text-teal-800 font-bold"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                  onClick={() => updateInput("bp_medication", 1)}
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-medium text-slate-600 mb-1.5">Diagnosed Diabetes?</label>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button
+                  type="button"
+                  className={`py-1 rounded text-center border text-[11px] font-medium ${
+                    inputs.history_diabetes === 0
+                      ? "bg-teal-50 border-teal-500 text-teal-800 font-bold"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                  onClick={() => updateInput("history_diabetes", 0)}
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  className={`py-1 rounded text-center border text-[11px] font-medium ${
+                    inputs.history_diabetes === 1
+                      ? "bg-teal-50 border-teal-500 text-teal-800 font-bold"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                  onClick={() => updateInput("history_diabetes", 1)}
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Prediction Results Display */}
-        <div className="lg:col-span-7 space-y-4">
+        <div className="lg:col-span-7 space-y-6">
           {error && (
             <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs">
               {error}
             </div>
           )}
 
+          {/* ============================================================== */}
+          {/* SECTION 1: FUTURE RISK (MORTALITY-LINKED SURVIVAL PROGNOSTICS) */}
+          {/* ============================================================== */}
+          {futureResult && (
+            <div className="space-y-4 p-5 rounded-2xl bg-white border border-teal-200/80 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-teal-700 flex items-center gap-1.5">
+                    <Clock size={13} className="text-teal-600" /> Prospective Survival Incidence
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 mt-0.5">
+                    Future Risk: 5-Year & 10-Year Mortality Endpoints
+                  </h3>
+                </div>
+                <span className="text-[10px] bg-teal-50 text-teal-800 border border-teal-200 px-2 py-0.5 rounded font-medium">
+                  CDC NHANES Linked Follow-up (1999-2019)
+                </span>
+              </div>
+
+              {/* Prominent Estimand Distinction Banner */}
+              <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 text-[11px] text-amber-900 leading-relaxed flex items-start gap-2.5">
+                <ShieldCheck size={18} className="shrink-0 text-amber-700 mt-0.5" />
+                <div className="space-y-1">
+                  <div className="font-semibold text-amber-950">
+                    CRITICAL ESTIMAND DISTINCTION: Prospective Future Incidence
+                  </div>
+                  <p className="text-[10px] text-amber-800 leading-normal">
+                    The models in this section estimate <strong>prospective future mortality incidence</strong> over fixed
+                    5-year (60 months) and 10-year (120 months) horizons derived from 47,281 civilian adults tracked
+                    prospectively through the National Death Index. This is mathematically and clinically distinct from
+                    cross-sectional prevalence of current doctor diagnoses.
+                  </p>
+                </div>
+              </div>
+
+              {/* Future Endpoints Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {Object.entries(futureResult.future_endpoints).map(([endKey, endData]: [string, FutureRiskEndpoint]) => {
+                  const risk5yr = endData.time_horizons["5_year"]?.risk_percent ?? 0;
+                  const risk10yr = endData.time_horizons["10_year"]?.risk_percent ?? 0;
+                  const tier = endData.risk_tier_5yr;
+
+                  return (
+                    <div
+                      key={endKey}
+                      className="p-4 rounded-xl bg-slate-50/60 border border-slate-200 hover:border-teal-300 transition-colors relative overflow-hidden flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                              <HeartPulse size={14} className="text-rose-600" />
+                              {endData.display_name}
+                            </div>
+                            <div className="text-[10px] text-slate-500 mt-0.5">
+                              C-index {endData.benchmark_metrics?.c_index} · 5-yr AUROC {endData.benchmark_metrics?.holdout_5yr_auroc}
+                            </div>
+                          </div>
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${getTierColor(tier)}`}
+                          >
+                            {tier} Risk (5-Yr)
+                          </span>
+                        </div>
+
+                        {/* Dual Horizon Display */}
+                        <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200">
+                          <div>
+                            <div className="text-[10px] font-semibold text-slate-500 flex items-center gap-1">
+                              <Calendar size={11} className="text-teal-600" /> 5-Year Incidence
+                            </div>
+                            <div className="text-xl font-black text-slate-900 mt-0.5">
+                              {risk5yr.toFixed(2)}%
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] font-semibold text-slate-500 flex items-center gap-1">
+                              <Calendar size={11} className="text-slate-400" /> 10-Year Incidence
+                            </div>
+                            <div className="text-xl font-black text-slate-800 mt-0.5">
+                              {risk10yr.toFixed(2)}%
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar for 5-Year Risk */}
+                        <div className="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden mt-3">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${getProgressBarColor(tier)}`}
+                            style={{ width: `${Math.min(100, Math.max(4, risk5yr * 2))}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Estimand Note */}
+                      <div className="mt-3 text-[9px] text-slate-500 bg-white border border-slate-200/80 rounded px-2 py-1 leading-snug">
+                        {endData.estimand_description}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Published Clinical Scores Benchmark Comparison Cards */}
+              <div className="pt-2 border-t border-slate-200">
+                <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <BookmarkCheck size={14} className="text-teal-600" /> Head-to-Head Comparison with Published Clinical Scores
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {/* ACC/AHA Pooled Cohort Equations */}
+                  {futureResult.published_scores?.pooled_cohort_equations_pce && (
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                      <div className="flex items-start justify-between gap-1">
+                        <div>
+                          <div className="font-bold text-slate-900">
+                            {futureResult.published_scores.pooled_cohort_equations_pce.display_name}
+                          </div>
+                          <div className="text-[10px] text-slate-500">
+                            Holdout C-index: {futureResult.published_scores.pooled_cohort_equations_pce.benchmark_c_index_on_holdout} · AUROC: {futureResult.published_scores.pooled_cohort_equations_pce.benchmark_5yr_auroc_on_holdout}
+                          </div>
+                        </div>
+                        {futureResult.published_scores.pooled_cohort_equations_pce.risk_category && (
+                          <span
+                            className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${getTierColor(
+                              futureResult.published_scores.pooled_cohort_equations_pce.risk_category
+                            )}`}
+                          >
+                            {futureResult.published_scores.pooled_cohort_equations_pce.risk_category}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-2 text-lg font-black text-slate-900">
+                        {futureResult.published_scores.pooled_cohort_equations_pce.estimated_10yr_ascvd_risk_pct !== null
+                          ? `${futureResult.published_scores.pooled_cohort_equations_pce.estimated_10yr_ascvd_risk_pct.toFixed(1)}% 10-Yr ASCVD Risk`
+                          : "Ineligible (Age outside 40-79 or missing lipids)"}
+                      </div>
+                      <div className="text-[9px] text-slate-500 mt-1 italic">
+                        {futureResult.published_scores.pooled_cohort_equations_pce.citation}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Indian Diabetes Risk Score (IDRS) */}
+                  {futureResult.published_scores?.indian_diabetes_risk_score_idrs && (
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                      <div className="flex items-start justify-between gap-1">
+                        <div>
+                          <div className="font-bold text-slate-900">
+                            {futureResult.published_scores.indian_diabetes_risk_score_idrs.display_name}
+                          </div>
+                          <div className="text-[10px] text-slate-500">
+                            Holdout AUROC: {futureResult.published_scores.indian_diabetes_risk_score_idrs.benchmark_auroc_on_holdout}
+                          </div>
+                        </div>
+                        <span
+                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${getTierColor(
+                            futureResult.published_scores.indian_diabetes_risk_score_idrs.risk_tier
+                          )}`}
+                        >
+                          {futureResult.published_scores.indian_diabetes_risk_score_idrs.risk_tier} Risk
+                        </span>
+                      </div>
+
+                      <div className="mt-2 text-lg font-black text-slate-900">
+                        {futureResult.published_scores.indian_diabetes_risk_score_idrs.score} / 100 Points
+                      </div>
+                      <div className="text-[10px] text-slate-600 mt-0.5">
+                        Age: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.age_points} · Waist: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.waist_points} · Activity: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.activity_points} · Family: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.family_history_points}
+                      </div>
+                      <div className="text-[9px] text-slate-500 mt-1 italic">
+                        {futureResult.published_scores.indian_diabetes_risk_score_idrs.citation}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================== */}
+          {/* SECTION 2: CROSS-SECTIONAL CHRONIC CONDITION RISK (PREVALENCE) */}
+          {/* ============================================================== */}
           {result && (
-            <div className="space-y-3">
+            <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                  <Activity size={14} className="text-teal-600" /> Multi-Condition Risk Assessment
-                </h3>
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                    <Activity size={14} className="text-teal-600" /> Cross-Sectional Chronic Condition Risk (Current Prevalence)
+                  </h3>
+                  <div className="text-[10px] text-slate-500">
+                    Estimates probability of current doctor-diagnosed condition among US adults (NHANES Cycles H-J)
+                  </div>
+                </div>
                 <span className="text-[10px] text-slate-500 font-medium">
-                  Evaluation: NHANES Forward Cycle J
+                  Evaluation: Holdout Cycle J (2017-2018)
                 </span>
               </div>
 
@@ -465,7 +840,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                   <div>
                     <strong>Estimand Clarification:</strong>{" "}
                     {result.estimand_clarification ||
-                      "All outputs estimate the probability of a CURRENT self-reported diagnosis in civilian adults; they do NOT predict future disease incidence."}
+                      "All outputs in this section estimate the probability of a CURRENT self-reported diagnosis in civilian adults; they do NOT predict future disease incidence."}
                   </div>
                   <div className="text-[10px] text-slate-500">
                     <strong>Safeguards:</strong> Fasting glucose and HbA1c are strictly withheld from diabetes modeling to avoid diagnostic circularity. Screening triage only; not a clinical diagnosis.
