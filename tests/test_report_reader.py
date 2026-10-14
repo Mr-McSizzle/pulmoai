@@ -325,5 +325,119 @@ class ReportReaderAPITests(unittest.TestCase):
         self.assertIn("contributing_factors", data)
 
 
+class ReportReaderRegressionTests(unittest.TestCase):
+    """Regression tests for clean PDF extraction, alias priorities, and adaptive preprocessing."""
+
+    def test_clean_pdf_five_layouts_accuracy(self) -> None:
+        """Verify native PDF text layer extraction achieves >= 98% accuracy across all 5 layouts."""
+        from scripts.audit_ocr_part_a import build_synthetic_dataset, render_pdf_bytes, evaluate_extracted_entities
+
+        dataset = build_synthetic_dataset(n_variations_per_layout=10)
+        by_layout: dict[str, list[int]] = {}
+
+        for d in dataset:
+            lid = d["layout_id"]
+            if lid not in by_layout:
+                by_layout[lid] = [0, 0]
+            pdf_b = render_pdf_bytes(d["text"])
+            doc = pymupdf.open(stream=pdf_b, filetype="pdf")
+            txt = doc[0].get_text()
+            doc.close()
+            extracted, _ = parse_lab_text(txt, sex=d["patient_sex"])
+            m, tot, _ = evaluate_extracted_entities(extracted, d["entities"])
+            by_layout[lid][0] += m
+            by_layout[lid][1] += tot
+
+        for lid, (m, tot) in by_layout.items():
+            acc = m / tot
+            self.assertGreaterEqual(
+                acc,
+                0.98,
+                f"Layout {lid} clean PDF accuracy {acc:.2%} ({m}/{tot}) below 98.0% target",
+            )
+
+    def test_hdl_direct_not_overwritten_by_total_cholesterol(self) -> None:
+        """Verify HDL direct assay is not captured by total cholesterol alias."""
+        text = (
+            "METROPOLIS HEALTHCARE LIMITED\n"
+            "TEST DESCRIPTION               FINDING   STANDARD UNIT   REFERENCE RANGE\n"
+            "CHOLESTEROL, TOTAL              215.0     mg/dL           < 200.0\n"
+            "HDL CHOLESTEROL - DIRECT        48.0      mg/dL           >= 40.0\n"
+            "TRIGLYCERIDES                   160.0     mg/dL           < 150.0\n"
+        )
+        extracted, _ = parse_lab_text(text, sex="male")
+        extracted_map = {it.canonical_name: it for it in extracted}
+
+        self.assertIn("total_cholesterol", extracted_map)
+        self.assertEqual(extracted_map["total_cholesterol"].value, 215.0)
+        self.assertEqual(extracted_map["total_cholesterol"].flag, "HIGH")
+
+        self.assertIn("hdl_cholesterol", extracted_map)
+        self.assertEqual(extracted_map["hdl_cholesterol"].value, 48.0)
+        self.assertEqual(extracted_map["hdl_cholesterol"].flag, "NORMAL")
+
+        self.assertIn("triglycerides", extracted_map)
+        self.assertEqual(extracted_map["triglycerides"].value, 160.0)
+        self.assertEqual(extracted_map["triglycerides"].flag, "HIGH")
+
+    def test_one_sided_reference_range_flagging(self) -> None:
+        """Verify one-sided printed ranges fall back to physiological minima for deficit detection."""
+        # Total cholesterol: printed < 200 mg/dL, physiological min 100 mg/dL
+        flag_low = determine_flag("total_cholesterol", 80.0, ref_max=199.0)
+        self.assertEqual(flag_low, "LOW")
+
+        flag_norm = determine_flag("total_cholesterol", 150.0, ref_max=199.0)
+        self.assertEqual(flag_norm, "NORMAL")
+
+        # Triglycerides: printed < 150 mg/dL, physiological min 50 mg/dL
+        flag_tg_low = determine_flag("triglycerides", 35.0, ref_max=149.0)
+        self.assertEqual(flag_tg_low, "LOW")
+
+    def test_bulleted_and_prefixed_lines(self) -> None:
+        """Verify leading bullet points and hyphens are stripped without corrupting test names."""
+        text = (
+            "HOSPITAL DISCHARGE SUMMARY\n"
+            "- Fasting Plasma Glucose: 110.0 mg/dL (Ref: 70.0 - 99.0)\n"
+            "• Creatinine: 0.9 mg/dL (Ref: 0.7 - 1.3)\n"
+            "* Hemoglobin: 14.5 g/dL (Ref: 13.5 - 17.5)\n"
+        )
+        extracted, _ = parse_lab_text(text, sex="male")
+        extracted_map = {it.canonical_name: it for it in extracted}
+
+        self.assertIn("fasting_glucose", extracted_map)
+        self.assertEqual(extracted_map["fasting_glucose"].value, 110.0)
+        self.assertEqual(extracted_map["fasting_glucose"].flag, "HIGH")
+
+        self.assertIn("serum_creatinine", extracted_map)
+        self.assertEqual(extracted_map["serum_creatinine"].value, 0.9)
+        self.assertEqual(extracted_map["serum_creatinine"].flag, "NORMAL")
+
+        self.assertIn("hemoglobin", extracted_map)
+        self.assertEqual(extracted_map["hemoglobin"].value, 14.5)
+        self.assertEqual(extracted_map["hemoglobin"].flag, "NORMAL")
+
+    def test_adaptive_preprocessing_decision(self) -> None:
+        """Verify adaptive preprocessing gates blur and skew accurately."""
+        from pulmoai.report_reader import preprocess_lab_image_adaptive
+        from PIL import ImageFilter
+
+        # Base clear image
+        base = Image.new("RGB", (800, 600), color=(255, 255, 255))
+        draw = ImageDraw.Draw(base)
+        for y in range(50, 550, 40):
+            draw.text((50, y), f"Sample Laboratory Text Line {y} Result 120.0 mg/dL", fill=(0, 0, 0))
+
+        # Blurred image
+        blurred = base.filter(ImageFilter.GaussianBlur(radius=3.0))
+        _, rationale_blur = preprocess_lab_image_adaptive(blurred)
+        self.assertIn("blur_defocus_detected", rationale_blur)
+
+        # Rotated image
+        rotated = base.rotate(3.5, expand=True, fillcolor=(255, 255, 255))
+        _, rationale_rot = preprocess_lab_image_adaptive(rotated)
+        self.assertIn("deskewed_and_enhanced", rationale_rot)
+
+
 if __name__ == "__main__":
     unittest.main()
+

@@ -94,7 +94,7 @@ pages = [
     ("Single-Cell Atlas", "Route: /analyze", "Pseudobulk CSV upload, 4-class disease classification", "#CCFBF1", "#0D9488"),
     ("Lab Report Reader", "Route: /reports", "PDF & OCR text parsing, SI-to-US unit normalization", "#DBEAFE", "#2563EB"),
     ("Chronic Risk Calculator", "Route: /risk", "6 NHANES risk gauges, 1-click lab transfer, presets", "#FFE4E6", "#E11D48"),
-    ("Medical Image Screening", "Route: /images", "5 MedMNIST modalities, ResNet-18, OOD guard slider", "#F3E8FF", "#7C3AED"),
+    ("Medical Image Screening", "Route: /images", "5 MedMNIST modalities, ResNet-18, OOD guard audit", "#F3E8FF", "#7C3AED"),
     ("Performance Audit", "Route: /performance", "LOSO cross-validation tables, confusion matrix, ROC", "#FEF3C7", "#D97706"),
 ]
 
@@ -168,64 +168,64 @@ engines = [
     (
         "Engine 1: Single-Cell Lung Atlas",
         "Linear SVM + Platt Scaling (Sigmoid 5-fold CV)",
-        "CPM counts -> log1p -> Standardize (30,566 genes)",
-        "4 Classes: Donor, COPD, PF, COVID19",
-        "Accuracy: 66.4% LOSO Outer Cross-Validation",
-        "Artifact: models/ensemble_benchmark_best.joblib",
+        "CPM -> log1p -> SelectKBest (500 / 30,566 genes)",
+        "4 Classes: Donor, COPD, PF, COVID-19",
+        "Accuracy: 62.9% Calibrated / 64.8% Uncalibrated",
+        "Dual-Rule Artifact: models/lung_uncalibrated_dual_rule.joblib",
         "#0D9488", "#F0FDFA", "#CCFBF1",
     ),
     (
         "Engine 2: Clinical Lab OCR Parser",
         "PyMuPDF Digital Text Layer + Tesseract OCR",
-        "Regex entity extraction for 20+ laboratory markers",
-        "Automated SI-to-US clinical unit conversion",
-        "Standard adult reference interval flagger",
-        "Accuracy: >99.5% on native PDFs; 91.2% OCR",
+        "Deskew & 300 DPI preproc (+33.4% recovery on tilt)",
+        "Sex-specific ranges (Hb, Cr, HDL) & printed priority",
+        "Confirmation gate: blocks transfer if confidence < 0.70",
+        "Synthetic benchmark (n=350/cond across 5 layouts)",
         "#2563EB", "#EFF6FF", "#DBEAFE",
     ),
     (
         "Engine 3: NHANES Chronic Risk",
-        "Regularized Logistic Regression + Platt Scaling",
-        "6 Targets: Diabetes, HTN, High Chol, CVD, Stroke, COPD",
-        "Glucose & HbA1c withheld to prevent circularity",
-        "Diabetes: 85.3% AUROC / 86.6% Acc (Cycle J forward test)",
-        "Artifact: models/nhanes_risk_models.joblib",
+        "HistGradientBoosting + Platt Scaling",
+        "6 Current Diagnoses (Cycle J Temporal Holdout, n=5,856)",
+        "Fixed 70% & 80% OOF sensitivity operating points",
+        "Stroke sensitivity collapse resolved via OOF threshold",
+        "Estimates current diagnosis, not future incidence",
         "#E11D48", "#FFF1F2", "#FFE4E6",
     ),
     (
         "Engine 4: MedMNIST Image Screening",
         "Fine-Tuned ResNet-18 Deep Convolutional Network",
-        "5 Modalities: Pneumonia, Derma, Retina, Blood, Chest",
-        "Out-of-Distribution (OOD) Guard: MSP < 0.50 cutoff",
-        "Pneumonia: 94.2% AUROC / 88.5% Acc; Blood: 99.4% AUROC",
-        "Artifact: models/medmnist/ (5 PyTorch checkpoints)",
+        "Pneumonia: Pediatric (Ages 1-5, 94.2% AUROC)",
+        "Penultimate features: Energy, Mahalanobis, kNN, OE",
+        "No detector achieves cross-domain FAR < 10%",
+        "OOD rejection slider removed; audited notice declared",
         "#7C3AED", "#FAF5FF", "#F3E8FF",
     ),
 ]
 
 for idx, (title, line1, line2, line3, line4, line5, accent, bg_color, header_bg) in enumerate(engines):
     cx = 5.5 + idx * 23.0
-    cy = 29.0
-    draw_box(cx, cy, 21.5, 17.0, bg_color=bg_color, border_color=accent, linewidth=1.5)
+    cy = 28.0
+    draw_box(cx, cy, 21.5, 18.0, bg_color=bg_color, border_color=accent, linewidth=1.5)
     # Card Header
     hdr = patches.FancyBboxPatch(
-        (cx, cy + 14.4), 21.5, 2.6,
+        (cx, cy + 15.4), 21.5, 2.6,
         boxstyle="round,pad=0,rounding_size=0.8",
         facecolor=header_bg, edgecolor=accent, linewidth=1.0,
     )
     ax.add_patch(hdr)
-    ax.text(cx + 10.75, cy + 15.7, title, ha="center", va="center", fontsize=8.2, fontweight="bold", color=accent)
+    ax.text(cx + 10.75, cy + 16.7, title, ha="center", va="center", fontsize=8.2, fontweight="bold", color=accent)
 
     # Bullet texts
     bullets = [line1, line2, line3, line4, line5]
     for b_idx, bullet in enumerate(bullets):
-        by = cy + 12.6 - b_idx * 2.5
-        ax.text(cx + 1.0, by, "•", fontsize=9, fontweight="bold", color=accent)
-        ax.text(cx + 2.2, by, bullet, fontsize=7.0, color="#1E293B", va="center")
+        by = cy + 13.5 - b_idx * 2.5
+        ax.text(cx + 1.0, by, "•", fontsize=8.5, fontweight="bold", color=accent)
+        ax.text(cx + 2.2, by, bullet, fontsize=6.8, color="#1E293B", va="center")
 
 # Arrows from Tier 3 to Tier 4
 for tx in engine_x_targets:
-    draw_arrow(tx, 27.5, tx, 22.0, color="#64748B", width=1.5)
+    draw_arrow(tx, 28.0, tx, 22.0, color="#64748B", width=1.5)
 
 # ---------------------------------------------------------------------------
 # Tier 4: Data Foundation & Verification Layer
@@ -239,23 +239,23 @@ ax.text(
 
 data_blocks = [
     (
-        "17 Lung scRNA-seq Studies",
-        "1,470,730 cells | 372 donor profiles\nHuman Lung Atlas + Melms COVID-19\nHonest Leave-One-Study-Out CV",
+        "16 Atlas scRNA-seq Studies",
+        "1,470,730 cells | 372 donor profiles | 16 studies\nMelms GSE171524 (20 COVID, 7 ctrl) holdout\nLOGO-CV: uncalibrated 64.8% vs calibrated 62.9%",
         "#0D9488",
     ),
     (
         "Standard Medical Dictionaries",
-        "LOINC and UCUM standardized units\nMolar mass factors for SI conversion\nAdult clinical laboratory intervals",
+        "LOINC and UCUM standardized units\nMolar mass factors for SI conversion\nSex-specific & printed lab intervals",
         "#2563EB",
     ),
     (
-        "CDC NHANES Multi-Year Cohort",
-        "17,961 adult participants (2013-2018)\nTraining/Validation: Cycles G & H (n=12,056)\nProspective Forward Test: Cycle J (n=5,905)",
+        "CDC NHANES Multi-Cycle Cohort",
+        "17,961 adult participants (2013-2018)\nTraining: Cycles H (2013-14) & I (2015-16), n=12,105\nTemporal Holdout: Cycle J (2017-18), n=5,856",
         "#E11D48",
     ),
     (
-        "MedMNIST Benchmark & Tests",
-        "Standardized 64x64 biomedical tensors\nOfficial benchmark test splits\n30/30 Automated Regression Tests Passing",
+        "MedMNIST Benchmarks & OOD Suite",
+        "Standardized biomedical image tensors\nPediatric X-Ray, Derma, Retina, Smear, Chest\nPenultimate feature OOD & Outlier Exposure",
         "#7C3AED",
     ),
 ]
@@ -272,7 +272,7 @@ for idx, (title, content, accent) in enumerate(data_blocks):
 # ---------------------------------------------------------------------------
 ax.text(
     50, 2.0,
-    "Verified for PulmoAI Multimodal Platform | Zero Emojis Compliance | All 30 Automated Tests Passing",
+    "Verified for PulmoAI Multimodal Platform | Zero Emojis Compliance | All 36 Automated Tests Passing",
     ha="center", va="center", fontsize=8, color="#94A3B8",
 )
 

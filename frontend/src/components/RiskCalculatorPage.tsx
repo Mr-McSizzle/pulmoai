@@ -465,7 +465,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                   <div>
                     <strong>Estimand Clarification:</strong>{" "}
                     {result.estimand_clarification ||
-                      "All outputs predict cross-sectional prevalent condition status or survey-reported lifetime history in civilian adults; they do NOT predict 10-year prospective future incidence."}
+                      "All outputs estimate the probability of a CURRENT self-reported diagnosis in civilian adults; they do NOT predict future disease incidence."}
                   </div>
                   <div className="text-[10px] text-slate-500">
                     <strong>Safeguards:</strong> Fasting glucose and HbA1c are strictly withheld from diabetes modeling to avoid diagnostic circularity. Screening triage only; not a clinical diagnosis.

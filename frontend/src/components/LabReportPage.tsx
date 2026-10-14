@@ -25,11 +25,16 @@ export function LabReportPage({ onTransferToRisk }: LabReportPageProps) {
   const [result, setResult] = useState<ReportExtractResponse | null>(null);
   const [showRawText, setShowRawText] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [patientSex, setPatientSex] = useState<string>("unspecified");
+  const [editedValues, setEditedValues] = useState<Record<string, number>>({});
+  const [confirmedByUser, setConfirmedByUser] = useState(false);
 
   const handleFile = (selected: File) => {
     setFile(selected);
     setError(null);
     setResult(null);
+    setEditedValues({});
+    setConfirmedByUser(false);
   };
 
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
@@ -46,14 +51,17 @@ export function LabReportPage({ onTransferToRisk }: LabReportPageProps) {
     }
   };
 
-  const runExtraction = async (targetFile?: File) => {
+  const runExtraction = async (targetFile?: File, sexOverride?: string) => {
     const f = targetFile || file;
     if (!f) return;
     setLoading(true);
     setError(null);
+    const effSex = sexOverride !== undefined ? sexOverride : patientSex;
     try {
-      const res = await api.extractReport(f);
+      const res = await api.extractReport(f, effSex !== "unspecified" ? effSex : undefined);
       setResult(res);
+      setEditedValues({});
+      setConfirmedByUser(false);
     } catch (err: any) {
       setError(err?.message || "Failed to extract lab report.");
     } finally {
@@ -105,21 +113,45 @@ Sex: Male`;
     runExtraction(sampleF);
   };
 
+  const handleEditValue = (canonicalName: string, val: number) => {
+    setEditedValues((prev) => ({ ...prev, [canonicalName]: val }));
+  };
+
   // Convert extracted tests to risk engine features
   const getRiskFeatures = (items: LabItemSchema[]): Record<string, number> => {
     const map: Record<string, number> = {};
     for (const it of items) {
-      if (it.canonical_name === "total_cholesterol") map.total_cholesterol = it.value;
-      else if (it.canonical_name === "hdl_cholesterol") map.hdl_cholesterol = it.value;
-      else if (it.canonical_name === "triglycerides") map.triglycerides = it.value;
-      else if (it.canonical_name === "systolic_bp") map.systolic_bp = it.value;
-      else if (it.canonical_name === "diastolic_bp") map.diastolic_bp = it.value;
-      else if (it.canonical_name === "bmi") map.bmi = it.value;
-      else if (it.canonical_name === "creatinine") map.creatinine = it.value;
-      else if (it.canonical_name === "pulse") map.pulse = it.value;
-      else if (it.canonical_name === "age") map.age = it.value;
-      else if (it.canonical_name === "gender") map.gender = it.value;
+      const val = editedValues[it.canonical_name] !== undefined ? editedValues[it.canonical_name] : it.value;
+      if (it.canonical_name === "total_cholesterol") map.total_cholesterol = val;
+      else if (it.canonical_name === "hdl_cholesterol") map.hdl_cholesterol = val;
+      else if (it.canonical_name === "triglycerides") map.triglycerides = val;
+      else if (it.canonical_name === "ldl_cholesterol") map.ldl_cholesterol = val;
+      else if (it.canonical_name === "fasting_glucose") map.fasting_glucose = val;
+      else if (it.canonical_name === "hba1c") map.hba1c = val;
+      else if (it.canonical_name === "systolic_bp") map.systolic_bp = val;
+      else if (it.canonical_name === "diastolic_bp") map.diastolic_bp = val;
+      else if (it.canonical_name === "bmi") map.bmi = val;
+      else if (it.canonical_name === "serum_creatinine" || it.canonical_name === "creatinine") map.serum_creatinine = val;
+      else if (it.canonical_name === "bun") map.bun = val;
+      else if (it.canonical_name === "uric_acid") map.uric_acid = val;
+      else if (it.canonical_name === "albumin") map.albumin = val;
+      else if (it.canonical_name === "total_protein") map.total_protein = val;
+      else if (it.canonical_name === "alt") map.alt = val;
+      else if (it.canonical_name === "ast") map.ast = val;
+      else if (it.canonical_name === "alk_phosphatase") map.alk_phosphatase = val;
+      else if (it.canonical_name === "sodium") map.sodium = val;
+      else if (it.canonical_name === "potassium") map.potassium = val;
+      else if (it.canonical_name === "calcium") map.calcium = val;
+      else if (it.canonical_name === "wbc_count") map.wbc_count = val;
+      else if (it.canonical_name === "rbc_count") map.rbc_count = val;
+      else if (it.canonical_name === "hemoglobin") map.hemoglobin = val;
+      else if (it.canonical_name === "hematocrit") map.hematocrit = val;
+      else if (it.canonical_name === "platelets") map.platelets = val;
+      else if (it.canonical_name === "pulse") map.pulse_bpm = val;
+      else if (it.canonical_name === "age") map.age = val;
     }
+    if (patientSex === "male") map.sex_male = 1.0;
+    else if (patientSex === "female") map.sex_male = 0.0;
     return map;
   };
 
@@ -127,6 +159,9 @@ Sex: Male`;
   const abnormalCount = result
     ? result.extracted_tests.filter((t) => t.flag !== "NORMAL" && t.flag !== "UNKNOWN").length
     : 0;
+  const hasLowConfidence = result
+    ? result.extracted_tests.some((t) => t.confidence < 0.70)
+    : false;
 
   return (
     <div className="module-page space-y-6">
@@ -200,6 +235,22 @@ Sex: Male`;
               </div>
             )}
 
+            {/* Patient Biological Sex Selection */}
+            <div className="mt-3">
+              <label className="text-[11px] font-semibold text-slate-700 block mb-1">
+                Patient Biological Sex (for sex-specific ranges):
+              </label>
+              <select
+                className="w-full text-xs p-2 rounded-lg border border-slate-300 bg-white text-slate-800"
+                value={patientSex}
+                onChange={(e) => setPatientSex(e.target.value)}
+              >
+                <option value="unspecified">Unspecified (Auto-detect from report)</option>
+                <option value="male">Male (Sex-specific Hb, Cr, HDL)</option>
+                <option value="female">Female (Sex-specific Hb, Cr, HDL)</option>
+              </select>
+            </div>
+
             <div className="mt-4 pt-4 border-t border-slate-200">
               <div className="text-[11px] font-semibold text-slate-600 mb-2">Or test with clinical samples:</div>
               <div className="flex flex-col gap-2">
@@ -234,8 +285,35 @@ Sex: Male`;
               <p className="text-xs text-teal-800 mb-3">
                 {Object.keys(riskFeatures).length} clinical biomarkers ready for NHANES chronic disease risk prediction.
               </p>
+
+              {hasLowConfidence && (
+                <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs mb-3 flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold">Low confidence OCR:</span> Some analytes have extraction confidence &lt; 0.70. You must verify and confirm values before transfer.
+                  </div>
+                </div>
+              )}
+
+              <div className="mb-3 p-2.5 rounded-lg bg-white/80 border border-teal-200 text-xs">
+                <label className="flex items-start gap-2 text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 rounded border-slate-300 text-teal-600"
+                    checked={confirmedByUser}
+                    onChange={(e) => setConfirmedByUser(e.target.checked)}
+                  />
+                  <span>I have verified and confirm all extracted laboratory values against the source document.</span>
+                </label>
+              </div>
+
               <button
-                className="button-primary w-full text-xs py-2.5 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white shadow"
+                className={`button-primary w-full text-xs py-2.5 flex items-center justify-center gap-2 text-white shadow ${
+                  confirmedByUser
+                    ? "bg-teal-600 hover:bg-teal-700 cursor-pointer"
+                    : "bg-slate-400 cursor-not-allowed opacity-60"
+                }`}
+                disabled={!confirmedByUser}
                 onClick={() => onTransferToRisk(riskFeatures)}
               >
                 <span>Send to Chronic Risk Engine</span>
@@ -344,7 +422,21 @@ Sex: Male`;
                             {test.raw_value} <span className="text-[10px] text-slate-500">{test.raw_unit}</span>
                           </td>
                           <td className="py-2.5 px-4 font-medium text-slate-900">
-                            {test.value} <span className="text-[10px] text-slate-500">{test.unit}</span>
+                            <input
+                              type="number"
+                              step="any"
+                              className="w-20 px-1.5 py-0.5 text-xs font-semibold rounded border border-slate-300 bg-white"
+                              value={
+                                editedValues[test.canonical_name] !== undefined
+                                  ? editedValues[test.canonical_name]
+                                  : test.value
+                              }
+                              onChange={(e) => {
+                                const v = parseFloat(e.target.value);
+                                if (!isNaN(v)) handleEditValue(test.canonical_name, v);
+                              }}
+                            />{" "}
+                            <span className="text-[10px] text-slate-500">{test.unit}</span>
                           </td>
                           <td className="py-2.5 px-4 text-slate-500">
                             {test.reference_range} {test.unit}

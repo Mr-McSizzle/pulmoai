@@ -62,6 +62,8 @@ export interface PredictionResponse {
   probabilities_available: boolean;
   class_probabilities?: Record<string, number> | null;
   interpretation: string;
+  decision_rule_note?: string | null;
+  input_contract_notice?: string | null;
 }
 
 export interface GeneCoefficient {
@@ -154,5 +156,9 @@ export interface ImagePredictionResponse {
   probabilities?: Record<string, number>;
   class_probabilities?: Record<string, number>;
   model_metrics?: Record<string, number>;
+  cifar10_false_accept_rate?: number | null;
+  guard_status?: string | null;
+  staging_notice?: string | null;
+  clinical_notice?: string;
   disclaimer: string;
 }

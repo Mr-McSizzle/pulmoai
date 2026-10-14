@@ -541,20 +541,28 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
           <section className="content-panel model-card">
             <p className="eyebrow">ACTIVE CLASSIFIER</p>
             <div className="model-emblem"><div className="emblem-orbit orbit-a" /><div className="emblem-orbit orbit-b" /><Activity size={19} /></div>
-            <h2>Linear SVM (Calibrated)</h2>
-            <p>Fitted on multi-study atlas profiles with 5-fold cross-validated Platt scaling.</p>
+            <h2>Linear SVM (Dual-Rule Decision)</h2>
+            <p>Discrete label uses uncalibrated balanced decision rule (argmax); calibrated probabilities shown as empirical risk estimates.</p>
             <div className="model-meta"><span>FEATURES</span><strong>30,566 genes</strong></div>
-            <div className="model-meta"><span>PROBABILITIES</span><strong>Calibrated (Platt scaling)</strong></div>
+            <div className="model-meta"><span>PROBABILITIES</span><strong>Calibrated (Platt scaling estimates)</strong></div>
+            <div className="mt-3 p-2.5 bg-amber-50 rounded border border-amber-200 text-[11px] text-amber-800 leading-snug">
+              <strong>Input Contract Notice:</strong> Trained strictly on whole-cell scRNA-seq from 16 atlas studies (372 profiles). Single-nucleus and autopsy tissue are not recognized (Melms evaluation: 1/26; 6 of 7 normal donors misclassified as PF). COVID-19 recall is at best 21.1% (4/19). Benchmark exploration model only, not validated for clinical use.
+            </div>
           </section>
 
           {result && (
             <section className="content-panel prediction-panel">
               <p className="eyebrow">PREDICTION RESULT</p>
               <h2>{displayDisease(result.predicted_class)}</h2>
-              <p className="text-xs text-slate-500 mb-3">{result.interpretation}</p>
+              <p className="text-xs text-slate-500 mb-2">{result.interpretation}</p>
+              {result.decision_rule_note && (
+                <p className="text-[11px] text-slate-600 bg-slate-50 p-2 rounded border border-slate-200 mb-3 leading-snug">
+                  {result.decision_rule_note}
+                </p>
+              )}
               {result.class_probabilities && (
                 <div className="space-y-1.5 pt-2 border-t border-slate-200">
-                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Class Probabilities</div>
+                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Calibrated Probability Estimates</div>
                   {Object.entries(result.class_probabilities).map(([cls, prob]) => (
                     <div key={cls} className="flex items-center justify-between text-xs">
                       <span className="font-medium text-slate-700">{displayDisease(cls)}</span>
@@ -839,7 +847,7 @@ function MethodologyPage({ data }: { data: DashboardData | null }) {
         })}</div>
       </section>
       <div className="methodology-grid">
-        <section className="content-panel"><div className="panel-heading"><div><p className="eyebrow">PREVENTION OF TAUTOLOGY</p><h2>Why withhold HbA1c & Glucose?</h2></div><Gauge size={18} className="panel-heading-icon" /></div><p className="body-copy">Diagnostic criteria for Type 2 Diabetes include HbA1c ≥ 6.5% or Fasting Glucose ≥ 126 mg/dL. Including them creates trivial, tautological self-prediction. In our engine, they are strictly withheld to evaluate true physiological risk factors (BP, BMI, lipids, age).</p><div className="methodology-stat"><strong>85.3%</strong><span>AUROC achieved<br />on forward cohort</span></div></section>
+        <section className="content-panel"><div className="panel-heading"><div><p className="eyebrow">PREVENTION OF TAUTOLOGY</p><h2>Why withhold HbA1c & Glucose?</h2></div><Gauge size={18} className="panel-heading-icon" /></div><p className="body-copy">Diagnostic criteria for Diabetes include HbA1c ≥ 6.5% or Fasting Glucose ≥ 126 mg/dL. Including them creates trivial, tautological self-prediction. In our engine, they are strictly withheld to evaluate true physiological risk factors (BP, BMI, lipids, age).</p><div className="methodology-stat"><strong>85.3%</strong><span>AUROC achieved<br />on later-cycle holdout</span></div></section>
         <section className="content-panel"><div className="panel-heading"><div><p className="eyebrow">INPUT CONTRACT</p><h2>Supported Modalities</h2></div><FileCheck2 size={18} className="panel-heading-icon" /></div><ul className="contract-list"><li><Check size={14} />Single-cell count profiles (30,566 genes)</li><li><Check size={14} />PDF & Scanned Lab Reports (OCR + SI normalization)</li><li><Check size={14} />Biomedical images (Chest X-ray, Skin, Retina, Blood)</li><li className="contract-no"><X size={14} />Full PACS clinical DICOMs without preprocessing</li><li className="contract-no"><X size={14} />Arbitrary phone photos under low lighting</li></ul></section>
       </div>
       <section className="limitations-panel"><div className="limitations-icon"><ShieldAlert size={19} /></div><div><p className="eyebrow">CRITICAL MEDICAL LIMITATION</p><h2>Research screening prototype, not a medical diagnosis</h2><p>PulmoAI provides educational triaging, research modeling, and epidemiological risk estimation. It does not replace board-certified clinical pathology, radiology examinations, or physician consultations.</p></div></section>

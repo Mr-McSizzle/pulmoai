@@ -19,6 +19,7 @@ data/
 reports/*
 !reports/evaluation_registry.json
 !reports/ood_benchmark.json
+!reports/audit_*.json
 final_report.md
 WALKTHROUGH.md
 FULL_MODEL_PLAN.md

@@ -32,6 +32,8 @@ class PredictionResponse(BaseModel):
     probabilities_available: bool
     class_probabilities: dict[str, float] | None = None
     interpretation: str
+    decision_rule_note: str | None = None
+    input_contract_notice: str | None = None
 
 
 class DashboardResponse(BaseModel):
@@ -122,20 +124,26 @@ class ImagePredictionResponse(BaseModel):
     image_type: str
     modality_name: str
     recognized: bool
-    status: Literal["success", "low_confidence", "error"]
+    status: Literal["success", "low_confidence", "rejected_modality_mismatch", "rejected_non_medical_input", "error"]
     message: str | None = None
     predicted_class: str | None = None
     confidence: float | None = None
     max_confidence: float | None = None
     threshold_applied: float | None = None
     empirical_false_accept_rate: float | None = None
+    cifar10_false_accept_rate: float | None = None
+    guard_status: str | None = None
     ood_benchmark: dict[str, Any] | None = None
     ood_methodology_statement: str | None = None
+    modality_gate: dict[str, Any] | None = None
+    warning_banner: str | None = None
     class_probabilities: dict[str, float] | None = None
     multilabel: bool = False
     active_conditions: list[str] | None = None
     probabilities: dict[str, float] | None = None
     model_metrics: dict[str, float] | None = None
+    staging_notice: str | None = None
+    clinical_notice: str = "Benchmark model, not for clinical use."
     disclaimer: str
 
 

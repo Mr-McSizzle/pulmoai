@@ -43,9 +43,10 @@ export const api = {
   predict: (file: File) => upload("/api/predict", file) as Promise<PredictionResponse>,
 
   // Phase 3: Lab Report Extraction
-  extractReport: (file: File): Promise<ReportExtractResponse> => {
+  extractReport: (file: File, sex?: string): Promise<ReportExtractResponse> => {
     const form = new FormData();
     form.append("file", file);
+    if (sex) form.append("sex", sex);
     return request<ReportExtractResponse>("/api/report/extract", { method: "POST", body: form });
   },
 

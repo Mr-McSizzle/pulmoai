@@ -227,6 +227,7 @@ MAX_REPORT_BYTES = 10 * 1024 * 1024  # 10 MB limit for lab PDFs/photos
 @app.post("/api/report/extract", response_model=ReportExtractResponse)
 async def extract_report(
     file: Annotated[UploadFile, File(description="Lab report PDF or photo (PNG, JPG, TIFF)")],
+    sex: Annotated[str | None, Form(description="Patient biological sex (male/female) for sex-specific reference ranges")] = None,
 ) -> ReportExtractResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
@@ -244,7 +245,7 @@ async def extract_report(
         raise HTTPException(status_code=413, detail="File exceeds the 10 MB upload limit.")
 
     try:
-        extraction_result = process_lab_report(contents, file.filename, file.content_type)
+        extraction_result = process_lab_report(contents, file.filename, file.content_type, sex=sex)
         return ReportExtractResponse(**extraction_result)
     except Exception as error:
         logger.exception("Lab report extraction failed")

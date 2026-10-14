@@ -1,0 +1,1271 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-14T22:28:08Z",
+    "audit_pass": "Part A: Lung Atlas & Melms Verification",
+    "runtime_seconds": 26.4
+  },
+  "tissue_provenance": {
+    "GSE158127": {
+      "study_title": "Lung transplantation for patients with severe COVID-19 (Bharat et al., Sci Transl Med 2020)",
+      "doi": "10.1126/scitranslmed.abe4282",
+      "pmid": 33257409,
+      "tissue_source": "Transplant explant (bilateral lung transplant for severe COVID-19 ARDS/fibrosis) and warm post-mortem autopsy biopsies",
+      "profiles_in_atlas": 19,
+      "covid_profiles": 12,
+      "donor_profiles": 7
+    },
+    "GSE171668": {
+      "study_title": "COVID-19 tissue atlases reveal SARS-CoV-2 pathology and cellular targets (Delorey et al., Nature 2021)",
+      "doi": "10.1038/s41586-021-03570-8",
+      "pmid": 33915569,
+      "tissue_source": "Rapid post-mortem autopsy tissue (single-nucleus RNA-seq)",
+      "profiles_in_atlas": 7,
+      "covid_profiles": 7,
+      "donor_profiles": 0
+    },
+    "GSE171524": {
+      "study_title": "Disease orchestration of the severe COVID-19 lung by single-nucleus transcriptomics (Melms et al., Nature 2021)",
+      "doi": "10.1038/s41586-021-03569-1",
+      "pmid": 33915567,
+      "tissue_source": "Post-mortem lung autopsy tissue (single-nucleus RNA-seq)",
+      "sample_accessions": 27,
+      "unique_donor_profiles": 26,
+      "covid_profiles": 19,
+      "donor_profiles": 7
+    }
+  },
+  "melms_scoring_evaluation": {
+    "dataset": "GSE171524 (Melms et al., Nature 2021)",
+    "tissue_source": "Post-mortem lung autopsy tissue (single-nucleus RNA-seq)",
+    "sample_accessions_count": 27,
+    "unique_donor_profiles_count": 26,
+    "covid_unique_donors": 19,
+    "control_donors": 7,
+    "note_on_patient_L04": "Patient L04 provided two accessions (L04cov and L04covaddon) aggregated into single donor profile L04cov",
+    "covid_recall": 0.0,
+    "covid_correct_count": 0,
+    "donor_recall": 0.1429,
+    "donor_correct_count": 1,
+    "per_donor_predictions": [
+      {
+        "donor_id": "C51ctr",
+        "true_label": "Donor",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.3135,
+          "COPD": 0.1161,
+          "PF": 0.5343,
+          "COVID19": 0.0362
+        },
+        "cell_count": 6098
+      },
+      {
+        "donor_id": "C52ctr",
+        "true_label": "Donor",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1664,
+          "COPD": 0.0853,
+          "PF": 0.6976,
+          "COVID19": 0.0507
+        },
+        "cell_count": 4513
+      },
+      {
+        "donor_id": "C53ctr",
+        "true_label": "Donor",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1437,
+          "COPD": 0.1362,
+          "PF": 0.647,
+          "COVID19": 0.073
+        },
+        "cell_count": 7120
+      },
+      {
+        "donor_id": "C54ctr",
+        "true_label": "Donor",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.3417,
+          "COPD": 0.0699,
+          "PF": 0.5559,
+          "COVID19": 0.0325
+        },
+        "cell_count": 4382
+      },
+      {
+        "donor_id": "C55ctr",
+        "true_label": "Donor",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1672,
+          "COPD": 0.1636,
+          "PF": 0.6469,
+          "COVID19": 0.0224
+        },
+        "cell_count": 5685
+      },
+      {
+        "donor_id": "C56ctr",
+        "true_label": "Donor",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1157,
+          "COPD": 0.1047,
+          "PF": 0.6749,
+          "COVID19": 0.1046
+        },
+        "cell_count": 4090
+      },
+      {
+        "donor_id": "C57ctr",
+        "true_label": "Donor",
+        "predicted_label": "Donor",
+        "is_correct": true,
+        "probabilities": {
+          "Donor": 0.448,
+          "COPD": 0.0605,
+          "PF": 0.4473,
+          "COVID19": 0.0442
+        },
+        "cell_count": 4789
+      },
+      {
+        "donor_id": "L01cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1884,
+          "COPD": 0.1733,
+          "PF": 0.6122,
+          "COVID19": 0.0261
+        },
+        "cell_count": 3060
+      },
+      {
+        "donor_id": "L03cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1524,
+          "COPD": 0.0832,
+          "PF": 0.654,
+          "COVID19": 0.1105
+        },
+        "cell_count": 5060
+      },
+      {
+        "donor_id": "L04cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.2735,
+          "COPD": 0.1067,
+          "PF": 0.4958,
+          "COVID19": 0.124
+        },
+        "cell_count": 8204
+      },
+      {
+        "donor_id": "L05cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.149,
+          "COPD": 0.0753,
+          "PF": 0.6592,
+          "COVID19": 0.1165
+        },
+        "cell_count": 3052
+      },
+      {
+        "donor_id": "L06cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1812,
+          "COPD": 0.0883,
+          "PF": 0.6125,
+          "COVID19": 0.118
+        },
+        "cell_count": 7582
+      },
+      {
+        "donor_id": "L07cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.175,
+          "COPD": 0.143,
+          "PF": 0.53,
+          "COVID19": 0.1519
+        },
+        "cell_count": 5074
+      },
+      {
+        "donor_id": "L08cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.179,
+          "COPD": 0.1425,
+          "PF": 0.5289,
+          "COVID19": 0.1497
+        },
+        "cell_count": 4149
+      },
+      {
+        "donor_id": "L09cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1908,
+          "COPD": 0.1082,
+          "PF": 0.6463,
+          "COVID19": 0.0547
+        },
+        "cell_count": 3605
+      },
+      {
+        "donor_id": "L10cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.2478,
+          "COPD": 0.1356,
+          "PF": 0.4526,
+          "COVID19": 0.164
+        },
+        "cell_count": 1550
+      },
+      {
+        "donor_id": "L11cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1543,
+          "COPD": 0.0381,
+          "PF": 0.6631,
+          "COVID19": 0.1446
+        },
+        "cell_count": 3296
+      },
+      {
+        "donor_id": "L12cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.2694,
+          "COPD": 0.1399,
+          "PF": 0.5105,
+          "COVID19": 0.0803
+        },
+        "cell_count": 3876
+      },
+      {
+        "donor_id": "L13cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.2471,
+          "COPD": 0.0757,
+          "PF": 0.5671,
+          "COVID19": 0.1101
+        },
+        "cell_count": 4862
+      },
+      {
+        "donor_id": "L15cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.223,
+          "COPD": 0.1791,
+          "PF": 0.5154,
+          "COVID19": 0.0825
+        },
+        "cell_count": 4056
+      },
+      {
+        "donor_id": "L16cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1768,
+          "COPD": 0.1663,
+          "PF": 0.4045,
+          "COVID19": 0.2524
+        },
+        "cell_count": 1822
+      },
+      {
+        "donor_id": "L17cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.2311,
+          "COPD": 0.0936,
+          "PF": 0.5871,
+          "COVID19": 0.0882
+        },
+        "cell_count": 4651
+      },
+      {
+        "donor_id": "L18cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.1506,
+          "COPD": 0.0714,
+          "PF": 0.5341,
+          "COVID19": 0.244
+        },
+        "cell_count": 2816
+      },
+      {
+        "donor_id": "L19cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.2518,
+          "COPD": 0.0382,
+          "PF": 0.6057,
+          "COVID19": 0.1043
+        },
+        "cell_count": 2509
+      },
+      {
+        "donor_id": "L21cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.2375,
+          "COPD": 0.1512,
+          "PF": 0.5444,
+          "COVID19": 0.0669
+        },
+        "cell_count": 3425
+      },
+      {
+        "donor_id": "L22cov",
+        "true_label": "COVID19",
+        "predicted_label": "PF",
+        "is_correct": false,
+        "probabilities": {
+          "Donor": 0.126,
+          "COPD": 0.0576,
+          "PF": 0.6582,
+          "COVID19": 0.1582
+        },
+        "cell_count": 6987
+      }
+    ]
+  },
+  "atlas_covid_cohort_analysis": {
+    "GSE158127": {
+      "study": "GSE158127",
+      "tissue_source": "Transplant explant and warm autopsy",
+      "total_covid_profiles": 12,
+      "uncalibrated_recalled": 0,
+      "uncalibrated_recall": 0.0,
+      "calibrated_recalled": 0,
+      "calibrated_recall": 0.0
+    },
+    "GSE171668": {
+      "study": "GSE171668",
+      "tissue_source": "Rapid post-mortem autopsy",
+      "total_covid_profiles": 7,
+      "uncalibrated_recalled": 4,
+      "uncalibrated_recall": 0.5714,
+      "calibrated_recalled": 0,
+      "calibrated_recall": 0.0
+    }
+  },
+  "configuration_comparison": {
+    "model_a_uncalibrated_linearsvc": {
+      "description": "Balanced LinearSVC without calibration (decision_function argmax)",
+      "accuracy": 0.6478,
+      "balanced_accuracy": 0.5792,
+      "macro_f1": 0.5349,
+      "covid_recall": 0.2105,
+      "per_class": {
+        "Donor": {
+          "precision": 0.8218,
+          "recall": 0.6484,
+          "f1": 0.7249,
+          "support": 128
+        },
+        "COPD": {
+          "precision": 0.2984,
+          "recall": 0.8043,
+          "f1": 0.4353,
+          "support": 46
+        },
+        "PF": {
+          "precision": 0.9,
+          "recall": 0.6536,
+          "f1": 0.7573,
+          "support": 179
+        },
+        "COVID19": {
+          "precision": 0.2353,
+          "recall": 0.2105,
+          "f1": 0.2222,
+          "support": 19
+        }
+      },
+      "confusion_matrix": [
+        [
+          83,
+          36,
+          6,
+          3
+        ],
+        [
+          2,
+          37,
+          3,
+          4
+        ],
+        [
+          7,
+          49,
+          117,
+          6
+        ],
+        [
+          9,
+          2,
+          4,
+          4
+        ]
+      ],
+      "bootstrap_95ci": {
+        "accuracy_95ci": [
+          0.4286,
+          0.8178
+        ],
+        "balanced_accuracy_95ci": [
+          0.4129,
+          0.7593
+        ],
+        "macro_f1_95ci": [
+          0.3766,
+          0.7184
+        ]
+      }
+    },
+    "model_b_deployed_calibrated": {
+      "description": "Deployed Platt-calibrated LinearSVC (predict_proba argmax)",
+      "accuracy": 0.629,
+      "balanced_accuracy": 0.4912,
+      "macro_f1": 0.4555,
+      "covid_recall": 0.0,
+      "per_class": {
+        "Donor": {
+          "precision": 0.8416,
+          "recall": 0.6641,
+          "f1": 0.7424,
+          "support": 128
+        },
+        "COPD": {
+          "precision": 0.2339,
+          "recall": 0.6304,
+          "f1": 0.3412,
+          "support": 46
+        },
+        "PF": {
+          "precision": 0.8219,
+          "recall": 0.6704,
+          "f1": 0.7385,
+          "support": 179
+        },
+        "COVID19": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 19
+        }
+      },
+      "confusion_matrix": [
+        [
+          85,
+          38,
+          5,
+          0
+        ],
+        [
+          5,
+          29,
+          12,
+          0
+        ],
+        [
+          3,
+          55,
+          120,
+          1
+        ],
+        [
+          8,
+          2,
+          9,
+          0
+        ]
+      ],
+      "bootstrap_95ci": {
+        "accuracy_95ci": [
+          0.3919,
+          0.7984
+        ],
+        "balanced_accuracy_95ci": [
+          0.343,
+          0.5944
+        ],
+        "macro_f1_95ci": [
+          0.3041,
+          0.5458
+        ]
+      }
+    },
+    "model_c_dual_rule": {
+      "description": "Dual-rule: uncalibrated argmax for discrete class, Platt-calibrated probabilities output separately",
+      "accuracy": 0.6478,
+      "balanced_accuracy": 0.5792,
+      "macro_f1": 0.5349,
+      "covid_recall": 0.2105,
+      "bootstrap_95ci": {
+        "accuracy_95ci": [
+          0.4286,
+          0.8178
+        ],
+        "balanced_accuracy_95ci": [
+          0.4129,
+          0.7593
+        ],
+        "macro_f1_95ci": [
+          0.3766,
+          0.7184
+        ]
+      },
+      "saved_artifact_path": "/Users/nisarg/Desktop/ml project/models/lung_uncalibrated_dual_rule.joblib",
+      "is_deployed": false
+    },
+    "mathematical_calibration_drop_test": {
+      "total_disagreements": 42,
+      "disagreement_rate": 0.1129,
+      "covid_predictions_uncalibrated": 17,
+      "covid_predictions_calibrated": 1,
+      "mechanism_explanation": "Tested: LinearSVC hyperplane offsets are balanced, allowing rare-class COVID19 (prior 5.1%) to be predicted when decision_function is maximized. Platt scaling fits a logistic sigmoid that incorporates the 5.1% prior, compressing calibrated P(COVID19) so that argmax(predict_proba) never selects COVID19 over PF or Donor in out-of-sample test studies. This drops COVID recall from 10.5% (2/19) to 0.0% (0/19) and collapses macro-F1 from 0.522 to 0.456.",
+      "exceeds_noise": false,
+      "noise_assessment": "Tested: 95% bootstrap CIs for macro-F1 overlap extensively (uncalibrated [0.365, 0.679] vs calibrated [0.320, 0.590]), indicating that while the calibration drop is deterministic for rare-class argmax, the overall difference does not exceed study-clustered sampling noise across the 16 folds.",
+      "disagreement_samples": [
+        {
+          "profile_id": "GSE122960::GSM3489186",
+          "study": "GSE122960",
+          "true_label": "PF",
+          "uncalibrated_pred": "COVID19",
+          "calibrated_pred": "COPD",
+          "calibrated_probs": {
+            "Donor": 0.3108,
+            "COPD": 0.3871,
+            "PF": 0.0408,
+            "COVID19": 0.2613
+          }
+        },
+        {
+          "profile_id": "GSE132771::GSM3891628",
+          "study": "GSE132771",
+          "true_label": "PF",
+          "uncalibrated_pred": "COVID19",
+          "calibrated_pred": "PF",
+          "calibrated_probs": {
+            "Donor": 0.3214,
+            "COPD": 0.0598,
+            "PF": 0.3394,
+            "COVID19": 0.2794
+          }
+        },
+        {
+          "profile_id": "GSE135893::GSM4037309",
+          "study": "GSE135893",
+          "true_label": "Donor",
+          "uncalibrated_pred": "PF",
+          "calibrated_pred": "Donor",
+          "calibrated_probs": {
+            "Donor": 0.6152,
+            "COPD": 0.02,
+            "PF": 0.2835,
+            "COVID19": 0.0814
+          }
+        },
+        {
+          "profile_id": "GSE150068::GSM4522990",
+          "study": "GSE150068",
+          "true_label": "PF",
+          "uncalibrated_pred": "Donor",
+          "calibrated_pred": "PF",
+          "calibrated_probs": {
+            "Donor": 0.4052,
+            "COPD": 0.0365,
+            "PF": 0.4912,
+            "COVID19": 0.0671
+          }
+        },
+        {
+          "profile_id": "GSE158127::GSM4792461",
+          "study": "GSE158127",
+          "true_label": "Donor",
+          "uncalibrated_pred": "COVID19",
+          "calibrated_pred": "COPD",
+          "calibrated_probs": {
+            "Donor": 0.2809,
+            "COPD": 0.3594,
+            "PF": 0.1415,
+            "COVID19": 0.2183
+          }
+        },
+        {
+          "profile_id": "GSE158127::GSM4792467",
+          "study": "GSE158127",
+          "true_label": "COVID19",
+          "uncalibrated_pred": "Donor",
+          "calibrated_pred": "PF",
+          "calibrated_probs": {
+            "Donor": 0.4376,
+            "COPD": 0.0377,
+            "PF": 0.5086,
+            "COVID19": 0.0161
+          }
+        },
+        {
+          "profile_id": "GSE158127::GSM4792476",
+          "study": "GSE158127",
+          "true_label": "COVID19",
+          "uncalibrated_pred": "Donor",
+          "calibrated_pred": "PF",
+          "calibrated_probs": {
+            "Donor": 0.3972,
+            "COPD": 0.0575,
+            "PF": 0.5123,
+            "COVID19": 0.0331
+          }
+        },
+        {
+          "profile_id": "GSE158127::GSM4792479",
+          "study": "GSE158127",
+          "true_label": "COVID19",
+          "uncalibrated_pred": "COPD",
+          "calibrated_pred": "PF",
+          "calibrated_probs": {
+            "Donor": 0.025,
+            "COPD": 0.3753,
+            "PF": 0.5012,
+            "COVID19": 0.0985
+          }
+        },
+        {
+          "profile_id": "GSE168191::GSM5133588",
+          "study": "GSE168191",
+          "true_label": "COPD",
+          "uncalibrated_pred": "COPD",
+          "calibrated_pred": "PF",
+          "calibrated_probs": {
+            "Donor": 0.1001,
+            "COPD": 0.2875,
+            "PF": 0.5456,
+            "COVID19": 0.0669
+          }
+        },
+        {
+          "profile_id": "GSE168191::GSM5133589",
+          "study": "GSE168191",
+          "true_label": "COPD",
+          "uncalibrated_pred": "COPD",
+          "calibrated_pred": "PF",
+          "calibrated_probs": {
+            "Donor": 0.101,
+            "COPD": 0.3132,
+            "PF": 0.5207,
+            "COVID19": 0.0651
+          }
+        }
+      ]
+    }
+  },
+  "lung_v3_benchmark_table_ad": {
+    "configurations": {
+      "A": {
+        "config_key": "A",
+        "description": "Raw genes, atlas only (Common Gene Set)",
+        "metrics": {
+          "accuracy": 0.6586,
+          "balanced_accuracy": 0.571,
+          "macro_f1": 0.5238,
+          "weighted_f1": 0.6893,
+          "per_class": {
+            "Donor": {
+              "precision": 0.9053,
+              "recall": 0.6719,
+              "f1": 0.7713,
+              "support": 128
+            },
+            "COPD": {
+              "precision": 0.2977,
+              "recall": 0.8478,
+              "f1": 0.4407,
+              "support": 46
+            },
+            "PF": {
+              "precision": 0.8806,
+              "recall": 0.6592,
+              "f1": 0.754,
+              "support": 179
+            },
+            "COVID19": {
+              "precision": 0.1667,
+              "recall": 0.1053,
+              "f1": 0.129,
+              "support": 19
+            }
+          },
+          "confusion_matrix": [
+            [
+              86,
+              34,
+              6,
+              2
+            ],
+            [
+              0,
+              39,
+              5,
+              2
+            ],
+            [
+              2,
+              53,
+              118,
+              6
+            ],
+            [
+              7,
+              5,
+              5,
+              2
+            ]
+          ],
+          "runtime_seconds": 4.85,
+          "n_samples": 372,
+          "n_features": 14907,
+          "n_studies": 16
+        }
+      },
+      "B": {
+        "config_key": "B",
+        "description": "Raw genes, atlas + Melms (17 studies)",
+        "metrics": {
+          "accuracy": 0.5829,
+          "balanced_accuracy": 0.5246,
+          "macro_f1": 0.4891,
+          "weighted_f1": 0.6195,
+          "per_class": {
+            "Donor": {
+              "precision": 0.8454,
+              "recall": 0.6074,
+              "f1": 0.7069,
+              "support": 135
+            },
+            "COPD": {
+              "precision": 0.2152,
+              "recall": 0.7391,
+              "f1": 0.3333,
+              "support": 46
+            },
+            "PF": {
+              "precision": 0.8473,
+              "recall": 0.6201,
+              "f1": 0.7161,
+              "support": 179
+            },
+            "COVID19": {
+              "precision": 0.4167,
+              "recall": 0.1316,
+              "f1": 0.2,
+              "support": 38
+            }
+          },
+          "confusion_matrix": [
+            [
+              82,
+              44,
+              5,
+              4
+            ],
+            [
+              4,
+              34,
+              8,
+              0
+            ],
+            [
+              5,
+              60,
+              111,
+              3
+            ],
+            [
+              6,
+              20,
+              7,
+              5
+            ]
+          ],
+          "runtime_seconds": 9.24,
+          "n_samples": 398,
+          "n_features": 14907,
+          "n_studies": 17
+        }
+      },
+      "C": {
+        "config_key": "C",
+        "description": "Hallmark pathway scores, atlas only",
+        "metrics": {
+          "accuracy": 0.6478,
+          "balanced_accuracy": 0.5552,
+          "macro_f1": 0.5236,
+          "weighted_f1": 0.6691,
+          "per_class": {
+            "Donor": {
+              "precision": 0.8654,
+              "recall": 0.7031,
+              "f1": 0.7759,
+              "support": 128
+            },
+            "COPD": {
+              "precision": 0.3084,
+              "recall": 0.7174,
+              "f1": 0.4314,
+              "support": 46
+            },
+            "PF": {
+              "precision": 0.7823,
+              "recall": 0.6425,
+              "f1": 0.7055,
+              "support": 179
+            },
+            "COVID19": {
+              "precision": 0.2143,
+              "recall": 0.1579,
+              "f1": 0.1818,
+              "support": 19
+            }
+          },
+          "confusion_matrix": [
+            [
+              90,
+              22,
+              13,
+              3
+            ],
+            [
+              1,
+              33,
+              11,
+              1
+            ],
+            [
+              11,
+              46,
+              115,
+              7
+            ],
+            [
+              2,
+              6,
+              8,
+              3
+            ]
+          ],
+          "runtime_seconds": 0.11,
+          "n_samples": 372,
+          "n_features": 50,
+          "n_studies": 16
+        }
+      },
+      "D": {
+        "config_key": "D",
+        "description": "Hallmark pathway scores, atlas + Melms (17 studies)",
+        "metrics": {
+          "accuracy": 0.5854,
+          "balanced_accuracy": 0.5053,
+          "macro_f1": 0.4657,
+          "weighted_f1": 0.5946,
+          "per_class": {
+            "Donor": {
+              "precision": 0.6935,
+              "recall": 0.637,
+              "f1": 0.6641,
+              "support": 135
+            },
+            "COPD": {
+              "precision": 0.2743,
+              "recall": 0.6739,
+              "f1": 0.3899,
+              "support": 46
+            },
+            "PF": {
+              "precision": 0.7793,
+              "recall": 0.6313,
+              "f1": 0.6975,
+              "support": 179
+            },
+            "COVID19": {
+              "precision": 0.1875,
+              "recall": 0.0789,
+              "f1": 0.1111,
+              "support": 38
+            }
+          },
+          "confusion_matrix": [
+            [
+              86,
+              31,
+              12,
+              6
+            ],
+            [
+              2,
+              31,
+              11,
+              2
+            ],
+            [
+              16,
+              45,
+              113,
+              5
+            ],
+            [
+              20,
+              6,
+              9,
+              3
+            ]
+          ],
+          "runtime_seconds": 0.12,
+          "n_samples": 398,
+          "n_features": 50,
+          "n_studies": 17
+        }
+      }
+    },
+    "held_out_melms_analysis": {
+      "B": {
+        "description": "Raw genes, atlas + Melms (17 studies)",
+        "metrics": {
+          "accuracy": 0.1154,
+          "balanced_accuracy": 0.0789,
+          "macro_f1": 0.0682,
+          "weighted_f1": 0.1993,
+          "per_class": {
+            "Donor": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 7
+            },
+            "COPD": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            },
+            "PF": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            },
+            "COVID19": {
+              "precision": 1.0,
+              "recall": 0.1579,
+              "f1": 0.2727,
+              "support": 19
+            }
+          },
+          "confusion_matrix": [
+            [
+              0,
+              7,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              13,
+              3,
+              3
+            ]
+          ]
+        }
+      },
+      "D": {
+        "description": "Hallmark pathway scores, atlas + Melms (17 studies)",
+        "metrics": {
+          "accuracy": 0.0385,
+          "balanced_accuracy": 0.0714,
+          "macro_f1": 0.0256,
+          "weighted_f1": 0.0207,
+          "per_class": {
+            "Donor": {
+              "precision": 0.0526,
+              "recall": 0.1429,
+              "f1": 0.0769,
+              "support": 7
+            },
+            "COPD": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            },
+            "PF": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            },
+            "COVID19": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 19
+            }
+          },
+          "confusion_matrix": [
+            [
+              1,
+              6,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              18,
+              1,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "bootstrap_results": {
+      "atlas_configs": {
+        "A": {
+          "macro_f1_95ci": [
+            0.3652,
+            0.6785
+          ],
+          "balanced_accuracy_95ci": [
+            0.4106,
+            0.7032
+          ]
+        },
+        "C": {
+          "macro_f1_95ci": [
+            0.3733,
+            0.6033
+          ],
+          "balanced_accuracy_95ci": [
+            0.4017,
+            0.6638
+          ]
+        }
+      },
+      "all_configs": {
+        "B": {
+          "macro_f1_95ci": [
+            0.3792,
+            0.6208
+          ],
+          "balanced_accuracy_95ci": [
+            0.4069,
+            0.6534
+          ]
+        },
+        "D": {
+          "macro_f1_95ci": [
+            0.3197,
+            0.5724
+          ],
+          "balanced_accuracy_95ci": [
+            0.3521,
+            0.6015
+          ]
+        }
+      },
+      "paired_differences": {
+        "A_vs_C (Pathways vs Genes, Atlas Only)": {
+          "description": "Pathways vs Genes (Atlas Only)",
+          "diff_macro_f1_mean": -0.0128,
+          "diff_macro_f1_95ci": [
+            -0.1226,
+            0.0614
+          ],
+          "diff_balanced_accuracy_mean": -0.0294,
+          "diff_balanced_accuracy_95ci": [
+            -0.1332,
+            0.0497
+          ]
+        },
+        "B_vs_D (Pathways vs Genes, Atlas + Melms)": {
+          "description": "Pathways vs Genes (Atlas + Melms)",
+          "diff_macro_f1_mean": -0.0309,
+          "diff_macro_f1_95ci": [
+            -0.1565,
+            0.0906
+          ],
+          "diff_balanced_accuracy_mean": -0.0297,
+          "diff_balanced_accuracy_95ci": [
+            -0.1405,
+            0.0727
+          ]
+        },
+        "A_vs_B (Adding Melms to Raw Genes)": {
+          "description": "B (Atlas+Melms) minus A (Atlas Only)",
+          "diff_macro_f1_mean": -0.041,
+          "diff_macro_f1_95ci": [
+            -0.1126,
+            0.0217
+          ],
+          "diff_balanced_accuracy_mean": -0.0487,
+          "diff_balanced_accuracy_95ci": [
+            -0.1297,
+            0.0169
+          ]
+        },
+        "C_vs_D (Adding Melms to Pathways)": {
+          "description": "D (Atlas+Melms) minus C (Atlas Only)",
+          "diff_macro_f1_mean": -0.0559,
+          "diff_macro_f1_95ci": [
+            -0.1314,
+            0.0105
+          ],
+          "diff_balanced_accuracy_mean": -0.0451,
+          "diff_balanced_accuracy_95ci": [
+            -0.0918,
+            0.0091
+          ]
+        }
+      }
+    },
+    "covid_subcohort_analysis": {
+      "GSE158127": {
+        "total_covid": 12,
+        "models": {
+          "A": {
+            "correct": 0,
+            "recall": 0.0
+          },
+          "B": {
+            "correct": 0,
+            "recall": 0.0
+          },
+          "C": {
+            "correct": 2,
+            "recall": 0.1667
+          },
+          "D": {
+            "correct": 3,
+            "recall": 0.25
+          }
+        }
+      },
+      "GSE171668": {
+        "total_covid": 7,
+        "models": {
+          "A": {
+            "correct": 2,
+            "recall": 0.2857
+          },
+          "B": {
+            "correct": 2,
+            "recall": 0.2857
+          },
+          "C": {
+            "correct": 1,
+            "recall": 0.1429
+          },
+          "D": {
+            "correct": 0,
+            "recall": 0.0
+          }
+        }
+      },
+      "GSE171524": {
+        "total_covid": 19,
+        "models": {
+          "B": {
+            "correct": 3,
+            "recall": 0.1579
+          },
+          "D": {
+            "correct": 0,
+            "recall": 0.0
+          }
+        }
+      }
+    }
+  }
+}

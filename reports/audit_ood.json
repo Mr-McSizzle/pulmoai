@@ -1,0 +1,504 @@
+{
+  "audit_metadata": {
+    "title": "Medical Vision Out-of-Distribution (OOD) Guard Audit",
+    "evaluation_date": "2026-10-14T19:40:40Z",
+    "device": "mps",
+    "guard_mechanism": "Maximum Softmax Probability (MSP) confidence thresholding",
+    "thresholds_evaluated": [
+      0.3,
+      0.5,
+      0.7
+    ],
+    "ood_sources": [
+      "Cross-modality medical datasets (PneumoniaMNIST, DermaMNIST, RetinaMNIST)",
+      "Natural photographs (CIFAR-10 test split: 10,000 real images)"
+    ],
+    "critical_safety_finding": "The maximum softmax probability (MSP) guard is severely deficient on out-of-distribution inputs. Models exhibit extreme semantic overconfidence when fed non-domain photographs (CIFAR-10). For example, Pediatric Chest X-Ray fails to reject 100% of photographic images at the standard 0.50 threshold (0.0% rejection rate; 100% false accept rate), predicting normal/pneumonia with mean confidence 97.9%. The platform CANNOT claim to reject real-world photographs or low-quality camera photos."
+  },
+  "modalities": {
+    "chest_xray": {
+      "modality_id": "chest_xray",
+      "modality_name": "Pediatric Chest X-Ray (Ages 1-5)",
+      "source_cohort": "Pediatric pneumonia cohort (children aged 1-5)",
+      "channels": 1,
+      "classes_count": 2,
+      "in_distribution": {
+        "sample_count": 624,
+        "mean_msp": 0.9663
+      },
+      "guard_assessment": {
+        "guard_status": "WEAK - Fails to reject majority of non-medical photographs",
+        "cifar10_rejection_rate_at_05": 0.0,
+        "cifar10_false_accept_rate_at_05": 1.0,
+        "can_claim_photo_rejection": false
+      },
+      "cross_modality_medical_ood": {
+        "summary": {
+          "sample_count": 2405,
+          "mean_msp": 0.9958,
+          "rejection_rate_at_thresholds": {
+            "0.3": 0.0,
+            "0.5": 0.0,
+            "0.7": 0.0
+          },
+          "false_accept_rate_at_thresholds": {
+            "0.3": 1.0,
+            "0.5": 1.0,
+            "0.7": 1.0
+          },
+          "msp_auroc_id_vs_ood": 0.5058
+        },
+        "breakdown_by_candidate": {
+          "skin_lesion": {
+            "sample_count": 2005,
+            "mean_msp": 0.9974,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.0,
+              "0.5": 0.0,
+              "0.7": 0.0
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 1.0,
+              "0.5": 1.0,
+              "0.7": 1.0
+            },
+            "msp_auroc_id_vs_ood": 0.4534
+          },
+          "retina": {
+            "sample_count": 400,
+            "mean_msp": 0.9877,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.0,
+              "0.5": 0.0,
+              "0.7": 0.0
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 1.0,
+              "0.5": 1.0,
+              "0.7": 1.0
+            },
+            "msp_auroc_id_vs_ood": 0.7683
+          }
+        }
+      },
+      "photographic_ood_cifar10": {
+        "sample_count": 10000,
+        "mean_msp": 0.9793,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.0,
+          "0.5": 0.0,
+          "0.7": 0.0132
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 1.0,
+          "0.5": 1.0,
+          "0.7": 0.9868
+        },
+        "msp_auroc_id_vs_ood": 0.672
+      },
+      "overall_ood_combined": {
+        "sample_count": 12405,
+        "mean_msp": 0.9825,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.0,
+          "0.5": 0.0,
+          "0.7": 0.0106
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 1.0,
+          "0.5": 1.0,
+          "0.7": 0.9894
+        },
+        "msp_auroc_id_vs_ood": 0.6398
+      }
+    },
+    "skin_lesion": {
+      "modality_id": "skin_lesion",
+      "modality_name": "Dermatoscopy (Skin Lesion)",
+      "source_cohort": "HAM10000 pigmented skin lesions",
+      "channels": 3,
+      "classes_count": 7,
+      "in_distribution": {
+        "sample_count": 2005,
+        "mean_msp": 0.7687
+      },
+      "guard_assessment": {
+        "guard_status": "WEAK - Fails to reject majority of non-medical photographs",
+        "cifar10_rejection_rate_at_05": 0.0559,
+        "cifar10_false_accept_rate_at_05": 0.9441,
+        "can_claim_photo_rejection": false
+      },
+      "cross_modality_medical_ood": {
+        "summary": {
+          "sample_count": 1024,
+          "mean_msp": 0.8363,
+          "rejection_rate_at_thresholds": {
+            "0.3": 0.0059,
+            "0.5": 0.0859,
+            "0.7": 0.2148
+          },
+          "false_accept_rate_at_thresholds": {
+            "0.3": 0.9941,
+            "0.5": 0.9141,
+            "0.7": 0.7852
+          },
+          "msp_auroc_id_vs_ood": 0.3539
+        },
+        "breakdown_by_candidate": {
+          "chest_xray": {
+            "sample_count": 624,
+            "mean_msp": 0.7475,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.0096,
+              "0.5": 0.141,
+              "0.7": 0.3526
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 0.9904,
+              "0.5": 0.859,
+              "0.7": 0.6474
+            },
+            "msp_auroc_id_vs_ood": 0.5323
+          },
+          "retina": {
+            "sample_count": 400,
+            "mean_msp": 0.9748,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.0,
+              "0.5": 0.0,
+              "0.7": 0.0
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 1.0,
+              "0.5": 1.0,
+              "0.7": 1.0
+            },
+            "msp_auroc_id_vs_ood": 0.0757
+          }
+        }
+      },
+      "photographic_ood_cifar10": {
+        "sample_count": 10000,
+        "mean_msp": 0.8162,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.0015,
+          "0.5": 0.0559,
+          "0.7": 0.2131
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 0.9985,
+          "0.5": 0.9441,
+          "0.7": 0.7869
+        },
+        "msp_auroc_id_vs_ood": 0.4374
+      },
+      "overall_ood_combined": {
+        "sample_count": 11024,
+        "mean_msp": 0.8181,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.0019,
+          "0.5": 0.0587,
+          "0.7": 0.2133
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 0.9981,
+          "0.5": 0.9413,
+          "0.7": 0.7867
+        },
+        "msp_auroc_id_vs_ood": 0.4296
+      }
+    },
+    "retina": {
+      "modality_id": "retina",
+      "modality_name": "Retinal Fundus Photography (Experimental)",
+      "source_cohort": "DeepDR diabetic retinopathy grading",
+      "channels": 3,
+      "classes_count": 5,
+      "in_distribution": {
+        "sample_count": 400,
+        "mean_msp": 0.3772
+      },
+      "guard_assessment": {
+        "guard_status": "MODERATE - Partially rejects non-medical photographs",
+        "cifar10_rejection_rate_at_05": 0.5877,
+        "cifar10_false_accept_rate_at_05": 0.4123,
+        "can_claim_photo_rejection": false
+      },
+      "cross_modality_medical_ood": {
+        "summary": {
+          "sample_count": 2629,
+          "mean_msp": 0.5198,
+          "rejection_rate_at_thresholds": {
+            "0.3": 0.0514,
+            "0.5": 0.5299,
+            "0.7": 0.8391
+          },
+          "false_accept_rate_at_thresholds": {
+            "0.3": 0.9486,
+            "0.5": 0.4701,
+            "0.7": 0.1609
+          },
+          "msp_auroc_id_vs_ood": 0.2383
+        },
+        "breakdown_by_candidate": {
+          "chest_xray": {
+            "sample_count": 624,
+            "mean_msp": 0.5386,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.024,
+              "0.5": 0.5096,
+              "0.7": 0.8221
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 0.976,
+              "0.5": 0.4904,
+              "0.7": 0.1779
+            },
+            "msp_auroc_id_vs_ood": 0.2009
+          },
+          "skin_lesion": {
+            "sample_count": 2005,
+            "mean_msp": 0.514,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.0599,
+              "0.5": 0.5362,
+              "0.7": 0.8444
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 0.9401,
+              "0.5": 0.4638,
+              "0.7": 0.1556
+            },
+            "msp_auroc_id_vs_ood": 0.25
+          }
+        }
+      },
+      "photographic_ood_cifar10": {
+        "sample_count": 10000,
+        "mean_msp": 0.5079,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.0566,
+          "0.5": 0.5877,
+          "0.7": 0.8445
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 0.9434,
+          "0.5": 0.4123,
+          "0.7": 0.1555
+        },
+        "msp_auroc_id_vs_ood": 0.2641
+      },
+      "overall_ood_combined": {
+        "sample_count": 12629,
+        "mean_msp": 0.5104,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.0555,
+          "0.5": 0.5757,
+          "0.7": 0.8434
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 0.9445,
+          "0.5": 0.4243,
+          "0.7": 0.1566
+        },
+        "msp_auroc_id_vs_ood": 0.2587
+      }
+    },
+    "blood_smear": {
+      "modality_id": "blood_smear",
+      "modality_name": "Peripheral Blood Smear",
+      "source_cohort": "Microscopic blood cell morphology",
+      "channels": 3,
+      "classes_count": 8,
+      "in_distribution": {
+        "sample_count": 0,
+        "mean_msp": null
+      },
+      "guard_assessment": {
+        "guard_status": "ADEQUATE - Rejects majority of non-medical photographs",
+        "cifar10_rejection_rate_at_05": 0.837,
+        "cifar10_false_accept_rate_at_05": 0.163,
+        "can_claim_photo_rejection": false
+      },
+      "cross_modality_medical_ood": {
+        "summary": {
+          "sample_count": 3029,
+          "mean_msp": 0.3368,
+          "rejection_rate_at_thresholds": {
+            "0.3": 0.4503,
+            "0.5": 0.9099,
+            "0.7": 0.9927
+          },
+          "false_accept_rate_at_thresholds": {
+            "0.3": 0.5497,
+            "0.5": 0.0901,
+            "0.7": 0.0073
+          }
+        },
+        "breakdown_by_candidate": {
+          "chest_xray": {
+            "sample_count": 624,
+            "mean_msp": 0.3536,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.367,
+              "0.5": 0.8958,
+              "0.7": 0.9888
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 0.633,
+              "0.5": 0.1042,
+              "0.7": 0.0112
+            }
+          },
+          "skin_lesion": {
+            "sample_count": 2005,
+            "mean_msp": 0.3142,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.5392,
+              "0.5": 0.9456,
+              "0.7": 0.9925
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 0.4608,
+              "0.5": 0.0544,
+              "0.7": 0.0075
+            }
+          },
+          "retina": {
+            "sample_count": 400,
+            "mean_msp": 0.4237,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.135,
+              "0.5": 0.7525,
+              "0.7": 1.0
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 0.865,
+              "0.5": 0.2475,
+              "0.7": 0.0
+            }
+          }
+        }
+      },
+      "photographic_ood_cifar10": {
+        "sample_count": 10000,
+        "mean_msp": 0.3734,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.354,
+          "0.5": 0.837,
+          "0.7": 0.9677
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 0.646,
+          "0.5": 0.163,
+          "0.7": 0.0323
+        }
+      },
+      "overall_ood_combined": {
+        "sample_count": 13029,
+        "mean_msp": 0.3649,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.3764,
+          "0.5": 0.8539,
+          "0.7": 0.9735
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 0.6236,
+          "0.5": 0.1461,
+          "0.7": 0.0265
+        }
+      }
+    },
+    "chest_multilabel": {
+      "modality_id": "chest_multilabel",
+      "modality_name": "Chest X-Ray (14 Pathologies)",
+      "source_cohort": "NIH ChestX-ray14",
+      "channels": 1,
+      "classes_count": 14,
+      "in_distribution": {
+        "sample_count": 0,
+        "mean_msp": null
+      },
+      "guard_assessment": {
+        "guard_status": "WEAK - Fails to reject majority of non-medical photographs",
+        "cifar10_rejection_rate_at_05": 0.0,
+        "cifar10_false_accept_rate_at_05": 1.0,
+        "can_claim_photo_rejection": false
+      },
+      "cross_modality_medical_ood": {
+        "summary": {
+          "sample_count": 2405,
+          "mean_msp": 0.759,
+          "rejection_rate_at_thresholds": {
+            "0.3": 0.0,
+            "0.5": 0.0,
+            "0.7": 0.3526
+          },
+          "false_accept_rate_at_thresholds": {
+            "0.3": 1.0,
+            "0.5": 1.0,
+            "0.7": 0.6474
+          }
+        },
+        "breakdown_by_candidate": {
+          "skin_lesion": {
+            "sample_count": 2005,
+            "mean_msp": 0.7198,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.0,
+              "0.5": 0.0,
+              "0.7": 0.4229
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 1.0,
+              "0.5": 1.0,
+              "0.7": 0.5771
+            }
+          },
+          "retina": {
+            "sample_count": 400,
+            "mean_msp": 0.9559,
+            "rejection_rate_at_thresholds": {
+              "0.3": 0.0,
+              "0.5": 0.0,
+              "0.7": 0.0
+            },
+            "false_accept_rate_at_thresholds": {
+              "0.3": 1.0,
+              "0.5": 1.0,
+              "0.7": 1.0
+            }
+          }
+        }
+      },
+      "photographic_ood_cifar10": {
+        "sample_count": 10000,
+        "mean_msp": 0.7222,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.0,
+          "0.5": 0.0,
+          "0.7": 0.3963
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 1.0,
+          "0.5": 1.0,
+          "0.7": 0.6037
+        }
+      },
+      "overall_ood_combined": {
+        "sample_count": 12405,
+        "mean_msp": 0.7294,
+        "rejection_rate_at_thresholds": {
+          "0.3": 0.0,
+          "0.5": 0.0,
+          "0.7": 0.3878
+        },
+        "false_accept_rate_at_thresholds": {
+          "0.3": 1.0,
+          "0.5": 1.0,
+          "0.7": 0.6122
+        }
+      }
+    }
+  }
+}

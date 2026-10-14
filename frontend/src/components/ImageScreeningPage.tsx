@@ -8,7 +8,6 @@ import {
   RefreshCw,
   Layers,
   CheckCircle,
-  Sliders,
 } from "lucide-react";
 import { api } from "../api";
 import type { ImagePredictionResponse } from "../types";
@@ -16,9 +15,9 @@ import type { ImagePredictionResponse } from "../types";
 const MODALITIES = [
   {
     id: "chest_xray",
-    name: "Chest X-Ray",
-    caption: "Pneumonia Screening (Binary)",
-    classes: "Normal vs Pneumonia",
+    name: "Pediatric Chest X-Ray",
+    caption: "Pediatric Pneumonia (Ages 1-5)",
+    classes: "Normal vs Pneumonia (Ages 1-5)",
     testAuc: "97.57%",
   },
   {
@@ -30,9 +29,9 @@ const MODALITIES = [
   },
   {
     id: "retina",
-    name: "Retinal Fundus",
-    caption: "Diabetic Retinopathy (5 Grades)",
-    classes: "Grades 0 to 4 (DR Severity)",
+    name: "Retinal Fundus (Experimental)",
+    caption: "Diabetic Retinopathy (52.8% Acc)",
+    classes: "Experimental benchmark only; staging disabled",
     testAuc: "74.38%",
   },
   {
@@ -53,7 +52,7 @@ const MODALITIES = [
 
 export function ImageScreeningPage() {
   const [selectedModality, setSelectedModality] = useState("chest_xray");
-  const [oodThreshold, setOodThreshold] = useState(0.50);
+  const oodThreshold = 0.50;
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -213,25 +212,14 @@ export function ImageScreeningPage() {
             </button>
           </div>
 
-          {/* OOD Threshold Slider */}
-          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-            <div className="flex items-center justify-between text-xs font-medium text-slate-700 mb-1">
-              <span className="flex items-center gap-1">
-                <Sliders size={12} className="text-slate-500" /> Rejection Heuristic Threshold:
-              </span>
-              <strong className="text-teal-700">{(oodThreshold * 100).toFixed(0)}%</strong>
+          {/* Audited OOD Assessment Notice (Slider removed per benchmark findings) */}
+          <div className="p-3 rounded-lg bg-amber-50/70 border border-amber-200">
+            <div className="text-xs font-semibold text-amber-900 mb-1 flex items-center gap-1.5">
+              <AlertTriangle size={14} className="text-amber-700" />
+              OOD Detection Guard Removed (No Reliable Detector Exists)
             </div>
-            <input
-              type="range"
-              min="0.10"
-              max="0.95"
-              step="0.05"
-              value={oodThreshold}
-              onChange={(e) => setOodThreshold(Number(e.target.value))}
-              className="w-full accent-teal-600"
-            />
-            <div className="text-[10px] text-slate-500 mt-1 leading-snug">
-              Maximum Softmax Probability (MSP) triage threshold. Evaluated against genuine cross-modality medical datasets to measure empirical False Accept Rates.
+            <div className="text-[11px] text-amber-800 leading-snug">
+              Audited across Maximum Softmax Probability, Energy Score, Mahalanobis Distance, kNN Embeddings, and Outlier Exposure. No evaluated method achieves a False-Accept Rate under 10% (observed FAR on out-of-domain medical images and photographs ranges from 48% to 100%). Automated rejection sliders provide false clinical reassurance and have been removed.
             </div>
           </div>
 
@@ -346,6 +334,17 @@ export function ImageScreeningPage() {
 
           {result && (
             <div className="space-y-4">
+              {/* Benchmark model clinical notice banner */}
+              <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <ShieldAlert size={15} className="text-blue-600 shrink-0" />
+                  Benchmark model, not for clinical use.
+                </span>
+                <span className="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                  Research Evaluation Only
+                </span>
+              </div>
+
               {/* OOD Rejection Status Banner */}
               {!result.recognized ? (
                 <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-2">
@@ -366,7 +365,7 @@ export function ImageScreeningPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-emerald-800">
                       <CheckCircle size={18} className="text-emerald-600" />
-                      Image Recognized & Classified
+                      Image Processed
                     </div>
                     {result.confidence && (
                       <span className="text-xs font-bold bg-emerald-200/70 text-emerald-900 px-2 py-0.5 rounded-full">
@@ -375,12 +374,20 @@ export function ImageScreeningPage() {
                     )}
                   </div>
 
+                  {/* Normal result with predicted class */}
                   {result.predicted_class && (
                     <div className="mt-2">
                       <div className="text-[11px] text-emerald-700 font-medium">Predicted Screening Finding:</div>
                       <div className="text-2xl font-black text-emerald-950 mt-0.5">
                         {result.predicted_class.toUpperCase()}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Retina experimental staging disabled banner */}
+                  {(selectedModality === "retina" || result.image_type === "retina" || result.staging_notice) && (
+                    <div className="mt-2 p-3 rounded-lg bg-amber-100/80 border border-amber-300 text-amber-950 text-xs">
+                      <strong>Experimental Model (52.8% Accuracy):</strong> Severity staging is disabled because clinical staging accuracy is insufficient. Only class probabilities are shown below for benchmark evaluation.
                     </div>
                   )}
 
@@ -443,11 +450,18 @@ export function ImageScreeningPage() {
                     <span className="flex items-center gap-1.5">
                       <ShieldAlert size={14} className="text-teal-600" /> Empirical OOD Rejection Profile
                     </span>
-                    {result.empirical_false_accept_rate !== undefined && result.empirical_false_accept_rate !== null && (
-                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
-                        Empirical FAR: {(result.empirical_false_accept_rate * 100).toFixed(1)}%
-                      </span>
-                    )}
+                    <div className="flex gap-1.5">
+                      {result.empirical_false_accept_rate !== undefined && result.empirical_false_accept_rate !== null && (
+                        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
+                          Med FAR: {(result.empirical_false_accept_rate * 100).toFixed(1)}%
+                        </span>
+                      )}
+                      {result.cifar10_false_accept_rate !== undefined && result.cifar10_false_accept_rate !== null && (
+                        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-red-100 text-red-900 border border-red-200">
+                          Photo FAR: {(result.cifar10_false_accept_rate * 100).toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
                     {result.ood_methodology_statement}

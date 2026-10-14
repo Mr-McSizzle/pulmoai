@@ -1,0 +1,578 @@
+{
+  "metadata": {
+    "audit_step": "Section C1 Fix: Lab Parser on Native PDFs and Adaptive Per-Image Preprocessing",
+    "benchmark_dataset_label": "synthetic set; real-world accuracy unknown",
+    "total_reports_evaluated": 50,
+    "entities_per_condition": 350,
+    "total_evaluations": 2100,
+    "layouts_evaluated": [
+      "dr_lal_pathlabs",
+      "srl_agilus_diagnostics",
+      "metropolis_healthcare",
+      "hospital_emr",
+      "compact_clinic"
+    ],
+    "degradations_evaluated": [
+      "clean_pdf",
+      "clean_ocr",
+      "rotation",
+      "blur",
+      "jpeg_compression",
+      "perspective"
+    ],
+    "timestamp": "2026-10-14T18:50:39Z",
+    "total_runtime_seconds": 431.31
+  },
+  "clean_pdf_audit": {
+    "overall_accuracy": 0.9971,
+    "matched_entities": 349,
+    "total_entities": 350,
+    "meets_target_98pct": true,
+    "per_layout_accuracy": {
+      "dr_lal_pathlabs": {
+        "accuracy": 1.0,
+        "matched": 70,
+        "total": 70
+      },
+      "srl_agilus_diagnostics": {
+        "accuracy": 1.0,
+        "matched": 70,
+        "total": 70
+      },
+      "metropolis_healthcare": {
+        "accuracy": 1.0,
+        "matched": 70,
+        "total": 70
+      },
+      "hospital_emr": {
+        "accuracy": 0.9857,
+        "matched": 69,
+        "total": 70
+      },
+      "compact_clinic": {
+        "accuracy": 1.0,
+        "matched": 70,
+        "total": 70
+      }
+    },
+    "failures": [
+      {
+        "doc_id": 39,
+        "layout_id": "hospital_emr",
+        "test": "serum_creatinine",
+        "expected": {
+          "val": 0.5,
+          "unit": "mg/dL",
+          "flag": "LOW"
+        },
+        "extracted": {
+          "val": 0.5,
+          "unit": "mg/dL",
+          "flag": "NORMAL"
+        },
+        "category": "rounding_boundary"
+      }
+    ]
+  },
+  "results_by_condition": {
+    "clean_pdf": {
+      "degradation_tier": "clean_pdf",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.9971,
+      "baseline_raw_matched": 349,
+      "fixed_enhanced_accuracy": 0.9971,
+      "fixed_enhanced_matched": 349,
+      "adaptive_preprocessed_accuracy": 0.9971,
+      "adaptive_preprocessed_matched": 349,
+      "adaptive_vs_raw_delta": 0.0,
+      "adaptive_vs_fixed_delta": 0.0,
+      "adaptive_decisions_distribution": {
+        "digital_pdf_text_layer": 50
+      },
+      "per_layout": {
+        "dr_lal_pathlabs": {
+          "baseline_raw_accuracy": 1.0,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        },
+        "srl_agilus_diagnostics": {
+          "baseline_raw_accuracy": 1.0,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        },
+        "metropolis_healthcare": {
+          "baseline_raw_accuracy": 1.0,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        },
+        "hospital_emr": {
+          "baseline_raw_accuracy": 0.9857,
+          "fixed_enhanced_accuracy": 0.9857,
+          "adaptive_preprocessed_accuracy": 0.9857,
+          "entities_evaluated": 70
+        },
+        "compact_clinic": {
+          "baseline_raw_accuracy": 1.0,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        }
+      },
+      "runtime_seconds": 0.6
+    },
+    "clean_ocr": {
+      "degradation_tier": "clean_ocr",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.9114,
+      "baseline_raw_matched": 319,
+      "fixed_enhanced_accuracy": 0.9086,
+      "fixed_enhanced_matched": 318,
+      "adaptive_preprocessed_accuracy": 0.9114,
+      "adaptive_preprocessed_matched": 319,
+      "adaptive_vs_raw_delta": 0.0,
+      "adaptive_vs_fixed_delta": 0.0028,
+      "adaptive_decisions_distribution": {
+        "upright_unblurred; raw preserved": 50
+      },
+      "per_layout": {
+        "dr_lal_pathlabs": {
+          "baseline_raw_accuracy": 1.0,
+          "fixed_enhanced_accuracy": 0.9857,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        },
+        "srl_agilus_diagnostics": {
+          "baseline_raw_accuracy": 1.0,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        },
+        "metropolis_healthcare": {
+          "baseline_raw_accuracy": 1.0,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        },
+        "hospital_emr": {
+          "baseline_raw_accuracy": 0.7,
+          "fixed_enhanced_accuracy": 0.7,
+          "adaptive_preprocessed_accuracy": 0.7,
+          "entities_evaluated": 70
+        },
+        "compact_clinic": {
+          "baseline_raw_accuracy": 0.8571,
+          "fixed_enhanced_accuracy": 0.8571,
+          "adaptive_preprocessed_accuracy": 0.8571,
+          "entities_evaluated": 70
+        }
+      },
+      "runtime_seconds": 77.23
+    },
+    "rotation": {
+      "degradation_tier": "rotation",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.4371,
+      "baseline_raw_matched": 153,
+      "fixed_enhanced_accuracy": 0.8857,
+      "fixed_enhanced_matched": 310,
+      "adaptive_preprocessed_accuracy": 0.9086,
+      "adaptive_preprocessed_matched": 318,
+      "adaptive_vs_raw_delta": 0.4715,
+      "adaptive_vs_fixed_delta": 0.0229,
+      "adaptive_decisions_distribution": {
+        "deskewed_and_enhanced (angle=-3.5 deg)": 50
+      },
+      "per_layout": {
+        "dr_lal_pathlabs": {
+          "baseline_raw_accuracy": 0.8714,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 0.9857,
+          "entities_evaluated": 70
+        },
+        "srl_agilus_diagnostics": {
+          "baseline_raw_accuracy": 0.4571,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        },
+        "metropolis_healthcare": {
+          "baseline_raw_accuracy": 0.4286,
+          "fixed_enhanced_accuracy": 0.9857,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        },
+        "hospital_emr": {
+          "baseline_raw_accuracy": 0.0714,
+          "fixed_enhanced_accuracy": 0.7,
+          "adaptive_preprocessed_accuracy": 0.7,
+          "entities_evaluated": 70
+        },
+        "compact_clinic": {
+          "baseline_raw_accuracy": 0.3571,
+          "fixed_enhanced_accuracy": 0.7429,
+          "adaptive_preprocessed_accuracy": 0.8571,
+          "entities_evaluated": 70
+        }
+      },
+      "runtime_seconds": 93.62
+    },
+    "blur": {
+      "degradation_tier": "blur",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.44,
+      "baseline_raw_matched": 154,
+      "fixed_enhanced_accuracy": 0.2114,
+      "fixed_enhanced_matched": 74,
+      "adaptive_preprocessed_accuracy": 0.44,
+      "adaptive_preprocessed_matched": 154,
+      "adaptive_vs_raw_delta": 0.0,
+      "adaptive_vs_fixed_delta": 0.2286,
+      "adaptive_decisions_distribution": {
+        "blur_defocus_detected (var=5.9); raw image preserved": 5,
+        "blur_defocus_detected (var=5.8); raw image preserved": 5,
+        "blur_defocus_detected (var=6.4); raw image preserved": 9,
+        "blur_defocus_detected (var=6.3); raw image preserved": 1,
+        "blur_defocus_detected (var=8.2); raw image preserved": 6,
+        "blur_defocus_detected (var=8.3); raw image preserved": 4,
+        "blur_defocus_detected (var=6.6); raw image preserved": 7,
+        "blur_defocus_detected (var=6.5); raw image preserved": 3,
+        "blur_defocus_detected (var=4.9); raw image preserved": 8,
+        "blur_defocus_detected (var=4.8); raw image preserved": 2
+      },
+      "per_layout": {
+        "dr_lal_pathlabs": {
+          "baseline_raw_accuracy": 0.2429,
+          "fixed_enhanced_accuracy": 0.1143,
+          "adaptive_preprocessed_accuracy": 0.2429,
+          "entities_evaluated": 70
+        },
+        "srl_agilus_diagnostics": {
+          "baseline_raw_accuracy": 0.5857,
+          "fixed_enhanced_accuracy": 0.3,
+          "adaptive_preprocessed_accuracy": 0.5857,
+          "entities_evaluated": 70
+        },
+        "metropolis_healthcare": {
+          "baseline_raw_accuracy": 0.4,
+          "fixed_enhanced_accuracy": 0.2143,
+          "adaptive_preprocessed_accuracy": 0.4,
+          "entities_evaluated": 70
+        },
+        "hospital_emr": {
+          "baseline_raw_accuracy": 0.2714,
+          "fixed_enhanced_accuracy": 0.3429,
+          "adaptive_preprocessed_accuracy": 0.2714,
+          "entities_evaluated": 70
+        },
+        "compact_clinic": {
+          "baseline_raw_accuracy": 0.7,
+          "fixed_enhanced_accuracy": 0.0857,
+          "adaptive_preprocessed_accuracy": 0.7,
+          "entities_evaluated": 70
+        }
+      },
+      "runtime_seconds": 80.26
+    },
+    "jpeg_compression": {
+      "degradation_tier": "jpeg_compression",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.88,
+      "baseline_raw_matched": 308,
+      "fixed_enhanced_accuracy": 0.82,
+      "fixed_enhanced_matched": 287,
+      "adaptive_preprocessed_accuracy": 0.88,
+      "adaptive_preprocessed_matched": 308,
+      "adaptive_vs_raw_delta": 0.0,
+      "adaptive_vs_fixed_delta": 0.06,
+      "adaptive_decisions_distribution": {
+        "upright_unblurred; raw preserved": 50
+      },
+      "per_layout": {
+        "dr_lal_pathlabs": {
+          "baseline_raw_accuracy": 1.0,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 1.0,
+          "entities_evaluated": 70
+        },
+        "srl_agilus_diagnostics": {
+          "baseline_raw_accuracy": 0.9714,
+          "fixed_enhanced_accuracy": 1.0,
+          "adaptive_preprocessed_accuracy": 0.9714,
+          "entities_evaluated": 70
+        },
+        "metropolis_healthcare": {
+          "baseline_raw_accuracy": 0.9857,
+          "fixed_enhanced_accuracy": 0.9571,
+          "adaptive_preprocessed_accuracy": 0.9857,
+          "entities_evaluated": 70
+        },
+        "hospital_emr": {
+          "baseline_raw_accuracy": 0.5857,
+          "fixed_enhanced_accuracy": 0.2857,
+          "adaptive_preprocessed_accuracy": 0.5857,
+          "entities_evaluated": 70
+        },
+        "compact_clinic": {
+          "baseline_raw_accuracy": 0.8571,
+          "fixed_enhanced_accuracy": 0.8571,
+          "adaptive_preprocessed_accuracy": 0.8571,
+          "entities_evaluated": 70
+        }
+      },
+      "runtime_seconds": 84.46
+    },
+    "perspective": {
+      "degradation_tier": "perspective",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.4857,
+      "baseline_raw_matched": 170,
+      "fixed_enhanced_accuracy": 0.7771,
+      "fixed_enhanced_matched": 272,
+      "adaptive_preprocessed_accuracy": 0.8029,
+      "adaptive_preprocessed_matched": 281,
+      "adaptive_vs_raw_delta": 0.3172,
+      "adaptive_vs_fixed_delta": 0.0258,
+      "adaptive_decisions_distribution": {
+        "deskewed_and_enhanced (angle=+3.5 deg)": 50
+      },
+      "per_layout": {
+        "dr_lal_pathlabs": {
+          "baseline_raw_accuracy": 0.0,
+          "fixed_enhanced_accuracy": 0.8571,
+          "adaptive_preprocessed_accuracy": 0.8714,
+          "entities_evaluated": 70
+        },
+        "srl_agilus_diagnostics": {
+          "baseline_raw_accuracy": 0.9286,
+          "fixed_enhanced_accuracy": 0.8286,
+          "adaptive_preprocessed_accuracy": 0.8571,
+          "entities_evaluated": 70
+        },
+        "metropolis_healthcare": {
+          "baseline_raw_accuracy": 0.5714,
+          "fixed_enhanced_accuracy": 0.8,
+          "adaptive_preprocessed_accuracy": 0.7429,
+          "entities_evaluated": 70
+        },
+        "hospital_emr": {
+          "baseline_raw_accuracy": 0.1429,
+          "fixed_enhanced_accuracy": 0.5714,
+          "adaptive_preprocessed_accuracy": 0.7,
+          "entities_evaluated": 70
+        },
+        "compact_clinic": {
+          "baseline_raw_accuracy": 0.7857,
+          "fixed_enhanced_accuracy": 0.8286,
+          "adaptive_preprocessed_accuracy": 0.8429,
+          "entities_evaluated": 70
+        }
+      },
+      "runtime_seconds": 92.77
+    }
+  },
+  "results_by_layout": {
+    "dr_lal_pathlabs": {
+      "clean_pdf": {
+        "baseline_accuracy": 1.0,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "clean_ocr": {
+        "baseline_accuracy": 1.0,
+        "fixed_enhanced_accuracy": 0.9857,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "rotation": {
+        "baseline_accuracy": 0.8714,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 0.9857,
+        "n_entities": 70
+      },
+      "blur": {
+        "baseline_accuracy": 0.2429,
+        "fixed_enhanced_accuracy": 0.1143,
+        "adaptive_accuracy": 0.2429,
+        "n_entities": 70
+      },
+      "jpeg_compression": {
+        "baseline_accuracy": 1.0,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "perspective": {
+        "baseline_accuracy": 0.0,
+        "fixed_enhanced_accuracy": 0.8571,
+        "adaptive_accuracy": 0.8714,
+        "n_entities": 70
+      }
+    },
+    "srl_agilus_diagnostics": {
+      "clean_pdf": {
+        "baseline_accuracy": 1.0,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "clean_ocr": {
+        "baseline_accuracy": 1.0,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "rotation": {
+        "baseline_accuracy": 0.4571,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "blur": {
+        "baseline_accuracy": 0.5857,
+        "fixed_enhanced_accuracy": 0.3,
+        "adaptive_accuracy": 0.5857,
+        "n_entities": 70
+      },
+      "jpeg_compression": {
+        "baseline_accuracy": 0.9714,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 0.9714,
+        "n_entities": 70
+      },
+      "perspective": {
+        "baseline_accuracy": 0.9286,
+        "fixed_enhanced_accuracy": 0.8286,
+        "adaptive_accuracy": 0.8571,
+        "n_entities": 70
+      }
+    },
+    "metropolis_healthcare": {
+      "clean_pdf": {
+        "baseline_accuracy": 1.0,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "clean_ocr": {
+        "baseline_accuracy": 1.0,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "rotation": {
+        "baseline_accuracy": 0.4286,
+        "fixed_enhanced_accuracy": 0.9857,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "blur": {
+        "baseline_accuracy": 0.4,
+        "fixed_enhanced_accuracy": 0.2143,
+        "adaptive_accuracy": 0.4,
+        "n_entities": 70
+      },
+      "jpeg_compression": {
+        "baseline_accuracy": 0.9857,
+        "fixed_enhanced_accuracy": 0.9571,
+        "adaptive_accuracy": 0.9857,
+        "n_entities": 70
+      },
+      "perspective": {
+        "baseline_accuracy": 0.5714,
+        "fixed_enhanced_accuracy": 0.8,
+        "adaptive_accuracy": 0.7429,
+        "n_entities": 70
+      }
+    },
+    "hospital_emr": {
+      "clean_pdf": {
+        "baseline_accuracy": 0.9857,
+        "fixed_enhanced_accuracy": 0.9857,
+        "adaptive_accuracy": 0.9857,
+        "n_entities": 70
+      },
+      "clean_ocr": {
+        "baseline_accuracy": 0.7,
+        "fixed_enhanced_accuracy": 0.7,
+        "adaptive_accuracy": 0.7,
+        "n_entities": 70
+      },
+      "rotation": {
+        "baseline_accuracy": 0.0714,
+        "fixed_enhanced_accuracy": 0.7,
+        "adaptive_accuracy": 0.7,
+        "n_entities": 70
+      },
+      "blur": {
+        "baseline_accuracy": 0.2714,
+        "fixed_enhanced_accuracy": 0.3429,
+        "adaptive_accuracy": 0.2714,
+        "n_entities": 70
+      },
+      "jpeg_compression": {
+        "baseline_accuracy": 0.5857,
+        "fixed_enhanced_accuracy": 0.2857,
+        "adaptive_accuracy": 0.5857,
+        "n_entities": 70
+      },
+      "perspective": {
+        "baseline_accuracy": 0.1429,
+        "fixed_enhanced_accuracy": 0.5714,
+        "adaptive_accuracy": 0.7,
+        "n_entities": 70
+      }
+    },
+    "compact_clinic": {
+      "clean_pdf": {
+        "baseline_accuracy": 1.0,
+        "fixed_enhanced_accuracy": 1.0,
+        "adaptive_accuracy": 1.0,
+        "n_entities": 70
+      },
+      "clean_ocr": {
+        "baseline_accuracy": 0.8571,
+        "fixed_enhanced_accuracy": 0.8571,
+        "adaptive_accuracy": 0.8571,
+        "n_entities": 70
+      },
+      "rotation": {
+        "baseline_accuracy": 0.3571,
+        "fixed_enhanced_accuracy": 0.7429,
+        "adaptive_accuracy": 0.8571,
+        "n_entities": 70
+      },
+      "blur": {
+        "baseline_accuracy": 0.7,
+        "fixed_enhanced_accuracy": 0.0857,
+        "adaptive_accuracy": 0.7,
+        "n_entities": 70
+      },
+      "jpeg_compression": {
+        "baseline_accuracy": 0.8571,
+        "fixed_enhanced_accuracy": 0.8571,
+        "adaptive_accuracy": 0.8571,
+        "n_entities": 70
+      },
+      "perspective": {
+        "baseline_accuracy": 0.7857,
+        "fixed_enhanced_accuracy": 0.8286,
+        "adaptive_accuracy": 0.8429,
+        "n_entities": 70
+      }
+    }
+  },
+  "summary": {
+    "clean_pdf_accuracy": 0.9971,
+    "clean_ocr_accuracy": 0.9114,
+    "rotation_accuracy_adaptive": 0.9086,
+    "rotation_accuracy_raw": 0.4371,
+    "blur_accuracy_adaptive": 0.44,
+    "blur_accuracy_fixed_otsu": 0.2114,
+    "jpeg_accuracy_adaptive": 0.88,
+    "perspective_accuracy_adaptive": 0.8029
+  }
+}
