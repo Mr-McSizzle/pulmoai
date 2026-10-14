@@ -187,7 +187,7 @@ class FutureRiskEstimandTests(unittest.TestCase):
 
         # Check estimand distinction
         self.assertIn("estimand_clarification", data)
-        self.assertIn("prospective future incidence", data["estimand_clarification"].lower())
+        self.assertIn("future mortality risk", data["estimand_clarification"].lower())
         self.assertIn("5-year", data["estimand_clarification"])
         self.assertIn("10-year", data["estimand_clarification"])
 

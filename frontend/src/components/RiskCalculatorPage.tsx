@@ -181,11 +181,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
     <div className="module-page space-y-6">
       <div className="page-heading">
         <div>
-          <div className="eyebrow page-kicker">PHASE 2 & PART B · CHRONIC RISK & SURVIVAL ENGINE</div>
-          <h1>Chronic Disease Risk & Prospective Survival Engine</h1>
+          <div className="eyebrow page-kicker">PHASE 2 & PART B · CHRONIC RISK & FUTURE MORTALITY ENGINE</div>
+          <h1>Chronic Disease Risk & Future Mortality Engine</h1>
           <p>
             Population-calibrated clinical risk models trained on 17,961 NHANES adult participants (cross-sectional)
-            and 47,281 adults linked to the CDC National Death Index across 16 years (prospective survival).
+            and 47,281 adults linked to the CDC National Death Index across 16 years (future mortality risk).
           </p>
         </div>
       </div>
@@ -414,9 +414,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
               />
             </div>
 
-            {/* Race / Ethnicity (PCE predictor) */}
+            {/* Race / Ethnicity (PCE comparator only) */}
             <div>
-              <label className="block text-[11px] font-medium text-slate-600 mb-1">Race/Ethnicity (PCE)</label>
+              <label className="block text-[11px] font-medium text-slate-600 mb-1">
+                Race/Ethnicity <span className="text-[10px] text-slate-400 font-normal">(PCE only)</span>
+              </label>
               <div className="grid grid-cols-2 gap-1.5">
                 <button
                   type="button"
@@ -441,6 +443,9 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                   Black / AA
                 </button>
               </div>
+              <p className="text-[10px] text-slate-400 mt-1 leading-tight">
+                Not used in PulmoAI mortality models; collected solely for published 2013 ACC/AHA equations.
+              </p>
             </div>
           </div>
 
@@ -584,7 +589,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <div>
                   <div className="text-[10px] font-bold uppercase tracking-wider text-teal-700 flex items-center gap-1.5">
-                    <Clock size={13} className="text-teal-600" /> Prospective Survival Incidence
+                    <Clock size={13} className="text-teal-600" /> Future mortality risk (US survey data)
                   </div>
                   <h3 className="text-sm font-bold text-slate-900 mt-0.5">
                     Future Risk: 5-Year & 10-Year Mortality Endpoints
@@ -600,15 +605,21 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 <ShieldCheck size={18} className="shrink-0 text-amber-700 mt-0.5" />
                 <div className="space-y-1">
                   <div className="font-semibold text-amber-950">
-                    CRITICAL ESTIMAND DISTINCTION: Prospective Future Incidence
+                    CRITICAL ESTIMAND DISTINCTION: Future mortality risk (US survey data)
                   </div>
                   <p className="text-[10px] text-amber-800 leading-normal">
-                    The models in this section estimate <strong>prospective future mortality incidence</strong> over fixed
+                    The models in this section estimate <strong>future mortality risk (US survey data)</strong> over fixed
                     5-year (60 months) and 10-year (120 months) horizons derived from 47,281 civilian adults tracked
-                    prospectively through the National Death Index. This is mathematically and clinically distinct from
+                    prospectively through the National Death Index on temporal holdout (2011-2014). This is mathematically and clinically distinct from
                     cross-sectional prevalence of current doctor diagnoses.
                   </p>
                 </div>
+              </div>
+
+              {/* NCHS Data Perturbation Warning */}
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-[10px] text-slate-600 leading-relaxed">
+                <strong>Data Privacy Notice:</strong> The public-use NHANES Linked Mortality Files (LMF) include synthetic data perturbation
+                applied by NCHS to protect respondent confidentiality; subgroup counts and survival intervals may slightly diverge from unperturbed restricted-use files.
               </div>
 
               {/* Future Endpoints Grid */}
@@ -645,7 +656,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                         <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200">
                           <div>
                             <div className="text-[10px] font-semibold text-slate-500 flex items-center gap-1">
-                              <Calendar size={11} className="text-teal-600" /> 5-Year Incidence
+                              <Calendar size={11} className="text-teal-600" /> 5-Year Mortality Risk
                             </div>
                             <div className="text-xl font-black text-slate-900 mt-0.5">
                               {risk5yr.toFixed(2)}%
@@ -653,7 +664,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                           </div>
                           <div>
                             <div className="text-[10px] font-semibold text-slate-500 flex items-center gap-1">
-                              <Calendar size={11} className="text-slate-400" /> 10-Year Incidence
+                              <Calendar size={11} className="text-slate-400" /> 10-Year Mortality Risk
                             </div>
                             <div className="text-xl font-black text-slate-800 mt-0.5">
                               {risk10yr.toFixed(2)}%
@@ -714,6 +725,9 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                           ? `${futureResult.published_scores.pooled_cohort_equations_pce.estimated_10yr_ascvd_risk_pct.toFixed(1)}% 10-Yr ASCVD Risk`
                           : "Ineligible (Age outside 40-79 or missing lipids)"}
                       </div>
+                      <div className="text-[10px] text-slate-500 mt-1">
+                        Primary prevention cohort (ages 40-79 without prior CVD). Evaluated for discrimination against fatal CVD.
+                      </div>
                       <div className="text-[9px] text-slate-500 mt-1 italic">
                         {futureResult.published_scores.pooled_cohort_equations_pce.citation}
                       </div>
@@ -746,6 +760,9 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                       </div>
                       <div className="text-[10px] text-slate-600 mt-0.5">
                         Age: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.age_points} · Waist: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.waist_points} · Activity: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.activity_points} · Family: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.family_history_points}
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-1">
+                        * Physical activity and family history are approximate mappings from NHANES variables.
                       </div>
                       <div className="text-[9px] text-slate-500 mt-1 italic">
                         {futureResult.published_scores.indian_diabetes_risk_score_idrs.citation}

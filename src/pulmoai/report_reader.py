@@ -599,9 +599,14 @@ def determine_flag(
         if ref_max is None:
             ref_max = eff_max
 
-    if ref_max is not None and val > ref_max:
+    # Settle boundary semantics: Reference intervals are INCLUSIVE ([ref_min, ref_max]).
+    # A value equal to ref_min or ref_max is clinically and mathematically classified as NORMAL.
+    # Strict inequality governs abnormality: val > ref_max -> HIGH; val < ref_min -> LOW.
+    # Floating-point epsilon (1e-6) tolerance prevents false-positive flags from precision rounding.
+    eps = 1e-6
+    if ref_max is not None and val > (ref_max + eps):
         return "HIGH"
-    if ref_min is not None and val < ref_min:
+    if ref_min is not None and val < (ref_min - eps):
         return "LOW"
     return "NORMAL"
 

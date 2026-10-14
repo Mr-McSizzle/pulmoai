@@ -1,0 +1,355 @@
+{
+  "metadata": {
+    "audit_step": "Pass 3 D5: Modality Gate Multi-Family & Leave-Dataset-Out Evaluation",
+    "model_architecture": "ResNet-18 (64x64 input, 3 channels, 5 classes)",
+    "checkpoint_path": "models/modality_gate_resnet18_v2.pt",
+    "classes": [
+      "chest_xray",
+      "dermoscopy",
+      "fundus",
+      "blood_smear",
+      "other"
+    ],
+    "timestamp_epoch": 1792010892.957973,
+    "compute_device": "mps",
+    "train_samples_model_a": 5980,
+    "train_samples_model_b": 5680,
+    "total_negative_test_samples_evaluated": 2136,
+    "runtime_seconds": 139.37
+  },
+  "standard_5class_test_evaluation": {
+    "accuracy": 0.9853,
+    "per_class_metrics": {
+      "chest_xray": {
+        "precision": 1.0,
+        "recall": 0.99,
+        "f1_score": 0.995,
+        "support": 400
+      },
+      "dermoscopy": {
+        "precision": 0.9446,
+        "recall": 0.98,
+        "f1_score": 0.962,
+        "support": 400
+      },
+      "fundus": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 400
+      },
+      "blood_smear": {
+        "precision": 0.9877,
+        "recall": 1.0,
+        "f1_score": 0.9938,
+        "support": 400
+      },
+      "other": {
+        "precision": 0.9909,
+        "recall": 0.9707,
+        "f1_score": 0.9807,
+        "support": 786
+      }
+    },
+    "confusion_matrix": [
+      [
+        396,
+        0,
+        0,
+        0,
+        4
+      ],
+      [
+        0,
+        392,
+        0,
+        5,
+        3
+      ],
+      [
+        0,
+        0,
+        400,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        400,
+        0
+      ],
+      [
+        0,
+        23,
+        0,
+        0,
+        763
+      ]
+    ]
+  },
+  "negative_families_evaluation_model_a_full": {
+    "overall_false_accept_count": 26,
+    "total_negative_samples": 2136,
+    "overall_false_accept_rate": 0.0122,
+    "overall_far_95ci": [
+      0.0083,
+      0.0178
+    ],
+    "replaces_earlier_single_far_claim": {
+      "earlier_claim": 0.0763,
+      "replacement_context": "The earlier 7.63% FAR claim was measured on a narrow test set with only CIFAR photos, BreastMNIST, and noise. On broader negative families including unseen organ CT scans and synthetic lab documents, FAR varies significantly by family."
+    },
+    "per_family_results": {
+      "cifar_photographic": {
+        "family_name": "cifar_photographic",
+        "n_samples": 500,
+        "false_accepts": 3,
+        "false_accept_rate": 0.006,
+        "far_95ci": [
+          0.002,
+          0.0175
+        ],
+        "correctly_rejected_as_other": 497,
+        "destination_breakdown": {
+          "chest_xray": 0,
+          "dermoscopy": 3,
+          "fundus": 0,
+          "blood_smear": 0
+        },
+        "description": "Photographic images (CIFAR-10 test)"
+      },
+      "breastmnist_medical": {
+        "family_name": "breastmnist_medical",
+        "n_samples": 156,
+        "false_accepts": 0,
+        "false_accept_rate": 0.0,
+        "far_95ci": [
+          0.0,
+          0.024
+        ],
+        "correctly_rejected_as_other": 156,
+        "destination_breakdown": {
+          "chest_xray": 0,
+          "dermoscopy": 0,
+          "fundus": 0,
+          "blood_smear": 0
+        },
+        "description": "Breast ultrasound non-target (BreastMNIST test)"
+      },
+      "heldout_organcmnist": {
+        "family_name": "heldout_organcmnist",
+        "n_samples": 500,
+        "false_accepts": 0,
+        "false_accept_rate": 0.0,
+        "far_95ci": [
+          0.0,
+          0.0076
+        ],
+        "correctly_rejected_as_other": 500,
+        "destination_breakdown": {
+          "chest_xray": 0,
+          "dermoscopy": 0,
+          "fundus": 0,
+          "blood_smear": 0
+        },
+        "description": "Abdominal CT coronal (OrganCMNIST test, unseen modality)"
+      },
+      "heldout_organsmnist": {
+        "family_name": "heldout_organsmnist",
+        "n_samples": 500,
+        "false_accepts": 3,
+        "false_accept_rate": 0.006,
+        "far_95ci": [
+          0.002,
+          0.0175
+        ],
+        "correctly_rejected_as_other": 497,
+        "destination_breakdown": {
+          "chest_xray": 3,
+          "dermoscopy": 0,
+          "fundus": 0,
+          "blood_smear": 0
+        },
+        "description": "Abdominal CT sagittal (OrganSMNIST test, unseen modality)"
+      },
+      "synthetic_lab_reports_64": {
+        "family_name": "synthetic_lab_reports_64",
+        "n_samples": 350,
+        "false_accepts": 0,
+        "false_accept_rate": 0.0,
+        "far_95ci": [
+          0.0,
+          0.0109
+        ],
+        "correctly_rejected_as_other": 350,
+        "destination_breakdown": {
+          "chest_xray": 0,
+          "dermoscopy": 0,
+          "fundus": 0,
+          "blood_smear": 0
+        },
+        "description": "Simulated 64x64 clinical laboratory report pages"
+      },
+      "synthetic_noise_and_blanks": {
+        "family_name": "synthetic_noise_and_blanks",
+        "n_samples": 130,
+        "false_accepts": 20,
+        "false_accept_rate": 0.1538,
+        "far_95ci": [
+          0.1019,
+          0.2257
+        ],
+        "correctly_rejected_as_other": 110,
+        "destination_breakdown": {
+          "chest_xray": 0,
+          "dermoscopy": 20,
+          "fundus": 0,
+          "blood_smear": 0
+        },
+        "description": "Gaussian noise, uniform noise, solid blank images"
+      }
+    }
+  },
+  "leave_dataset_out_ablation_model_b": {
+    "ablation_description": "Gate trained WITHOUT medical negatives in 'other' (photographic + noise only)",
+    "overall_false_accept_count": 250,
+    "total_negative_samples": 2136,
+    "overall_false_accept_rate": 0.117,
+    "overall_far_95ci": [
+      0.1041,
+      0.1314
+    ],
+    "medical_negative_degradation": {
+      "breastmnist_far_full_vs_nomed": [
+        0.0,
+        0.0
+      ],
+      "organcmnist_far_full_vs_nomed": [
+        0.0,
+        0.052
+      ],
+      "organsmnist_far_full_vs_nomed": [
+        0.006,
+        0.106
+      ]
+    },
+    "per_family_results": {
+      "cifar_photographic": {
+        "family_name": "cifar_photographic",
+        "n_samples": 500,
+        "false_accepts": 4,
+        "false_accept_rate": 0.008,
+        "far_95ci": [
+          0.0031,
+          0.0204
+        ],
+        "correctly_rejected_as_other": 496,
+        "destination_breakdown": {
+          "chest_xray": 0,
+          "dermoscopy": 2,
+          "fundus": 2,
+          "blood_smear": 0
+        },
+        "description": "Photographic images (CIFAR-10 test)"
+      },
+      "breastmnist_medical": {
+        "family_name": "breastmnist_medical",
+        "n_samples": 156,
+        "false_accepts": 0,
+        "false_accept_rate": 0.0,
+        "far_95ci": [
+          0.0,
+          0.024
+        ],
+        "correctly_rejected_as_other": 156,
+        "destination_breakdown": {
+          "chest_xray": 0,
+          "dermoscopy": 0,
+          "fundus": 0,
+          "blood_smear": 0
+        },
+        "description": "Breast ultrasound non-target (BreastMNIST test)"
+      },
+      "heldout_organcmnist": {
+        "family_name": "heldout_organcmnist",
+        "n_samples": 500,
+        "false_accepts": 26,
+        "false_accept_rate": 0.052,
+        "far_95ci": [
+          0.0357,
+          0.0751
+        ],
+        "correctly_rejected_as_other": 474,
+        "destination_breakdown": {
+          "chest_xray": 21,
+          "dermoscopy": 0,
+          "fundus": 5,
+          "blood_smear": 0
+        },
+        "description": "Abdominal CT coronal (OrganCMNIST test, unseen modality)"
+      },
+      "heldout_organsmnist": {
+        "family_name": "heldout_organsmnist",
+        "n_samples": 500,
+        "false_accepts": 53,
+        "false_accept_rate": 0.106,
+        "far_95ci": [
+          0.082,
+          0.1361
+        ],
+        "correctly_rejected_as_other": 447,
+        "destination_breakdown": {
+          "chest_xray": 47,
+          "dermoscopy": 0,
+          "fundus": 2,
+          "blood_smear": 4
+        },
+        "description": "Abdominal CT sagittal (OrganSMNIST test, unseen modality)"
+      },
+      "synthetic_lab_reports_64": {
+        "family_name": "synthetic_lab_reports_64",
+        "n_samples": 350,
+        "false_accepts": 147,
+        "false_accept_rate": 0.42,
+        "far_95ci": [
+          0.3694,
+          0.4723
+        ],
+        "correctly_rejected_as_other": 203,
+        "destination_breakdown": {
+          "chest_xray": 34,
+          "dermoscopy": 0,
+          "fundus": 0,
+          "blood_smear": 113
+        },
+        "description": "Simulated 64x64 clinical laboratory report pages"
+      },
+      "synthetic_noise_and_blanks": {
+        "family_name": "synthetic_noise_and_blanks",
+        "n_samples": 130,
+        "false_accepts": 20,
+        "false_accept_rate": 0.1538,
+        "far_95ci": [
+          0.1019,
+          0.2257
+        ],
+        "correctly_rejected_as_other": 110,
+        "destination_breakdown": {
+          "chest_xray": 10,
+          "dermoscopy": 0,
+          "fundus": 0,
+          "blood_smear": 10
+        },
+        "description": "Gaussian noise, uniform noise, solid blank images"
+      }
+    }
+  },
+  "clinical_scope_and_safety_caveats": [
+    "The gate cannot distinguish adult from pediatric chest radiographs; it was trained on PneumoniaMNIST which consists entirely of pediatric chest X-rays (ages 1-5).",
+    "The gate cannot reliably reject modalities completely absent from negative training (such as brain MRI or contrast-enhanced abdominal CT); unseen modalities can have elevated false-accept rates (up to 20-30%) and enter screening pipelines undetected.",
+    "For non-medical photographic images and synthetic lab reports, the gate maintains high rejection (FAR < 10%).",
+    "A visual modality warning banner is mandatory in all clinical screening workflows."
+  ]
+}

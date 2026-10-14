@@ -437,7 +437,23 @@ class ReportReaderRegressionTests(unittest.TestCase):
         _, rationale_rot = preprocess_lab_image_adaptive(rotated)
         self.assertIn("deskewed_and_enhanced", rationale_rot)
 
+    def test_boundary_semantics_inclusive_reference_limits(self) -> None:
+        """Verify settled boundary semantics: reference intervals are strictly inclusive [min, max]."""
+        # Exactly on the lower bound -> NORMAL
+        self.assertEqual(determine_flag("fasting_glucose", 70.0, ref_min=70.0, ref_max=99.0), "NORMAL")
+        # Exactly on the upper bound -> NORMAL
+        self.assertEqual(determine_flag("fasting_glucose", 99.0, ref_min=70.0, ref_max=99.0), "NORMAL")
+        # Strictly below lower bound -> LOW
+        self.assertEqual(determine_flag("fasting_glucose", 69.9, ref_min=70.0, ref_max=99.0), "LOW")
+        # Strictly above upper bound -> HIGH
+        self.assertEqual(determine_flag("fasting_glucose", 99.1, ref_min=70.0, ref_max=99.0), "HIGH")
+        # Female creatinine exact lower cutoff 0.5 mg/dL -> NORMAL
+        self.assertEqual(determine_flag("serum_creatinine", 0.5, ref_min=0.5, ref_max=1.1), "NORMAL")
+        # Female creatinine below lower cutoff 0.49 mg/dL -> LOW
+        self.assertEqual(determine_flag("serum_creatinine", 0.49, ref_min=0.5, ref_max=1.1), "LOW")
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

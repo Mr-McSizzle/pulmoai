@@ -295,8 +295,8 @@ class FutureRiskService:
                 "all_cause_mortality": {
                     "display_name": "All-Cause Mortality",
                     "estimand_type": "prospective_incidence",
-                    "estimand_label": "Prospective Cumulative Incidence",
-                    "estimand_description": "Estimates prospective probability of death from any cause over 5-year and 10-year horizons based on CDC NHANES linked to National Death Index follow-up.",
+                    "estimand_label": "Future mortality risk (US survey data)",
+                    "estimand_description": "Estimates future mortality risk from any cause over 5-year and 10-year horizons based on CDC NHANES linked to National Death Index follow-up on temporal holdout (2011-2014).",
                     "time_horizons": {
                         "5_year": {"risk_probability": round(risk_5yr_all, 4), "risk_percent": round(risk_5yr_all * 100, 2)},
                         "10_year": {"risk_probability": round(risk_10yr_all, 4), "risk_percent": round(risk_10yr_all * 100, 2)},
@@ -305,16 +305,17 @@ class FutureRiskService:
                     "tier_cutoffs_5yr": cut_all,
                     "benchmark_metrics": {
                         "c_index": 0.8621,
-                        "holdout_5yr_auroc": 0.8735,
+                        "holdout_5yr_auroc": 0.8713,
                         "brier_score_5yr": 0.0468,
                         "calibration_slope": 1.0352,
+                        "oe_ratio_5yr": 1.007,
                     },
                 },
                 "cardiovascular_mortality": {
                     "display_name": "Cardiovascular Mortality",
                     "estimand_type": "prospective_incidence",
-                    "estimand_label": "Prospective Cumulative Incidence",
-                    "estimand_description": "Estimates prospective probability of death from cardiovascular disease (ICD-10 I00-I09, I11, I13, I20-I51, I60-I69) based on CDC NHANES linked to National Death Index follow-up.",
+                    "estimand_label": "Future mortality risk (US survey data)",
+                    "estimand_description": "Estimates future mortality risk from cardiovascular disease (ICD-10 I00-I09, I11, I13, I20-I51, I60-I69) based on CDC NHANES linked to National Death Index follow-up on temporal holdout (2011-2014).",
                     "time_horizons": {
                         "5_year": {"risk_probability": round(risk_5yr_cvd, 4), "risk_percent": round(risk_5yr_cvd * 100, 2)},
                         "10_year": {"risk_probability": round(risk_10yr_cvd, 4), "risk_percent": round(risk_10yr_cvd * 100, 2)},
@@ -333,12 +334,14 @@ class FutureRiskService:
                 "pooled_cohort_equations_pce": {
                     "display_name": "Pooled Cohort Equations (ACC/AHA 2013)",
                     "eligible": pce_risk is not None,
-                    "eligibility_criteria": "Age 40-79 years with measured blood pressure and lipid panel",
+                    "eligibility_criteria": "Age 40-79 years without prior CVD with measured blood pressure and lipid panel",
                     "estimated_10yr_ascvd_risk_pct": pce_risk,
                     "risk_category": pce_category,
-                    "benchmark_c_index_on_holdout": 0.7797,
-                    "benchmark_5yr_auroc_on_holdout": 0.7684,
-                    "citation": "Goff DC Jr, et al. Circulation 2014;129:S49-S73.",
+                    "benchmark_c_index_on_holdout": 0.7799,
+                    "benchmark_5yr_auroc_on_holdout": 0.7739,
+                    "evaluation_cohort": "Ages 40-79 without prior cardiovascular disease (MCQ160C/D/E/F = 0) on temporal holdout (2011-2014)",
+                    "claim_scope": "Evaluated strictly for discrimination against observed fatal CVD; calibration is not claimed because PCE estimates fatal + non-fatal ASCVD whereas NHANES-LMF observes fatal events only.",
+                    "citation": "Goff DC Jr, et al. Circulation 2014;129:S49-S73 (Table A & Appendix 7).",
                 },
                 "indian_diabetes_risk_score_idrs": {
                     "display_name": "Indian Diabetes Risk Score (IDRS)",
@@ -347,15 +350,23 @@ class FutureRiskService:
                     "interpretation": idrs_res["interpretation"],
                     "components": idrs_res["components"],
                     "benchmark_auroc_on_holdout": 0.7798,
-                    "citation": "Mohan V, et al. J Assoc Physicians India 2005;53:759-763.",
+                    "four_feature_ml_auroc": 0.8303,
+                    "nhanes_mapping_notes": "Physical activity (3 levels) and family history of diabetes (1st-degree relative) are approximate mappings from NHANES variables.",
+                    "citation": "Mohan V, et al. J Assoc Physicians India 2005;53:759-763 (Table 1).",
                 },
             },
             "features_provided_count": features_provided,
+            "nchs_privacy_perturbation_warning": (
+                "The public-use NHANES Linked Mortality Files (LMF) include data perturbation (synthetic swapping) "
+                "on a small fraction of records applied by the National Center for Health Statistics (NCHS) to protect respondent "
+                "confidentiality. As documented by NCHS, while population parameter estimates remain unbiased, small-cell "
+                "subgroup counts and individual-level survival intervals may slightly diverge from unperturbed restricted-use files."
+            ),
             "estimand_clarification": (
-                "CRITICAL ESTIMAND DISTINCTION: This module estimates PROSPECTIVE FUTURE INCIDENCE "
+                "CRITICAL ESTIMAND DISTINCTION: This module estimates Future mortality risk (US survey data) "
                 "over fixed 5-year (60 months) and 10-year (120 months) horizons derived from CDC NHANES "
-                "participants tracked prospectively through the National Death Index. In contrast, the "
-                "chronic condition module estimates cross-sectional prevalence of CURRENT doctor diagnoses."
+                "participants tracked prospectively through the National Death Index on temporal holdout (2011-2014). "
+                "In contrast, the chronic condition module estimates cross-sectional survey-reported doctor diagnoses."
             ),
             "disclaimer": (
                 "BENCHMARK RESEARCH ESTIMATION ONLY. Not approved as a medical device or prognostic instrument. "

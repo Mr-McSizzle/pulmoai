@@ -1,0 +1,157 @@
+{
+  "metadata": {
+    "audit_step": "Pass 3 D6: Honest Holdout Lab OCR Evaluation",
+    "timestamp": "2026-10-14T20:25:00Z",
+    "benchmark_dataset_label": "honest holdout test set (unseen layouts, seed=999)",
+    "development_set_label": "development set (used for tuning)",
+    "total_reports_evaluated": 50,
+    "entities_per_condition": 350,
+    "layouts_evaluated": [
+      "max_healthcare",
+      "fortis_escorts",
+      "thyrocare_technologies",
+      "narayana_health"
+    ],
+    "degradations_evaluated": [
+      "clean_pdf",
+      "clean_ocr",
+      "rotation",
+      "blur",
+      "jpeg_compression",
+      "perspective"
+    ],
+    "total_runtime_seconds": 439.15
+  },
+  "clean_pdf_holdout_audit": {
+    "overall_accuracy": 0.9257,
+    "matched_entities": 324,
+    "total_entities": 350,
+    "meets_target_98pct": false,
+    "per_layout_accuracy": {
+      "max_healthcare": {
+        "matched": 77,
+        "total": 91,
+        "accuracy": 0.8462,
+        "meets_target_98pct": false
+      },
+      "fortis_escorts": {
+        "matched": 86,
+        "total": 91,
+        "accuracy": 0.9451,
+        "meets_target_98pct": false
+      },
+      "thyrocare_technologies": {
+        "matched": 87,
+        "total": 91,
+        "accuracy": 0.956,
+        "meets_target_98pct": false
+      },
+      "narayana_health": {
+        "matched": 74,
+        "total": 77,
+        "accuracy": 0.961,
+        "meets_target_98pct": false
+      }
+    }
+  },
+  "results_by_condition": {
+    "clean_pdf": {
+      "condition": "clean_pdf",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.9257,
+      "baseline_raw_matched": 324,
+      "fixed_enhanced_accuracy": 0.9257,
+      "fixed_enhanced_matched": 324,
+      "adaptive_preprocessed_accuracy": 0.9257,
+      "adaptive_preprocessed_matched": 324,
+      "adaptive_vs_raw_delta": 0.0,
+      "adaptive_decisions_distribution": {
+        "digital_pdf_text_layer": 50
+      },
+      "runtime_seconds": 0.23
+    },
+    "clean_ocr": {
+      "condition": "clean_ocr",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.8914,
+      "baseline_raw_matched": 312,
+      "fixed_enhanced_accuracy": 0.8886,
+      "fixed_enhanced_matched": 311,
+      "adaptive_preprocessed_accuracy": 0.8914,
+      "adaptive_preprocessed_matched": 312,
+      "adaptive_vs_raw_delta": 0.0,
+      "adaptive_decisions_distribution": {
+        "upright_unblurred; raw preserved": 50
+      },
+      "runtime_seconds": 80.37
+    },
+    "rotation": {
+      "condition": "rotation",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.6771,
+      "baseline_raw_matched": 237,
+      "fixed_enhanced_accuracy": 0.8714,
+      "fixed_enhanced_matched": 305,
+      "adaptive_preprocessed_accuracy": 0.8629,
+      "adaptive_preprocessed_matched": 302,
+      "adaptive_vs_raw_delta": 0.1857,
+      "adaptive_decisions_distribution": {
+        "deskewed_and_enhanced (angle=-3.5 deg)": 50
+      },
+      "runtime_seconds": 101.1
+    },
+    "blur": {
+      "condition": "blur",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.5086,
+      "baseline_raw_matched": 178,
+      "fixed_enhanced_accuracy": 0.0286,
+      "fixed_enhanced_matched": 10,
+      "adaptive_preprocessed_accuracy": 0.5086,
+      "adaptive_preprocessed_matched": 178,
+      "adaptive_vs_raw_delta": 0.0,
+      "adaptive_decisions_distribution": {
+        "blur_defocus_detected (var=3.7); raw image preserved": 13,
+        "blur_defocus_detected (var=3.1); raw image preserved": 16,
+        "blur_defocus_detected (var=3.0); raw image preserved": 8,
+        "blur_defocus_detected (var=3.9); raw image preserved": 11,
+        "blur_defocus_detected (var=4.0); raw image preserved": 2
+      },
+      "runtime_seconds": 88.28
+    },
+    "jpeg_compression": {
+      "condition": "jpeg_compression",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.8629,
+      "baseline_raw_matched": 302,
+      "fixed_enhanced_accuracy": 0.8857,
+      "fixed_enhanced_matched": 310,
+      "adaptive_preprocessed_accuracy": 0.8629,
+      "adaptive_preprocessed_matched": 302,
+      "adaptive_vs_raw_delta": 0.0,
+      "adaptive_decisions_distribution": {
+        "upright_unblurred; raw preserved": 50
+      },
+      "runtime_seconds": 89.95
+    },
+    "perspective": {
+      "condition": "perspective",
+      "total_entities_evaluated": 350,
+      "baseline_raw_accuracy": 0.8257,
+      "baseline_raw_matched": 289,
+      "fixed_enhanced_accuracy": 0.4686,
+      "fixed_enhanced_matched": 164,
+      "adaptive_preprocessed_accuracy": 0.8257,
+      "adaptive_preprocessed_matched": 289,
+      "adaptive_vs_raw_delta": 0.0,
+      "adaptive_decisions_distribution": {
+        "upright_unblurred; raw preserved": 50
+      },
+      "runtime_seconds": 76.77
+    }
+  },
+  "boundary_semantics_policy": {
+    "rule": "Reference intervals are strictly inclusive [ref_min, ref_max]. A result exactly equal to ref_min or ref_max is classified as NORMAL. Abnormality requires strict inequality with epsilon tolerance: val < (ref_min - 1e-6) -> LOW, val > (ref_max + 1e-6) -> HIGH.",
+    "value_specific_exceptions": "None (zero value-specific hardcoded overrides exist)."
+  }
+}

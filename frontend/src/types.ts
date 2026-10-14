@@ -212,6 +212,7 @@ export interface FutureRiskResponse {
     [key: string]: any;
   };
   features_provided_count: number;
+  nchs_privacy_perturbation_warning?: string;
   estimand_clarification: string;
   disclaimer: string;
 }

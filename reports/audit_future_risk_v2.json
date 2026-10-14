@@ -1,0 +1,413 @@
+{
+  "audit_version": "v2_pass3",
+  "timestamp_epoch": 1792010209.3891158,
+  "nchs_privacy_perturbation_warning": "The public-use NHANES Linked Mortality Files (LMF) include data perturbation (synthetic swapping) on a small fraction of records applied by the National Center for Health Statistics (NCHS) to protect respondent confidentiality. As documented by NCHS, while population parameter estimates remain unbiased, small-cell subgroup counts and individual-level survival intervals may slightly diverge from unperturbed restricted-use files.",
+  "published_score_verification": {
+    "pce": {
+      "verified_against_published_vignette": true,
+      "guideline_citation": "Goff DC Jr, Lloyd-Jones DM, Bennett G, et al. 2013 ACC/AHA Guideline on the Assessment of Cardiovascular Risk. Circulation 2014;129(25 Suppl 2):S49-S73.",
+      "vignette_inputs": {
+        "age": 55,
+        "total_cholesterol_mg_dl": 213,
+        "hdl_cholesterol_mg_dl": 50,
+        "systolic_bp_mmhg": 120,
+        "bp_medication": false,
+        "current_smoker": false,
+        "diabetic": false
+      },
+      "computed_vs_published": {
+        "white_female": {
+          "computed_pct": 2.05,
+          "published_pct": 2.1
+        },
+        "black_female": {
+          "computed_pct": 3.0,
+          "published_pct": 3.0
+        },
+        "white_male": {
+          "computed_pct": 5.38,
+          "published_pct": 5.3
+        },
+        "black_male": {
+          "computed_pct": 6.06,
+          "published_pct": 6.1
+        }
+      },
+      "coefficients_source": "Table A (Circulation 2014;129:S59), Cox proportional hazards models on pooled cohorts (ARIC, CHS, CARDIA, Framingham).",
+      "runtime_dependency": "None (100% in-repo implementation; external 'ascvd' PyPI package uninstalled and removed)."
+    },
+    "idrs": {
+      "specification_source": "Mohan V, Deepa R, Deepa M, Somannavar S, Datta M. A simplified Indian Diabetes Risk Score for screening for undiagnosed diabetic subjects. J Assoc Physicians India 2005;53:759-763 (Table 1, p. 760).",
+      "published_worked_examples_printed_in_paper": false,
+      "note": "No individual patient worked examples or numerical vignettes were printed in Mohan et al. 2005. The scoring algorithm follows the exact published Table 1 point allocations. Previous worked examples in earlier reports were illustrative unit test cases, not published vignettes.",
+      "nhanes_variable_mapping_approximations": {
+        "physical_activity": "NHANES activity_level is derived from PAQ leisure-time and occupational activity. In our mapping, vigorous = 0 pts (regular exercise + strenuous work), moderate = 20 pts (either), sedentary = 30 pts (neither). This is an approximation of the Madras Diabetes Studies physical activity questionnaire.",
+        "family_history": "NHANES MCQ300C records diabetes in any first-degree biological relative (parent or sibling) as binary (1=Yes, 2=No). Since NHANES does not differentiate between one parent versus both parents, positive family history is mapped conservatively to 10 points (one parent diabetic)."
+      }
+    }
+  },
+  "mortality_model_features": {
+    "user_facing_features": [
+      "age",
+      "sex_male",
+      "bmi",
+      "waist_cm",
+      "systolic_bp",
+      "diastolic_bp",
+      "pulse_bpm",
+      "bp_medication",
+      "total_cholesterol",
+      "hdl_cholesterol",
+      "fasting_glucose",
+      "hba1c",
+      "serum_creatinine",
+      "bun",
+      "albumin",
+      "uric_acid",
+      "current_smoker",
+      "drinks_per_day",
+      "physically_active",
+      "target_diabetes",
+      "target_hypertension",
+      "target_heart_disease",
+      "target_stroke"
+    ],
+    "race_policy": "Race is strictly excluded from user-facing mortality risk inputs and models. It is retained solely for the Published PCE comparison card where the published 2013 ACC/AHA equations explicitly require race-specific coefficients."
+  },
+  "decile_calibration_holdout_2011_2014": {
+    "overall_observed_5yr_events": 745,
+    "overall_expected_5yr_events": 739.6,
+    "observed_to_expected_ratio": 1.007,
+    "calibration_in_the_large_intercept": 0.0096,
+    "raw_brier_score_5yr": 0.0468,
+    "intercept_recalibrated_brier_5yr": 0.0468,
+    "decile_calibration_table": [
+      {
+        "decile_index": 1,
+        "decile_range": "(-0.000201, 0.00258]",
+        "n_subjects": 1191,
+        "observed_events": 6,
+        "observed_rate": 0.005,
+        "observed_95ci": [
+          0.0017,
+          0.0092
+        ],
+        "mean_predicted_risk": 0.0019,
+        "predicted_to_observed_ratio": 0.385
+      },
+      {
+        "decile_index": 2,
+        "decile_range": "(0.00258, 0.00425]",
+        "n_subjects": 1190,
+        "observed_events": 8,
+        "observed_rate": 0.0067,
+        "observed_95ci": [
+          0.0025,
+          0.0118
+        ],
+        "mean_predicted_risk": 0.0033,
+        "predicted_to_observed_ratio": 0.498
+      },
+      {
+        "decile_index": 3,
+        "decile_range": "(0.00425, 0.00672]",
+        "n_subjects": 1191,
+        "observed_events": 11,
+        "observed_rate": 0.0092,
+        "observed_95ci": [
+          0.0042,
+          0.0151
+        ],
+        "mean_predicted_risk": 0.0054,
+        "predicted_to_observed_ratio": 0.583
+      },
+      {
+        "decile_index": 4,
+        "decile_range": "(0.00672, 0.011]",
+        "n_subjects": 1190,
+        "observed_events": 9,
+        "observed_rate": 0.0076,
+        "observed_95ci": [
+          0.0034,
+          0.0126
+        ],
+        "mean_predicted_risk": 0.0086,
+        "predicted_to_observed_ratio": 1.142
+      },
+      {
+        "decile_index": 5,
+        "decile_range": "(0.011, 0.0179]",
+        "n_subjects": 1191,
+        "observed_events": 16,
+        "observed_rate": 0.0134,
+        "observed_95ci": [
+          0.0076,
+          0.0202
+        ],
+        "mean_predicted_risk": 0.0141,
+        "predicted_to_observed_ratio": 1.049
+      },
+      {
+        "decile_index": 6,
+        "decile_range": "(0.0179, 0.0309]",
+        "n_subjects": 1190,
+        "observed_events": 27,
+        "observed_rate": 0.0227,
+        "observed_95ci": [
+          0.0143,
+          0.0311
+        ],
+        "mean_predicted_risk": 0.0237,
+        "predicted_to_observed_ratio": 1.047
+      },
+      {
+        "decile_index": 7,
+        "decile_range": "(0.0309, 0.0526]",
+        "n_subjects": 1190,
+        "observed_events": 34,
+        "observed_rate": 0.0286,
+        "observed_95ci": [
+          0.0193,
+          0.0387
+        ],
+        "mean_predicted_risk": 0.0407,
+        "predicted_to_observed_ratio": 1.425
+      },
+      {
+        "decile_index": 8,
+        "decile_range": "(0.0526, 0.0929]",
+        "n_subjects": 1191,
+        "observed_events": 62,
+        "observed_rate": 0.0521,
+        "observed_95ci": [
+          0.0395,
+          0.0647
+        ],
+        "mean_predicted_risk": 0.07,
+        "predicted_to_observed_ratio": 1.344
+      },
+      {
+        "decile_index": 9,
+        "decile_range": "(0.0929, 0.19]",
+        "n_subjects": 1190,
+        "observed_events": 149,
+        "observed_rate": 0.1252,
+        "observed_95ci": [
+          0.1067,
+          0.1445
+        ],
+        "mean_predicted_risk": 0.1343,
+        "predicted_to_observed_ratio": 1.072
+      },
+      {
+        "decile_index": 10,
+        "decile_range": "(0.19, 1.0]",
+        "n_subjects": 1191,
+        "observed_events": 423,
+        "observed_rate": 0.3552,
+        "observed_95ci": [
+          0.3283,
+          0.3829
+        ],
+        "mean_predicted_risk": 0.319,
+        "predicted_to_observed_ratio": 0.898
+      }
+    ]
+  },
+  "added_value_beyond_age_strata": {
+    "age_40_59": {
+      "age_range": "40-59",
+      "n_subjects": 3777,
+      "deaths_observed": 167,
+      "c_index_full_multimodal": 0.7471,
+      "c_index_age_sex_baseline": 0.6232,
+      "delta_c_index": 0.1239,
+      "delta_c_index_95ci": [
+        0.0914,
+        0.1572
+      ],
+      "auroc_5yr_full_multimodal": 0.7545,
+      "auroc_5yr_age_sex_baseline": 0.6202,
+      "delta_auroc_5yr": 0.1343,
+      "delta_auroc_5yr_95ci": [
+        0.0905,
+        0.1775
+      ]
+    },
+    "age_60_79": {
+      "age_range": "60-79",
+      "n_subjects": 2909,
+      "deaths_observed": 457,
+      "c_index_full_multimodal": 0.7469,
+      "c_index_age_sex_baseline": 0.6629,
+      "delta_c_index": 0.084,
+      "delta_c_index_95ci": [
+        0.0613,
+        0.1073
+      ],
+      "auroc_5yr_full_multimodal": 0.7594,
+      "auroc_5yr_age_sex_baseline": 0.6718,
+      "delta_auroc_5yr": 0.0876,
+      "delta_auroc_5yr_95ci": [
+        0.0593,
+        0.114
+      ]
+    }
+  },
+  "demographic_subgroups": {
+    "sex_male": {
+      "subgroup": "Male",
+      "n": 5802,
+      "deaths": 596,
+      "c_index": 0.8527,
+      "auroc_5yr": 0.8651
+    },
+    "sex_female": {
+      "subgroup": "Female",
+      "n": 6147,
+      "deaths": 499,
+      "c_index": 0.867,
+      "auroc_5yr": 0.8775
+    },
+    "age_20-39": {
+      "subgroup": "Age 20-39",
+      "n": 3902,
+      "deaths": 61,
+      "c_index": 0.6319,
+      "auroc_5yr": 0.6091
+    },
+    "age_40-59": {
+      "subgroup": "Age 40-59",
+      "n": 3777,
+      "deaths": 167,
+      "c_index": 0.7471,
+      "auroc_5yr": 0.7545
+    },
+    "age_60-79": {
+      "subgroup": "Age 60-79",
+      "n": 2909,
+      "deaths": 457,
+      "c_index": 0.7469,
+      "auroc_5yr": 0.7594
+    },
+    "age_80+": {
+      "subgroup": "Age 80+",
+      "n": 715,
+      "deaths": 408,
+      "c_index": 0.5947,
+      "auroc_5yr": 0.6117
+    },
+    "race_1.0": {
+      "subgroup": 1.0,
+      "n": 1433,
+      "deaths": 71,
+      "c_index": 0.8726,
+      "auroc_5yr": 0.8823
+    },
+    "race_2.0": {
+      "subgroup": 2.0,
+      "n": 1152,
+      "deaths": 64,
+      "c_index": 0.8776,
+      "auroc_5yr": 0.8811
+    },
+    "race_3.0": {
+      "subgroup": 3.0,
+      "n": 4673,
+      "deaths": 614,
+      "c_index": 0.8531,
+      "auroc_5yr": 0.8666
+    },
+    "race_4.0": {
+      "subgroup": 4.0,
+      "n": 2801,
+      "deaths": 268,
+      "c_index": 0.8301,
+      "auroc_5yr": 0.843
+    },
+    "race_6.0": {
+      "subgroup": 6.0,
+      "n": 1529,
+      "deaths": 53,
+      "c_index": 0.8618,
+      "auroc_5yr": 0.8834
+    },
+    "race_7.0": {
+      "subgroup": 7.0,
+      "n": 361,
+      "deaths": 25,
+      "c_index": 0.8595,
+      "auroc_5yr": 0.858
+    }
+  },
+  "survey_weighted_headline_metrics": {
+    "unweighted_auroc_5yr": 0.8713,
+    "survey_weighted_auroc_5yr": 0.8559,
+    "unweighted_brier_5yr": 0.0468,
+    "survey_weighted_brier_5yr": 0.038,
+    "weight_variable": "survey_weight_mec (WTMEC2YR mobile examination center weights)"
+  },
+  "fair_comparison_pce_vs_ml": {
+    "cohort_description": "Ages 40-79 without prior cardiovascular disease (MCQ160C/D/E/F = 0)",
+    "sample_size_train": 15837,
+    "sample_size_holdout": 5899,
+    "fatal_cvd_events_holdout": 110,
+    "published_pce": {
+      "c_index": 0.7799,
+      "auroc_5yr": 0.7739,
+      "claim_scope": "Evaluated strictly for discrimination against observed fatal CVD; calibration is not assessed because PCE estimates 10-year fatal + non-fatal hard ASCVD whereas NHANES-LMF observes fatal events only."
+    },
+    "cox_ml_pce_inputs_only": {
+      "c_index": 0.7864,
+      "auroc_5yr": 0.7771,
+      "features_used": [
+        "age",
+        "sex_male",
+        "race_black",
+        "total_cholesterol",
+        "hdl_cholesterol",
+        "systolic_bp",
+        "bp_medication",
+        "current_smoker",
+        "target_diabetes"
+      ]
+    },
+    "incremental_ml_difference": {
+      "delta_c_index_point": 0.0066,
+      "delta_c_index_95ci": [
+        -0.0104,
+        0.0254
+      ],
+      "delta_auroc_5yr_point": 0.0032,
+      "delta_auroc_5yr_95ci": [
+        -0.0215,
+        0.0306
+      ]
+    }
+  },
+  "fair_comparison_idrs_vs_ml": {
+    "cohort_description": "US NHANES adult holdout (2011-2014) with self-reported diagnosed diabetes",
+    "sample_size": 10034,
+    "prevalence": 0.1225,
+    "published_idrs": {
+      "auroc": 0.7798,
+      "context_mismatch": "IDRS was derived in the Chennai Urban Rural Epidemiology Study (CURES) specifically for Asian Indians to screen for undiagnosed type 2 diabetes. Evaluating on a multi-ethnic US adult cohort with self-reported diagnosed diabetes introduces geographic and outcome spectrum shifts."
+    },
+    "four_feature_ml_logistic_regression": {
+      "auroc": 0.8303,
+      "features_used": [
+        "age",
+        "waist_cm",
+        "activity_level",
+        "family_history_diabetes"
+      ]
+    },
+    "paired_difference": {
+      "delta_auroc_point": 0.0505,
+      "delta_auroc_95ci": [
+        0.0417,
+        0.0588
+      ]
+    }
+  }
+}

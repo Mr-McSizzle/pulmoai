@@ -178,6 +178,7 @@ class FutureRiskResponse(BaseModel):
     future_endpoints: dict[str, FutureRiskEndpoint]
     published_scores: dict[str, Any]
     features_provided_count: int
+    nchs_privacy_perturbation_warning: str | None = None
     estimand_clarification: str
     disclaimer: str
 
