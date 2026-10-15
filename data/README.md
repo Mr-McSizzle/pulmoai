@@ -2,7 +2,7 @@
 
 ## Source dataset
 
-- Full source file: `/Users/nisarg/Downloads/atlas-001.h5ad` (6,310,632,229 bytes).
+- Full source file: `<DOWNLOADS>/atlas-001.h5ad` (6,310,632,229 bytes).
 - The source is kept in Downloads and is not copied or modified by the project.
 - `data/atlas/INFLAMMATION_ATLAS_main_afterQC.h5ad` is a 15,908,864-byte partial/incomplete file with a similar name. It is not the source used for the current model and must not be substituted for the full atlas.
 

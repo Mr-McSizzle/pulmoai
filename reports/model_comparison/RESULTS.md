@@ -4,7 +4,7 @@
 
 This run predicts COVID versus healthy from the two locally available GSE248688 COVID-HC expression matrices. The analysis aggregates assigned cells by donor across both libraries, producing eight independent donor profiles: four healthy and four COVID. COVID pneumonia and mild cases are combined as the COVID class.
 
-The matrices are read directly from `/Users/nisarg/Downloads/GSE248688_RAW.tar`; no files are extracted. Counts are summed by donor, normalized to counts per million, and transformed with `log1p`. Constant features are removed and up to 100 genes are selected with ANOVA F-scores inside each training fold.
+The matrices are read directly from `<DOWNLOADS>/GSE248688_RAW.tar`; no files are extracted. Counts are summed by donor, normalized to counts per million, and transformed with `log1p`. Constant features are removed and up to 100 genes are selected with ANOVA F-scores inside each training fold.
 
 ## Results
 
@@ -29,6 +29,6 @@ The comparison uses leave-one-donor-out cross-validation, so each donor receives
 
 ```bash
 .venv/bin/python scripts/compare_pilot_models.py \
-  /Users/nisarg/Downloads/GSE248688_RAW.tar \
+  <DOWNLOADS>/GSE248688_RAW.tar \
   --output-dir reports/model_comparison --model-dir models
 ```

@@ -1,4 +1,4 @@
-Archive: /Users/nisarg/Downloads/GSE248688_RAW.tar
+Archive: <DOWNLOADS>/GSE248688_RAW.tar
 Metadata is streamed from the archive; expression matrices are not read or extracted.
 
 CMO donor metadata:

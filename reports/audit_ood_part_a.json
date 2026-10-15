@@ -17,7 +17,7 @@
       "classes": 2,
       "channels": 1,
       "in_distribution_test_samples": 624,
-      "new_oe_checkpoint": "/Users/nisarg/Desktop/ml project/models/medmnist/pneumoniamnist_oe.pt",
+      "new_oe_checkpoint": "models/medmnist/pneumoniamnist_oe.pt",
       "detector_evaluations": {
         "msp_baseline": {
           "cross_modality_dermamnist": {
@@ -116,7 +116,7 @@
       "classes": 7,
       "channels": 3,
       "in_distribution_test_samples": 2005,
-      "new_oe_checkpoint": "/Users/nisarg/Desktop/ml project/models/medmnist/dermamnist_oe.pt",
+      "new_oe_checkpoint": "models/medmnist/dermamnist_oe.pt",
       "detector_evaluations": {
         "msp_baseline": {
           "cross_modality_pneumoniamnist": {
@@ -215,7 +215,7 @@
       "classes": 5,
       "channels": 3,
       "in_distribution_test_samples": 400,
-      "new_oe_checkpoint": "/Users/nisarg/Desktop/ml project/models/medmnist/retinamnist_oe.pt",
+      "new_oe_checkpoint": "models/medmnist/retinamnist_oe.pt",
       "detector_evaluations": {
         "msp_baseline": {
           "cross_modality_pneumoniamnist": {

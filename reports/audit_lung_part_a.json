@@ -574,7 +574,7 @@
           0.7184
         ]
       },
-      "saved_artifact_path": "/Users/nisarg/Desktop/ml project/models/lung_uncalibrated_dual_rule.joblib",
+      "saved_artifact_path": "models/lung_uncalibrated_dual_rule.joblib",
       "is_deployed": false
     },
     "mathematical_calibration_drop_test": {

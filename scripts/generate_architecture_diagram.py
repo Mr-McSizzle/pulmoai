@@ -97,7 +97,7 @@ ax.text(
 pages = [
     ("Overview Dashboard", "Route: /", "System health, dataset metrics, subsystem navigation & integrity flags", "#E0F2FE", "#0284C7"),
     ("Single-Cell Atlas", "Route: /analyze", "Pseudobulk upload, dual-rule classifier, whole-cell input contract", "#CCFBF1", "#0D9488"),
-    ("Lab Report Reader", "Route: /reports", "Adaptive deskew / blur gate, PyMuPDF text layer, Templates A-G", "#DBEAFE", "#2563EB"),
+    ("Lab Report Reader", "Route: /reports", "Adaptive deskew / blur gate, PyMuPDF text layer, Templates A-H", "#DBEAFE", "#2563EB"),
     ("Chronic & Survival Risk", "Route: /risk", "Prospective mortality, PCE & IDRS benchmarks, 6 current diagnoses", "#FFE4E6", "#E11D48"),
     ("Image Screening & Gate", "Route: /images", "ResNet-18 modality gate (LOFO FAR 19.03%), pediatric X-ray, retina safeguard", "#F3E8FF", "#7C3AED"),
     ("Performance Audit", "Route: /performance", "Leave-one-study-out tables, holdout calibration slopes, Brier skill scores", "#FEF3C7", "#D97706"),
@@ -181,10 +181,10 @@ engines = [
     ),
     (
         "Engine 2: Clinical Lab Parser",
-        "Adaptive Preprocessing Gate (reports/audit_ocr_holdout_v2.json)",
-        "Templates A-D (styled after common clinical formats)",
-        "Clean PDF: 92.57% correct, exactly 0 silent numerical errors",
-        "Rotated scans: raw 68.29% -> adaptive 84.86% (+16.57%)",
+        "Adaptive Preprocessing Gate (reports/audit_ocr_pass7.json)",
+        "Templates A-H (styled after clinical pathology & EHR layouts)",
+        "Clean PDF: 94.64% correct, exactly 0 silent numerical errors",
+        "Rotated scans: adaptive orientation & deskew recovery",
         "100% extracted values require explicit user confirmation",
         "#2563EB", "#EFF6FF", "#DBEAFE",
     ),
@@ -250,7 +250,7 @@ data_blocks = [
     ),
     (
         "Standard Medical Dictionaries",
-        "LOINC and UCUM standardized clinical units\nMolar mass factors for SI-to-US conversions\nTemplates A-G styled after common clinical formats",
+        "LOINC and UCUM standardized clinical units\nMolar mass factors for SI-to-US conversions\nTemplates A-H styled after clinical pathology & EHR formats",
         "#2563EB",
     ),
     (

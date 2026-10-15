@@ -1,4 +1,4 @@
-Archive: /Users/nisarg/Downloads/GSE248688_RAW.tar
+Archive: <DOWNLOADS>/GSE248688_RAW.tar
 Reads Matrix Market headers and compressed text metadata; extracts no files.
 
 Library: GSM8335813_ul6ge419_oxt3y11v_matrix.mtx.gz

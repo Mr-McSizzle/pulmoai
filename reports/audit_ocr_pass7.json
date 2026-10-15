@@ -1,0 +1,976 @@
+{
+  "metadata": {
+    "title": "PulmoAI Pass 7 (H2) Fresh Holdout OCR Evaluation with Fixed Generator and Expanded Conditions",
+    "benchmark_label": "synthetic set; real-world accuracy unknown",
+    "seed": 1010,
+    "total_synthetic_documents": 56,
+    "total_entities_per_condition": 392,
+    "templates_evaluated": [
+      "template_a",
+      "template_b",
+      "template_c",
+      "template_d",
+      "template_e",
+      "template_f",
+      "template_g",
+      "template_h"
+    ],
+    "timestamp": "2026-10-15T14:10:40Z",
+    "false_refusal_rate_clean_raster": 0.0,
+    "false_refusal_pass_threshold_met": true
+  },
+  "condition_summaries": {
+    "clean_pdf": {
+      "condition": "clean_pdf",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 385,
+      "accuracy_on_accepted": 0.9821,
+      "wrong_value_accepted_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 7,
+      "not_detected_rate_on_accepted": 0.0179,
+      "runtime_seconds": 0.38,
+      "silent_error_examples": []
+    },
+    "clean_raster_150dpi": {
+      "condition": "clean_raster_150dpi",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 332,
+      "accuracy_on_accepted": 0.8469,
+      "wrong_value_accepted_count": 23,
+      "silent_error_rate_on_accepted": 0.0587,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 37,
+      "not_detected_rate_on_accepted": 0.0944,
+      "runtime_seconds": 36.58,
+      "silent_error_examples": [
+        {
+          "condition": "clean_raster_150dpi",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_150dpi",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_150dpi",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_150dpi",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_150dpi",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 6.4,
+          "parsed_val": 4.7,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "clean_raster_200dpi": {
+      "condition": "clean_raster_200dpi",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 322,
+      "accuracy_on_accepted": 0.8214,
+      "wrong_value_accepted_count": 14,
+      "silent_error_rate_on_accepted": 0.0357,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 56,
+      "not_detected_rate_on_accepted": 0.1429,
+      "runtime_seconds": 51.97,
+      "silent_error_examples": [
+        {
+          "condition": "clean_raster_200dpi",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_200dpi",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_200dpi",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_200dpi",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_200dpi",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 6.4,
+          "parsed_val": 4.7,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "clean_raster_300dpi": {
+      "condition": "clean_raster_300dpi",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 275,
+      "accuracy_on_accepted": 0.7015,
+      "wrong_value_accepted_count": 16,
+      "silent_error_rate_on_accepted": 0.0408,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 101,
+      "not_detected_rate_on_accepted": 0.2577,
+      "runtime_seconds": 89.55,
+      "silent_error_examples": [
+        {
+          "condition": "clean_raster_300dpi",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_300dpi",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_300dpi",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_300dpi",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_300dpi",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 6.4,
+          "parsed_val": 4.7,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "clean_raster_150dpi_noise": {
+      "condition": "clean_raster_150dpi_noise",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 300,
+      "accuracy_on_accepted": 0.7653,
+      "wrong_value_accepted_count": 59,
+      "silent_error_rate_on_accepted": 0.1505,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 33,
+      "not_detected_rate_on_accepted": 0.0842,
+      "runtime_seconds": 61.68,
+      "silent_error_examples": [
+        {
+          "condition": "clean_raster_150dpi_noise",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "fasting_glucose",
+          "expected_val": 75.1,
+          "parsed_val": 75.4,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "NORMAL"
+        },
+        {
+          "condition": "clean_raster_150dpi_noise",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_150dpi_noise",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "fasting_glucose",
+          "expected_val": 39.9,
+          "parsed_val": 9.0,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_150dpi_noise",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_150dpi_noise",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "serum_creatinine",
+          "expected_val": 1.1,
+          "parsed_val": 1.4,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        }
+      ]
+    },
+    "clean_raster_200dpi_noise": {
+      "condition": "clean_raster_200dpi_noise",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 189,
+      "accuracy_on_accepted": 0.4821,
+      "wrong_value_accepted_count": 113,
+      "silent_error_rate_on_accepted": 0.2883,
+      "flag_mismatch_only_count": 3,
+      "flag_mismatch_rate_on_accepted": 0.0077,
+      "not_detected_count": 87,
+      "not_detected_rate_on_accepted": 0.2219,
+      "runtime_seconds": 95.38,
+      "silent_error_examples": [
+        {
+          "condition": "clean_raster_200dpi_noise",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "fasting_glucose",
+          "expected_val": 75.1,
+          "parsed_val": 751.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_200dpi_noise",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "triglycerides",
+          "expected_val": 101.6,
+          "parsed_val": 1.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_200dpi_noise",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "serum_creatinine",
+          "expected_val": 2.1,
+          "parsed_val": 21.0,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_200dpi_noise",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "serum_creatinine",
+          "expected_val": 1.0,
+          "parsed_val": 1.7,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_200dpi_noise",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 18.0,
+          "expected_flag": "LOW",
+          "parsed_flag": "HIGH"
+        }
+      ]
+    },
+    "clean_raster_300dpi_noise": {
+      "condition": "clean_raster_300dpi_noise",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 194,
+      "accuracy_on_accepted": 0.4949,
+      "wrong_value_accepted_count": 90,
+      "silent_error_rate_on_accepted": 0.2296,
+      "flag_mismatch_only_count": 5,
+      "flag_mismatch_rate_on_accepted": 0.0128,
+      "not_detected_count": 103,
+      "not_detected_rate_on_accepted": 0.2628,
+      "runtime_seconds": 192.2,
+      "silent_error_examples": [
+        {
+          "condition": "clean_raster_300dpi_noise",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "fasting_glucose",
+          "expected_val": 75.1,
+          "parsed_val": 71561.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_300dpi_noise",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hdl_cholesterol",
+          "expected_val": 30.1,
+          "parsed_val": 3021.0,
+          "expected_flag": "LOW",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_300dpi_noise",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 71.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "clean_raster_300dpi_noise",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "clean_raster_300dpi_noise",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "triglycerides",
+          "expected_val": 23.7,
+          "parsed_val": 23757.0,
+          "expected_flag": "LOW",
+          "parsed_flag": "HIGH"
+        }
+      ]
+    },
+    "skew_0deg": {
+      "condition": "skew_0deg",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 275,
+      "accuracy_on_accepted": 0.7015,
+      "wrong_value_accepted_count": 16,
+      "silent_error_rate_on_accepted": 0.0408,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 101,
+      "not_detected_rate_on_accepted": 0.2577,
+      "runtime_seconds": 89.37,
+      "silent_error_examples": [
+        {
+          "condition": "skew_0deg",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "skew_0deg",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "skew_0deg",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "skew_0deg",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "skew_0deg",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 6.4,
+          "parsed_val": 4.7,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "skew_3.5deg": {
+      "condition": "skew_3.5deg",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 335,
+      "accuracy_on_accepted": 0.8546,
+      "wrong_value_accepted_count": 15,
+      "silent_error_rate_on_accepted": 0.0383,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 42,
+      "not_detected_rate_on_accepted": 0.1071,
+      "runtime_seconds": 221.03,
+      "silent_error_examples": [
+        {
+          "condition": "skew_3.5deg",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "skew_3.5deg",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "skew_3.5deg",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "skew_3.5deg",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "skew_3.5deg",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 6.4,
+          "parsed_val": 4.7,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "skew_8deg": {
+      "condition": "skew_8deg",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 298,
+      "accuracy_on_accepted": 0.7602,
+      "wrong_value_accepted_count": 22,
+      "silent_error_rate_on_accepted": 0.0561,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 72,
+      "not_detected_rate_on_accepted": 0.1837,
+      "runtime_seconds": 407.08,
+      "silent_error_examples": [
+        {
+          "condition": "skew_8deg",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "skew_8deg",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "skew_8deg",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "skew_8deg",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "skew_8deg",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 6.4,
+          "parsed_val": 4.7,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "skew_11deg": {
+      "condition": "skew_11deg",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 234,
+      "accuracy_on_accepted": 0.5969,
+      "wrong_value_accepted_count": 18,
+      "silent_error_rate_on_accepted": 0.0459,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 140,
+      "not_detected_rate_on_accepted": 0.3571,
+      "runtime_seconds": 415.25,
+      "silent_error_examples": [
+        {
+          "condition": "skew_11deg",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "skew_11deg",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "skew_11deg",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "triglycerides",
+          "expected_val": 23.7,
+          "parsed_val": 23.0,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "skew_11deg",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "skew_11deg",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "skew_13deg": {
+      "condition": "skew_13deg",
+      "total_entities": 392,
+      "refused_for_quality_count": 392,
+      "refused_for_quality_rate": 1.0,
+      "accepted_entities_count": 0,
+      "correct_count": 0,
+      "accuracy_on_accepted": 0.0,
+      "wrong_value_accepted_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 0,
+      "not_detected_rate_on_accepted": 0.0,
+      "runtime_seconds": 39.01,
+      "silent_error_examples": []
+    },
+    "skew_20deg": {
+      "condition": "skew_20deg",
+      "total_entities": 392,
+      "refused_for_quality_count": 392,
+      "refused_for_quality_rate": 1.0,
+      "accepted_entities_count": 0,
+      "correct_count": 0,
+      "accuracy_on_accepted": 0.0,
+      "wrong_value_accepted_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 0,
+      "not_detected_rate_on_accepted": 0.0,
+      "runtime_seconds": 41.17,
+      "silent_error_examples": []
+    },
+    "blur_sigma_0.5": {
+      "condition": "blur_sigma_0.5",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 315,
+      "accuracy_on_accepted": 0.8036,
+      "wrong_value_accepted_count": 17,
+      "silent_error_rate_on_accepted": 0.0434,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 60,
+      "not_detected_rate_on_accepted": 0.1531,
+      "runtime_seconds": 105.72,
+      "silent_error_examples": [
+        {
+          "condition": "blur_sigma_0.5",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "blur_sigma_0.5",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "blur_sigma_0.5",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "blur_sigma_0.5",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "blur_sigma_0.5",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 6.4,
+          "parsed_val": 4.7,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "blur_sigma_0.8": {
+      "condition": "blur_sigma_0.8",
+      "total_entities": 392,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 392,
+      "correct_count": 314,
+      "accuracy_on_accepted": 0.801,
+      "wrong_value_accepted_count": 16,
+      "silent_error_rate_on_accepted": 0.0408,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 62,
+      "not_detected_rate_on_accepted": 0.1582,
+      "runtime_seconds": 108.14,
+      "silent_error_examples": [
+        {
+          "condition": "blur_sigma_0.8",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "blur_sigma_0.8",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "blur_sigma_0.8",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "blur_sigma_0.8",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "blur_sigma_0.8",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 6.4,
+          "parsed_val": 4.7,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "blur_sigma_1.2": {
+      "condition": "blur_sigma_1.2",
+      "total_entities": 392,
+      "refused_for_quality_count": 196,
+      "refused_for_quality_rate": 0.5,
+      "accepted_entities_count": 196,
+      "correct_count": 168,
+      "accuracy_on_accepted": 0.8571,
+      "wrong_value_accepted_count": 14,
+      "silent_error_rate_on_accepted": 0.0714,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 14,
+      "not_detected_rate_on_accepted": 0.0714,
+      "runtime_seconds": 60.78,
+      "silent_error_examples": [
+        {
+          "condition": "blur_sigma_1.2",
+          "doc_id": 4001,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 18.8,
+          "parsed_val": 7.3,
+          "expected_flag": "HIGH",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "blur_sigma_1.2",
+          "doc_id": 4002,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 7.1,
+          "parsed_val": 1.8,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "blur_sigma_1.2",
+          "doc_id": 4003,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 14.0,
+          "parsed_val": 7.5,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "HIGH"
+        },
+        {
+          "condition": "blur_sigma_1.2",
+          "doc_id": 4004,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 12.9,
+          "parsed_val": 2.0,
+          "expected_flag": "NORMAL",
+          "parsed_flag": "LOW"
+        },
+        {
+          "condition": "blur_sigma_1.2",
+          "doc_id": 4005,
+          "layout_id": "template_a",
+          "analyte": "hemoglobin",
+          "expected_val": 6.4,
+          "parsed_val": 4.7,
+          "expected_flag": "LOW",
+          "parsed_flag": "LOW"
+        }
+      ]
+    },
+    "blur_sigma_2.0": {
+      "condition": "blur_sigma_2.0",
+      "total_entities": 392,
+      "refused_for_quality_count": 392,
+      "refused_for_quality_rate": 1.0,
+      "accepted_entities_count": 0,
+      "correct_count": 0,
+      "accuracy_on_accepted": 0.0,
+      "wrong_value_accepted_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 0,
+      "not_detected_rate_on_accepted": 0.0,
+      "runtime_seconds": 21.83,
+      "silent_error_examples": []
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
   "task": "donor-level COVID versus healthy classification",
   "status": "exploratory; eight independent donors only",
-  "archive": "/Users/nisarg/Downloads/GSE248688_RAW.tar",
+  "archive": "<DOWNLOADS>/GSE248688_RAW.tar",
   "donor_count": 8,
   "class_counts": {
     "healthy": 4,

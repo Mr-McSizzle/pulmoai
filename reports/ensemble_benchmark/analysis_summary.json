@@ -1,6 +1,6 @@
 {
   "status": "completed; exploratory research benchmark",
-  "source_profiles": "/Users/nisarg/Desktop/ml project/data/processed/allcells_pseudobulk_counts.npz",
+  "source_profiles": "data/processed/allcells_pseudobulk_counts.npz",
   "sample_group_count": 372,
   "source_study_count": 16,
   "cells_aggregated_into_profiles": 1470730,
@@ -306,7 +306,7 @@
       }
     },
     "selected_final_algorithm": "Linear SVM",
-    "final_model_path": "/Users/nisarg/Desktop/ml project/models/ensemble_benchmark_best.joblib"
+    "final_model_path": "models/ensemble_benchmark_best.joblib"
   },
   "runtime_seconds": {
     "nested_model_fits_by_candidate": {

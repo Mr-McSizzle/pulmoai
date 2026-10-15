@@ -1,6 +1,6 @@
 {
   "status": "trained and evaluated; exploratory research model",
-  "source_file": "/Users/nisarg/Downloads/atlas-001.h5ad",
+  "source_file": "<DOWNLOADS>/atlas-001.h5ad",
   "dimensions": [
     372,
     30566
@@ -249,14 +249,14 @@
         "weighted_f1": 0.877229351
       }
     },
-    "path": "/Users/nisarg/Desktop/ml project/models/allcells_lung_disease_classifier.joblib",
+    "path": "models/allcells_lung_disease_classifier.joblib",
     "fit_on_all_sample_groups": true,
     "performance_source": "Do not report training-set performance; use the held-out-study metrics above."
   },
   "outputs": {
-    "report_dir": "/Users/nisarg/Desktop/ml project/reports/allcells_atlas",
-    "pseudobulk_counts": "/Users/nisarg/Desktop/ml project/data/processed/allcells_pseudobulk_counts.npz",
-    "model": "/Users/nisarg/Desktop/ml project/models/allcells_lung_disease_classifier.joblib"
+    "report_dir": "reports/allcells_atlas",
+    "pseudobulk_counts": "data/processed/allcells_pseudobulk_counts.npz",
+    "model": "models/allcells_lung_disease_classifier.joblib"
   },
   "limitations": [
     "The H5AD provides orig.ident, Disease, gse_alias, and celltypeuse, but no verified biological patient identifier.",
