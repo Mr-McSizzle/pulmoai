@@ -102,7 +102,7 @@
     "seed": 42,
     "top_features": 500
   },
-  "model_file": "/Users/nisarg/Desktop/ml project/models/lung_disease_classifier.joblib",
+  "model_file": "models/lung_disease_classifier.joblib",
   "project": "PulmoAI \u2014 exploratory lung disease classification",
   "software_versions": {
     "numpy": "2.5.4",
@@ -113,16 +113,16 @@
   "source_files": {
     "barcodes": {
       "bytes": 1392307,
-      "path": "/Users/nisarg/Downloads/GSE136831_AllCells.cellBarcodes.txt.gz"
+      "path": "<DOWNLOADS>/GSE136831_AllCells.cellBarcodes.txt.gz"
     },
     "gene_ids": null,
     "matrix": {
       "bytes": 9715422046,
-      "path": "/Users/nisarg/Downloads/GSE136831_RawCounts_Sparse.mtx"
+      "path": "<DOWNLOADS>/GSE136831_RawCounts_Sparse.mtx"
     },
     "metadata": {
       "bytes": 4308752,
-      "path": "/Users/nisarg/Downloads/GSE136831_AllCells.Samples.CellType.MetadataTable.txt.gz"
+      "path": "<DOWNLOADS>/GSE136831_AllCells.Samples.CellType.MetadataTable.txt.gz"
     }
   }
 }

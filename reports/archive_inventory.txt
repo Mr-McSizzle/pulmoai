@@ -1,4 +1,4 @@
-Archive: /Users/nisarg/Downloads/GSE248688_RAW.tar
+Archive: <DOWNLOADS>/GSE248688_RAW.tar
 Archive size: 3,876,075,520 bytes
 Tar members: 68
 Regular files: 68

@@ -1,6 +1,6 @@
 {
   "status": "passed_with_identity_limitation",
-  "source_file": "/Users/nisarg/Downloads/atlas-001.h5ad",
+  "source_file": "<DOWNLOADS>/atlas-001.h5ad",
   "source_file_size_bytes": 6310632229,
   "matrix_shape_cells_by_features": [
     1470730,

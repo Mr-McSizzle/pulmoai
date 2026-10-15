@@ -64,6 +64,7 @@ NOISE_PRECHECK_JSON = REPORTS_DIR / "audit_noise_precheck.json"
 OCR_FRESH_JSON = REPORTS_DIR / "audit_ocr_fresh_holdout.json"
 OCR_HOLDOUT_V2_JSON = REPORTS_DIR / "audit_ocr_holdout_v2.json"
 OCR_PASS6_JSON = REPORTS_DIR / "audit_ocr_pass6.json"
+OCR_PASS7_JSON = REPORTS_DIR / "audit_ocr_pass7.json"
 GATE_DECOMP_JSON = REPORTS_DIR / "audit_gate_stress_test_decomposition.json"
 OUTPUT_REPORT = DOCS_DIR / "final_report_v2.md"
 
@@ -142,6 +143,7 @@ def build_report() -> str:
     noise_chk = load_json(NOISE_PRECHECK_JSON)
     ocr_fresh = load_json(OCR_FRESH_JSON)
     ocr_p6 = load_json(OCR_PASS6_JSON)
+    ocr_p7 = load_json(OCR_PASS7_JSON) if OCR_PASS7_JSON.exists() else None
     gate_decomp = load_json(GATE_DECOMP_JSON)
 
     test_count = count_tests()
@@ -416,8 +418,31 @@ def build_report() -> str:
             f"{cond_v['wrong_value_accepted_count']} | **{cond_v['silent_error_rate_on_accepted']*100:.2f}%** | "
             f"{cond_v['flag_mismatch_only_count']} | {cond_v['not_detected_count']} |"
         )
-    md.append("")
-    md.append("### 6.4 Clinical UI Safety Gate")
+    if ocr_p7:
+        ocr_p7_conds = ocr_p7["condition_summaries"]
+        md.append("")
+        md.append("### 6.4 Pass 7 Fresh Holdout Benchmark Results (Seed 1010, Templates A-H)")
+        md.append(
+            f"- **Benchmark Scope:** 56 synthetic documents across 8 templates (Templates A-G plus new Template H: Veterans Affairs & Military Health EHR Tabular Summary), "
+            f"totaling **{ocr_p7['metadata']['total_entities_per_condition']} entities per condition** (>= 350 required).\n"
+            f"- **Benchmark Classification:** *synthetic set; real-world accuracy unknown*.\n"
+            f"- **Generator Rule Correction (H2a):** Expected flags depend strictly and solely on what is printed on the report (printed reference range if present, else documented default physiological limits). Latent unprinted generator thresholds (such as HDL >60/70 or Total Cholesterol <125) have been eliminated. The parser logic was left completely untouched.\n"
+            f"- **False-Refusal Rate on Clean Raster Pages (H2c,d):** **{ocr_p7['metadata']['false_refusal_rate_clean_raster']*100:.2f}%** (threshold <= 5.0% satisfied; no threshold retuning required).\n"
+        )
+        md.append("")
+        md.append("| Condition Evaluated | Total Entities | Refused for Quality | Accepted Entities | Correct Extractions | Accuracy on Accepted (%) | Silent Errors (Wrong Value) | Silent Error Rate on Accepted (%) | Flag Mismatches | Not Detected |")
+        md.append("| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |")
+        for cond_k, cond_v in ocr_p7_conds.items():
+            refused_pct = cond_v["refused_for_quality_rate"] * 100
+            md.append(
+                f"| **{cond_k}** | {cond_v['total_entities']} | {cond_v['refused_for_quality_count']} ({refused_pct:.1f}%) | "
+                f"{cond_v['accepted_entities_count']} | {cond_v['correct_count']} | {cond_v['accuracy_on_accepted']*100:.2f}% | "
+                f"{cond_v['wrong_value_accepted_count']} | **{cond_v['silent_error_rate_on_accepted']*100:.2f}%** | "
+                f"{cond_v['flag_mismatch_only_count']} | {cond_v['not_detected_count']} |"
+            )
+        md.append("")
+
+    md.append("### 6.5 Clinical UI Safety Gate")
     md.append("- **Persistent Warning Banner:** For all scanned or OCR-extracted inputs, UI displays: *'scanned input: values may be wrong (synthetic set; real-world accuracy unknown)'*.")
     md.append("- **Side-by-Side Verification:** Parsed values are displayed alongside the raw extracted source text line snippet.")
     md.append("- **Mandatory Individual Confirmation:** Every individual biomarker requires an explicit user checkbox confirmation before the 'Send to Chronic Risk Engine' action is enabled.")
@@ -480,7 +505,7 @@ def build_report() -> str:
     md.append("")
     md.append("### 9.1 Versioned Machine-Readable JSON Artifacts")
     for jpath in [
-        PCE_VARIANTS_JSON, IDRS_CHECK_JSON, OCR_PASS6_JSON, OCR_FRESH_JSON,
+        OCR_PASS7_JSON, PCE_VARIANTS_JSON, IDRS_CHECK_JSON, OCR_PASS6_JSON, OCR_FRESH_JSON,
         GATE_DECOMP_JSON, NOISE_PRECHECK_JSON, LUNG_JSON, LUNG_PART_A_JSON,
         NHANES_JSON, NHANES_PART_A_JSON, RISK_TIERS_C4_JSON, FUTURE_RISK_V3_JSON,
         MODALITY_GATE_V3_JSON

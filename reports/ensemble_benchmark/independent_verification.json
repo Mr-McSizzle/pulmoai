@@ -1,7 +1,7 @@
 {
   "status": "passed",
   "method": "metrics recomputed directly from one out-of-fold row per study-scoped profile",
-  "prediction_file": "/Users/nisarg/Desktop/ml project/reports/ensemble_benchmark/out_of_fold_predictions.csv",
+  "prediction_file": "reports/ensemble_benchmark/out_of_fold_predictions.csv",
   "profile_count": 372,
   "study_count": 16,
   "class_counts": {

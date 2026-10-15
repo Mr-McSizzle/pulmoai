@@ -248,7 +248,34 @@ class FutureRiskEstimandTests(unittest.TestCase):
         self.assertEqual(tc3["score"], 70)
         self.assertEqual(tc3["tier"], "High")
 
+    def test_glycemic_features_excluded_from_diabetes_model(self) -> None:
+        """Verify glycemic features are excluded from diabetes model inputs to prevent diagnostic leakage."""
+        import joblib
+        bundle_path = PROJECT_ROOT / "models" / "nhanes_risk_models.joblib"
+        self.assertTrue(bundle_path.exists())
+        bundle = joblib.load(bundle_path)
+        self.assertIn("diabetes", bundle)
+        diabetes_feats = bundle["diabetes"]["feature_names"]
+        glycemic_markers = ["fasting_glucose", "hba1c", "LBXGLU", "LBXGH"]
+        for marker in glycemic_markers:
+            self.assertNotIn(marker, diabetes_feats, f"Glycemic marker {marker} found in diabetes features!")
+
+    def test_non_hispanic_asian_subgroup_reproducibility(self) -> None:
+        """Verify Non-Hispanic Asian subgroup mortality metrics in audit report match evaluated holdout."""
+        rep_path = PROJECT_ROOT / "reports" / "audit_future_risk_v3.json"
+        self.assertTrue(rep_path.exists())
+        with open(rep_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        asian = data["subgroup_metrics_with_bootstrap_95ci_e4"]["non_hispanic_asian"]
+        self.assertEqual(asian["n_subjects"], 1529)
+        self.assertEqual(asian["deaths_observed"], 53)
+        self.assertAlmostEqual(asian["c_index"], 0.8618, places=4)
+        self.assertAlmostEqual(asian["auroc_5yr"], 0.8834, places=4)
+        self.assertIn("c_index_95ci", asian)
+        self.assertIn("auroc_5yr_95ci", asian)
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

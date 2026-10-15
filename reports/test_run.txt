@@ -48,7 +48,7 @@ test_image_screening_inference_is_offline (test_privacy_offline.OfflineInference
 Verify medical image screening and modality gate make zero network calls. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
 ok
 test_local_report_reader_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_local_report_reader_inference_is_offline)
-Verify local lab report parser (without Gemini key) makes zero network calls. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x174c628e0>
+Verify local lab report parser (without Gemini key) makes zero network calls. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x3019cf330>
 ok
 test_nhanes_risk_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_nhanes_risk_inference_is_offline)
 Verify NHANES chronic disease risk engine makes zero network calls. ... INFO:pulmoai.risk_service:Initialized HealthRiskService with targets: diabetes, hypertension, high_cholesterol, heart_disease, stroke, copd
@@ -56,7 +56,7 @@ ok
 test_scrna_seq_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_scrna_seq_inference_is_offline)
 Verify scRNA-seq classification makes zero network calls. ... ok
 test_api_report_extract_txt (test_report_reader.ReportReaderAPITests.test_api_report_extract_txt)
-Test POST /api/report/extract with a text report. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x174945850>
+Test POST /api/report/extract with a text report. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x302f089f0>
 INFO:httpx2:HTTP Request: POST http://testserver/api/report/extract "HTTP/1.1 200 OK"
 ok
 test_api_report_extract_unsupported_format (test_report_reader.ReportReaderAPITests.test_api_report_extract_unsupported_format)
@@ -98,8 +98,12 @@ test_registry_file_structure (test_reproducibility_and_estimands.CanonicalEvalua
 Verify evaluation_registry.json contains all required modules and metrics. ... ok
 test_future_risk_endpoints_and_published_scores (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_future_risk_endpoints_and_published_scores) ... INFO:httpx2:HTTP Request: POST http://testserver/api/risk/future "HTTP/1.1 200 OK"
 ok
+test_glycemic_features_excluded_from_diabetes_model (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_glycemic_features_excluded_from_diabetes_model)
+Verify glycemic features are excluded from diabetes model inputs to prevent diagnostic leakage. ... ok
 test_idrs_unit_test_worked_examples (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_idrs_unit_test_worked_examples)
 Verify IDRS scoring matches Mohan et al. 2005 published worked examples. ... ok
+test_non_hispanic_asian_subgroup_reproducibility (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_non_hispanic_asian_subgroup_reproducibility)
+Verify Non-Hispanic Asian subgroup mortality metrics in audit report match evaluated holdout. ... ok
 test_pce_unit_test_worked_examples (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_pce_unit_test_worked_examples)
 Verify PCE calculation matches 2013 ACC/AHA published worked examples. ... ok
 test_image_predict_returns_empirical_far_and_methodology (test_reproducibility_and_estimands.OODRejectionBenchmarkTests.test_image_predict_returns_empirical_far_and_methodology)
@@ -118,6 +122,6 @@ Verify that condition predictions define estimand_type, label, and time_horizon.
 ok
 
 ----------------------------------------------------------------------
-Ran 54 tests in 8.608s
+Ran 56 tests in 9.507s
 
 OK
