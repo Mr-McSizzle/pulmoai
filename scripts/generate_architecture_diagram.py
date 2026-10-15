@@ -92,9 +92,9 @@ ax.text(
 pages = [
     ("Overview Dashboard", "Route: /", "System health, dataset metrics, subsystem navigation & integrity flags", "#E0F2FE", "#0284C7"),
     ("Single-Cell Atlas", "Route: /analyze", "Pseudobulk upload, dual-rule classifier, whole-cell input contract", "#CCFBF1", "#0D9488"),
-    ("Lab Report Reader", "Route: /reports", "Adaptive deskew / blur gate, PyMuPDF text layer, SI-to-US normalization", "#DBEAFE", "#2563EB"),
-    ("Chronic & Survival Risk", "Route: /risk", "Prospective 5-yr/10-yr mortality, PCE & IDRS benchmarks, 6 current diagnoses", "#FFE4E6", "#E11D48"),
-    ("Image Screening & Gate", "Route: /images", "ResNet-18 modality gate (FAR 7.63%), pediatric X-ray, retina experimental safeguard", "#F3E8FF", "#7C3AED"),
+    ("Lab Report Reader", "Route: /reports", "Adaptive deskew / blur gate, PyMuPDF text layer, Templates A-D", "#DBEAFE", "#2563EB"),
+    ("Chronic & Survival Risk", "Route: /risk", "Prospective mortality, PCE & IDRS benchmarks, 6 current diagnoses", "#FFE4E6", "#E11D48"),
+    ("Image Screening & Gate", "Route: /images", "ResNet-18 modality gate (LOFO FAR 19.03%), pediatric X-ray, retina safeguard", "#F3E8FF", "#7C3AED"),
     ("Performance Audit", "Route: /performance", "Leave-one-study-out tables, holdout calibration slopes, Brier skill scores", "#FEF3C7", "#D97706"),
 ]
 
@@ -176,28 +176,28 @@ engines = [
     ),
     (
         "Engine 2: Clinical Lab Parser",
-        "Adaptive Preprocessing Gate (reports/audit_ocr_part_c.json)",
-        "Digital PDF layer parsed first (99.71% clean_pdf accuracy)",
-        "Per-image adaptive gate: deskews tilt (+47.15%), preserves blur",
-        "Sex-specific intervals (Hb, Cr, HDL) & direct total-chol priority",
-        "Synthetic benchmark: n=350/cond across 5 clinical layouts",
+        "Adaptive Preprocessing Gate (reports/audit_ocr_holdout_v2.json)",
+        "Templates A-D (styled after common clinical formats)",
+        "Clean PDF: 92.57% correct, exactly 0 silent numerical errors",
+        "Rotated scans: raw 68.29% -> adaptive 84.86% (+16.57%)",
+        "100% extracted values require explicit user confirmation",
         "#2563EB", "#EFF6FF", "#DBEAFE",
     ),
     (
         "Engine 3: Chronic & Future Risk",
-        "Dual Estimand Pipeline (Cross-Sectional + Future Mortality Risk)",
-        "Current Diagnosis: 6 targets (Cycle J holdout n=5,856, OOF tiers)",
-        "Future Mortality Risk: US survey data (47,281 adults, 8,828 deaths)",
-        "5-Yr All-Cause: C-index 0.8621, AUROC 0.8713 (temporal holdout 2011-2014)",
-        "5-Yr CVD: C-index 0.8948, AUROC 0.9074 (PCE 0.7739, IDRS 0.7798)",
+        "Dual Estimand Pipeline (models/future_risk_models_v3.joblib)",
+        "Primary Prevention (n=5,899): Full Cox 0.8297 vs PCE 0.7391",
+        "PCE-input Cox 0.7864 (PCE uses White eq for other races)",
+        "CVD Mortality Decile Calibration: O/E ratio 1.032, Brier 0.0184",
+        "Asian Subgroup C-index 0.8618; IDRS Mohan 2005 verified",
         "#E11D48", "#FFF1F2", "#FFE4E6",
     ),
     (
         "Engine 4: Image Screening & Gate",
-        "Modality Gate Classifier (models/modality_gate_resnet18_v2.pt)",
-        "5-class ResNet-18 (64x64): chest_xray, derma, fundus, smear, other",
-        "Multi-family negative evaluation (audit_modality_gate_v2.json)",
-        "Hard rejection of cross-modality mismatches & photographic inputs",
+        "Modality Gate Classifier (models/modality_gate_resnet18_v3.pt)",
+        "LOFO macro FAR 19.03% (worst: doc 100.0%, noise 0.00%)",
+        "Pixel std pre-check (std < 0.040) eliminates blank/noise",
+        "Target modalities TAR: 99.50% (X-ray, derma, fundus, smear)",
         "Pediatric pneumonia notice (ages 1-5); retina staging disabled",
         "#7C3AED", "#FAF5FF", "#F3E8FF",
     ),
@@ -245,17 +245,17 @@ data_blocks = [
     ),
     (
         "Standard Medical Dictionaries",
-        "LOINC and UCUM standardized clinical units\nMolar mass factors for SI-to-US conversions\nSex-specific & printed lab reference intervals",
+        "LOINC and UCUM standardized clinical units\nMolar mass factors for SI-to-US conversions\nTemplates A-D styled after common clinical formats",
         "#2563EB",
     ),
     (
         "CDC NHANES + Linked Mortality Files",
-        "16-Year Prospective Cohort (1999-2014, NCHS LMF)\n47,281 eligible adults (8,828 all-cause, 2,825 CVD deaths)\nTemporal holdout: 2011-2014 (n=11,949) + Cycle J (n=5,856)",
+        "16-Year Prospective Cohort (1999-2014, NCHS LMF)\nPrimary Prevention (n=5,899, 110 fatal CVD deaths)\nTemporal holdout: 2011-2014 (n=11,949) + Cycle J (n=5,856)",
         "#E11D48",
     ),
     (
-        "MedMNIST & OOD Benchmarks",
-        "ResNet-18 modality gate: 97.15% test accuracy\nNegative classes: CIFAR-100, BreastMNIST, noise, blank\nEmpirical FAR: 7.63% overall, 6.00% on CIFAR photos",
+        "MedMNIST & Modality Gate v3",
+        "ResNet-18 modality gate: 99.50% target TAR\nLOFO cross-validation: 19.03% macro FAR\nPixel std pre-check: 0.00% blank/noise FAR",
         "#7C3AED",
     ),
 ]
@@ -272,7 +272,7 @@ for idx, (title, content, accent) in enumerate(data_blocks):
 # ---------------------------------------------------------------------------
 ax.text(
     50, 2.0,
-    "Verified for PulmoAI Multimodal Platform | Zero Emojis Compliance | 46 Automated Tests Passing",
+    "Verified for PulmoAI Multimodal Platform | Zero Emojis Compliance | 52 Automated Tests Passing",
     ha="center", va="center", fontsize=8, color="#94A3B8",
 )
 

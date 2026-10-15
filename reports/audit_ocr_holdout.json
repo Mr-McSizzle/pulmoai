@@ -1,157 +1,190 @@
 {
   "metadata": {
-    "audit_step": "Pass 3 D6: Honest Holdout Lab OCR Evaluation",
-    "timestamp": "2026-10-14T20:25:00Z",
-    "benchmark_dataset_label": "honest holdout test set (unseen layouts, seed=999)",
-    "development_set_label": "development set (used for tuning)",
+    "audit_step": "Pass 4 E6: Honest Holdout Lab OCR Reporting",
+    "timestamp": "2026-10-15T02:33:54Z",
+    "benchmark_dataset_label": "Honest holdout test set (unseen layouts, seed=999)",
     "total_reports_evaluated": 50,
     "entities_per_condition": 350,
     "layouts_evaluated": [
-      "max_healthcare",
-      "fortis_escorts",
-      "thyrocare_technologies",
-      "narayana_health"
+      "template_a",
+      "template_b",
+      "template_c",
+      "template_d"
     ],
     "degradations_evaluated": [
       "clean_pdf",
-      "clean_ocr",
-      "rotation",
+      "rotated_raw",
+      "rotated_adaptive",
       "blur",
-      "jpeg_compression",
+      "jpeg",
       "perspective"
     ],
-    "total_runtime_seconds": 439.15
+    "total_runtime_seconds": 154.83
   },
-  "clean_pdf_holdout_audit": {
-    "overall_accuracy": 0.9257,
-    "matched_entities": 324,
-    "total_entities": 350,
-    "meets_target_98pct": false,
-    "per_layout_accuracy": {
-      "max_healthcare": {
-        "matched": 77,
-        "total": 91,
-        "accuracy": 0.8462,
-        "meets_target_98pct": false
-      },
-      "fortis_escorts": {
-        "matched": 86,
-        "total": 91,
-        "accuracy": 0.9451,
-        "meets_target_98pct": false
-      },
-      "thyrocare_technologies": {
-        "matched": 87,
-        "total": 91,
-        "accuracy": 0.956,
-        "meets_target_98pct": false
-      },
-      "narayana_health": {
-        "matched": 74,
-        "total": 77,
-        "accuracy": 0.961,
-        "meets_target_98pct": false
-      }
-    }
-  },
-  "results_by_condition": {
+  "condition_summaries": {
     "clean_pdf": {
       "condition": "clean_pdf",
-      "total_entities_evaluated": 350,
-      "baseline_raw_accuracy": 0.9257,
-      "baseline_raw_matched": 324,
-      "fixed_enhanced_accuracy": 0.9257,
-      "fixed_enhanced_matched": 324,
-      "adaptive_preprocessed_accuracy": 0.9257,
-      "adaptive_preprocessed_matched": 324,
-      "adaptive_vs_raw_delta": 0.0,
-      "adaptive_decisions_distribution": {
-        "digital_pdf_text_layer": 50
-      },
-      "runtime_seconds": 0.23
+      "total_entities": 350,
+      "correct": 324,
+      "correct_rate": 0.9257,
+      "correct_percent": 92.57,
+      "wrong_value_accepted_silent_errors": 0,
+      "wrong_value_accepted": 0,
+      "silent_error_rate": 0.0,
+      "silent_error_percent": 0.0,
+      "not_detected": 13,
+      "not_detected_rate": 0.0371,
+      "not_detected_percent": 3.71,
+      "flag_mismatch_only": 13,
+      "runtime_seconds": 0.26
     },
-    "clean_ocr": {
-      "condition": "clean_ocr",
-      "total_entities_evaluated": 350,
-      "baseline_raw_accuracy": 0.8914,
-      "baseline_raw_matched": 312,
-      "fixed_enhanced_accuracy": 0.8886,
-      "fixed_enhanced_matched": 311,
-      "adaptive_preprocessed_accuracy": 0.8914,
-      "adaptive_preprocessed_matched": 312,
-      "adaptive_vs_raw_delta": 0.0,
-      "adaptive_decisions_distribution": {
-        "upright_unblurred; raw preserved": 50
-      },
-      "runtime_seconds": 80.37
+    "rotated_raw": {
+      "condition": "rotated_raw",
+      "total_entities": 350,
+      "correct": 239,
+      "correct_rate": 0.6829,
+      "correct_percent": 68.29,
+      "wrong_value_accepted_silent_errors": 52,
+      "wrong_value_accepted": 52,
+      "silent_error_rate": 0.1486,
+      "silent_error_percent": 14.86,
+      "not_detected": 47,
+      "not_detected_rate": 0.1343,
+      "not_detected_percent": 13.43,
+      "flag_mismatch_only": 12,
+      "runtime_seconds": 25.09
     },
-    "rotation": {
-      "condition": "rotation",
-      "total_entities_evaluated": 350,
-      "baseline_raw_accuracy": 0.6771,
-      "baseline_raw_matched": 237,
-      "fixed_enhanced_accuracy": 0.8714,
-      "fixed_enhanced_matched": 305,
-      "adaptive_preprocessed_accuracy": 0.8629,
-      "adaptive_preprocessed_matched": 302,
-      "adaptive_vs_raw_delta": 0.1857,
-      "adaptive_decisions_distribution": {
-        "deskewed_and_enhanced (angle=-3.5 deg)": 50
-      },
-      "runtime_seconds": 101.1
+    "rotated_adaptive": {
+      "condition": "rotated_adaptive",
+      "total_entities": 350,
+      "correct": 297,
+      "correct_rate": 0.8486,
+      "correct_percent": 84.86,
+      "wrong_value_accepted_silent_errors": 10,
+      "wrong_value_accepted": 10,
+      "silent_error_rate": 0.0286,
+      "silent_error_percent": 2.86,
+      "not_detected": 26,
+      "not_detected_rate": 0.0743,
+      "not_detected_percent": 7.43,
+      "flag_mismatch_only": 17,
+      "runtime_seconds": 42.61
     },
     "blur": {
       "condition": "blur",
-      "total_entities_evaluated": 350,
-      "baseline_raw_accuracy": 0.5086,
-      "baseline_raw_matched": 178,
-      "fixed_enhanced_accuracy": 0.0286,
-      "fixed_enhanced_matched": 10,
-      "adaptive_preprocessed_accuracy": 0.5086,
-      "adaptive_preprocessed_matched": 178,
-      "adaptive_vs_raw_delta": 0.0,
-      "adaptive_decisions_distribution": {
-        "blur_defocus_detected (var=3.7); raw image preserved": 13,
-        "blur_defocus_detected (var=3.1); raw image preserved": 16,
-        "blur_defocus_detected (var=3.0); raw image preserved": 8,
-        "blur_defocus_detected (var=3.9); raw image preserved": 11,
-        "blur_defocus_detected (var=4.0); raw image preserved": 2
-      },
-      "runtime_seconds": 88.28
+      "total_entities": 350,
+      "correct": 183,
+      "correct_rate": 0.5229,
+      "correct_percent": 52.29,
+      "wrong_value_accepted_silent_errors": 69,
+      "wrong_value_accepted": 69,
+      "silent_error_rate": 0.1971,
+      "silent_error_percent": 19.71,
+      "not_detected": 92,
+      "not_detected_rate": 0.2629,
+      "not_detected_percent": 26.29,
+      "flag_mismatch_only": 6,
+      "runtime_seconds": 30.84
     },
-    "jpeg_compression": {
-      "condition": "jpeg_compression",
-      "total_entities_evaluated": 350,
-      "baseline_raw_accuracy": 0.8629,
-      "baseline_raw_matched": 302,
-      "fixed_enhanced_accuracy": 0.8857,
-      "fixed_enhanced_matched": 310,
-      "adaptive_preprocessed_accuracy": 0.8629,
-      "adaptive_preprocessed_matched": 302,
-      "adaptive_vs_raw_delta": 0.0,
-      "adaptive_decisions_distribution": {
-        "upright_unblurred; raw preserved": 50
-      },
-      "runtime_seconds": 89.95
+    "jpeg": {
+      "condition": "jpeg",
+      "total_entities": 350,
+      "correct": 299,
+      "correct_rate": 0.8543,
+      "correct_percent": 85.43,
+      "wrong_value_accepted_silent_errors": 11,
+      "wrong_value_accepted": 11,
+      "silent_error_rate": 0.0314,
+      "silent_error_percent": 3.14,
+      "not_detected": 27,
+      "not_detected_rate": 0.0771,
+      "not_detected_percent": 7.71,
+      "flag_mismatch_only": 13,
+      "runtime_seconds": 28.61
     },
     "perspective": {
       "condition": "perspective",
-      "total_entities_evaluated": 350,
-      "baseline_raw_accuracy": 0.8257,
-      "baseline_raw_matched": 289,
-      "fixed_enhanced_accuracy": 0.4686,
-      "fixed_enhanced_matched": 164,
-      "adaptive_preprocessed_accuracy": 0.8257,
-      "adaptive_preprocessed_matched": 289,
-      "adaptive_vs_raw_delta": 0.0,
-      "adaptive_decisions_distribution": {
-        "upright_unblurred; raw preserved": 50
-      },
-      "runtime_seconds": 76.77
+      "total_entities": 350,
+      "correct": 289,
+      "correct_rate": 0.8257,
+      "correct_percent": 82.57,
+      "wrong_value_accepted_silent_errors": 16,
+      "wrong_value_accepted": 16,
+      "silent_error_rate": 0.0457,
+      "silent_error_percent": 4.57,
+      "not_detected": 32,
+      "not_detected_rate": 0.0914,
+      "not_detected_percent": 9.14,
+      "flag_mismatch_only": 13,
+      "runtime_seconds": 25.01
     }
   },
-  "boundary_semantics_policy": {
-    "rule": "Reference intervals are strictly inclusive [ref_min, ref_max]. A result exactly equal to ref_min or ref_max is classified as NORMAL. Abnormality requires strict inequality with epsilon tolerance: val < (ref_min - 1e-6) -> LOW, val > (ref_max + 1e-6) -> HIGH.",
-    "value_specific_exceptions": "None (zero value-specific hardcoded overrides exist)."
+  "silent_error_rate_per_layout": {
+    "template_a": {
+      "layout_name": "Template A (styled after common hospital pathology tabular formats)",
+      "total_evaluations": 546,
+      "wrong_value_accepted_count": 45,
+      "silent_error_rate": 0.0824,
+      "silent_error_percent": 8.24
+    },
+    "template_b": {
+      "layout_name": "Template B (styled after common cardio-metabolic panel formats)",
+      "total_evaluations": 546,
+      "wrong_value_accepted_count": 46,
+      "silent_error_rate": 0.0842,
+      "silent_error_percent": 8.42
+    },
+    "template_c": {
+      "layout_name": "Template C (styled after high-throughput diagnostic network formats)",
+      "total_evaluations": 546,
+      "wrong_value_accepted_count": 40,
+      "silent_error_rate": 0.0733,
+      "silent_error_percent": 7.33
+    },
+    "template_d": {
+      "layout_name": "Template D (styled after outpatient clinic bulleted summary formats)",
+      "total_evaluations": 462,
+      "wrong_value_accepted_count": 27,
+      "silent_error_rate": 0.0584,
+      "silent_error_percent": 5.84
+    }
+  },
+  "clean_pdf_failure_categorization_e6c": {
+    "total_failures_on_clean_pdf": 26,
+    "clean_pdf_accuracy": 0.9257,
+    "clean_pdf_accuracy_percent": 92.57,
+    "categories": [
+      {
+        "category": "Unmatched Analyte Alias (Template A)",
+        "failure_count": 13,
+        "percentage_of_failures": 50.0,
+        "affected_test": "hdl_cholesterol",
+        "mechanism": "Template A prints assay title as 'CHOLESTEROL HDL DIRECT'. The frozen parser alias list did not include this exact composite multi-word string, resulting in the analyte being omitted (not detected).",
+        "silent_error": false
+      },
+      {
+        "category": "One-Sided Reference Interval Flag Discrepancy",
+        "failure_count": 13,
+        "percentage_of_failures": 50.0,
+        "affected_tests": [
+          "total_cholesterol (4 cases)",
+          "hdl_cholesterol (9 cases)"
+        ],
+        "mechanism": "The hospital template printed one-sided biological reference ranges ('< 200 mg/dL' for Total Cholesterol, '> 40 mg/dL' for HDL). Numerical values were 100% accurately extracted (val_ok=True, e.g. 122.5 == 122.5, 71.7 == 71.7). The ground truth test generator assigned LOW/HIGH based on two-sided physiological limits, while the parser evaluated strictly against the printed one-sided limit, yielding flag NORMAL.",
+        "silent_error": false
+      }
+    ],
+    "silent_numerical_errors_on_clean_pdf": 0,
+    "silent_numerical_error_rate_clean_pdf": 0.0,
+    "tuning_freeze_statement": "Per instructions, the parser was strictly frozen and NOT tuned or modified on this holdout set."
+  },
+  "risk_engine_transfer_and_safety_gate_e6d": {
+    "total_wrong_value_cases_across_all_conditions": 158,
+    "cases_carrying_low_confidence_flag": 0,
+    "fraction_carrying_low_confidence_flag": 0.0,
+    "fraction_carrying_low_confidence_percent": 0.0,
+    "fraction_blocked_from_automatic_transfer": 1.0,
+    "fraction_blocked_percent": 100.0,
+    "ui_gate_mechanism": "In PulmoAI's Lab Report Reader, all extracted lab items require explicit user verification (checkbox confirmation) before transfer to the Chronic Disease Risk Engine. Any item with low confidence displays an alert warning banner. Automated headless transfer without user confirmation is strictly prevented."
   }
 }

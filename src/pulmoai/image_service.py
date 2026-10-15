@@ -110,16 +110,27 @@ class ImageScreeningService:
         """Load and cache the 5-class Modality Classifier Gate (ResNet-18)."""
         if self._gate_model is not None:
             return self._gate_model
-        gate_path = self.model_dir.parent / "modality_gate_resnet18.pt"
-        if not gate_path.exists():
-            gate_path = self.model_dir / "modality_gate_resnet18.pt"
-        if not gate_path.exists():
-            logger.warning("Modality gate checkpoint not found at %s", gate_path)
+        candidate_paths = [
+            self.model_dir.parent / "models" / "modality_gate_resnet18_v3.pt",
+            self.model_dir / "modality_gate_resnet18_v3.pt",
+            self.model_dir.parent / "models" / "modality_gate_resnet18_v2.pt",
+            self.model_dir / "modality_gate_resnet18_v2.pt",
+            self.model_dir.parent / "modality_gate_resnet18.pt",
+            self.model_dir / "modality_gate_resnet18.pt",
+        ]
+        gate_path = None
+        for p in candidate_paths:
+            if p.exists():
+                gate_path = p
+                break
+        if gate_path is None:
+            logger.warning("Modality gate checkpoint not found in %s", self.model_dir)
             return None
         try:
             ckpt = torch.load(gate_path, map_location="cpu", weights_only=False)
             gate = _build_model(3, 5)
-            gate.load_state_dict(ckpt["model_state_dict"])
+            state = ckpt["model_state_dict"] if isinstance(ckpt, dict) and "model_state_dict" in ckpt else ckpt
+            gate.load_state_dict(state)
             gate.to(self.device)
             gate.eval()
             self._gate_model = gate
@@ -187,24 +198,33 @@ class ImageScreeningService:
         if enforce_modality_gate and gate_model is not None and expected_gate_class is not None:
             try:
                 gate_pil = Image.open(io.BytesIO(image_bytes)).convert("RGB").resize((64, 64), Image.Resampling.BICUBIC)
-                mean_g = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
-                std_g = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
-                t_gate = ((transforms.ToTensor()(gate_pil) - mean_g) / std_g).unsqueeze(0).to(self.device)
+                # Low-entropy / pixel standard deviation pre-check (Pass 4 E5)
+                arr = np.array(gate_pil).astype(float) / 255.0
+                if arr.std() < 0.040:
+                    g_pred = "other"
+                    g_conf = 1.0
+                else:
+                    mean_g = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+                    std_g = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+                    t_gate = ((transforms.ToTensor()(gate_pil) - mean_g) / std_g).unsqueeze(0).to(self.device)
 
-                with torch.no_grad():
-                    g_logits = gate_model(t_gate)
-                    g_probs = torch.softmax(g_logits, dim=1).cpu().numpy()[0]
-                    g_idx = int(np.argmax(g_probs))
-                    g_pred = GATE_CLASSES[g_idx]
-                    g_conf = float(g_probs[g_idx])
+                    with torch.no_grad():
+                        g_logits = gate_model(t_gate)
+                        g_probs = torch.softmax(g_logits, dim=1).cpu().numpy()[0]
+                        g_idx = int(np.argmax(g_probs))
+                        g_pred = GATE_CLASSES[g_idx]
+                        g_conf = float(g_probs[g_idx])
 
                 gate_info = {
                     "status": "VERIFIED_MATCH",
                     "predicted_modality": g_pred,
                     "confidence": round(g_conf, 4),
                     "expected_modality": expected_gate_class,
-                    "false_accept_rate": 0.0763,
-                    "meets_below_10pct_target": True,
+                    "false_accept_rate": 0.0122,
+                    "unseen_family_macro_far": 0.1903,
+                    "worst_left_out_family": "synthetic_lab_reports (100.0%)",
+                    "target_true_accept_rate": 0.9950,
+                    "meets_below_10pct_target": False,
                 }
 
                 # Precompute empirical OOD metrics for this modality and threshold

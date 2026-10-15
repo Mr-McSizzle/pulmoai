@@ -1,0 +1,227 @@
+{
+  "metadata": {
+    "audit_step": "Pass 4 E5: Modality Gate Honest Unseen-Family (LOFO) Evaluation",
+    "model_architecture": "ResNet-18 (64x64 input, 3 channels, 5 classes)",
+    "checkpoint_path": "models/modality_gate_resnet18_v3.pt",
+    "classes": [
+      "chest_xray",
+      "dermoscopy",
+      "fundus",
+      "blood_smear",
+      "other"
+    ],
+    "timestamp": "2026-10-15T02:29:18Z",
+    "compute_device": "mps",
+    "precheck_pixel_std_threshold": 0.04,
+    "negative_families_evaluated": [
+      "cifar_photographic",
+      "breast_ultrasound",
+      "organ_c_ct",
+      "organ_s_ct",
+      "synthetic_lab_reports",
+      "synthetic_noise_blanks"
+    ],
+    "unverified_omitted_families_note": "OrganAMNIST and PathMNIST could not be downloaded due to anonymous Zenodo/HuggingFace bandwidth throttling (~2 KB/s on external networks; estimated download duration > 4 hours). LOFO cross-validation was rigorously executed across all 6 verified locally available negative families: CIFAR photographic, BreastMNIST ultrasound, OrganCMNIST coronal CT, OrganSMNIST sagittal CT, synthetic lab reports, and synthetic noise/blanks."
+  },
+  "headline_unseen_family_metrics": {
+    "macro_average_left_out_far": 0.1903,
+    "macro_average_left_out_far_percent": 19.03,
+    "worst_left_out_family_name": "synthetic_lab_reports",
+    "worst_left_out_family_far": 1.0,
+    "worst_left_out_family_far_percent": 100.0,
+    "worst_left_out_family_95ci": [
+      0.9891,
+      1.0
+    ],
+    "comparison_with_pass3_headline": {
+      "pass3_seen_negatives_far": 0.0122,
+      "pass4_honest_lofo_macro_far": 0.1903,
+      "pass4_honest_worst_family_far": 1.0,
+      "note": "Pass 3 FAR (1.22%) included families present in the negative training set; Pass 4 LOFO measures true zero-shot out-of-family generalization."
+    }
+  },
+  "noise_and_blank_precheck_ablation": {
+    "raw_noise_blank_far_no_precheck": 0.0769,
+    "raw_noise_blank_far_percent": 7.69,
+    "raw_noise_blank_95ci": [
+      0.0423,
+      0.1358
+    ],
+    "prechecked_noise_blank_far": 0.0,
+    "prechecked_noise_blank_far_percent": 0.0,
+    "prechecked_noise_blank_95ci": [
+      0.0,
+      0.0287
+    ],
+    "precheck_rejections_count": 30,
+    "reduction_in_false_accepts": 10
+  },
+  "leave_one_family_out_detailed_breakdown": {
+    "cifar_photographic": {
+      "family_name": "cifar_photographic",
+      "n_samples": 500,
+      "false_accepts": 52,
+      "false_accept_rate": 0.104,
+      "far_percent": 10.4,
+      "far_95ci": [
+        0.0802,
+        0.1338
+      ],
+      "precheck_rejections_count": 0,
+      "correctly_rejected_as_other": 448,
+      "destination_breakdown": {
+        "chest_xray": 6,
+        "dermoscopy": 38,
+        "fundus": 7,
+        "blood_smear": 1
+      }
+    },
+    "breast_ultrasound": {
+      "family_name": "breast_ultrasound",
+      "n_samples": 156,
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "far_percent": 0.0,
+      "far_95ci": [
+        0.0,
+        0.024
+      ],
+      "precheck_rejections_count": 0,
+      "correctly_rejected_as_other": 156,
+      "destination_breakdown": {
+        "chest_xray": 0,
+        "dermoscopy": 0,
+        "fundus": 0,
+        "blood_smear": 0
+      }
+    },
+    "organ_c_ct": {
+      "family_name": "organ_c_ct",
+      "n_samples": 500,
+      "false_accepts": 5,
+      "false_accept_rate": 0.01,
+      "far_percent": 1.0,
+      "far_95ci": [
+        0.0043,
+        0.0232
+      ],
+      "precheck_rejections_count": 0,
+      "correctly_rejected_as_other": 495,
+      "destination_breakdown": {
+        "chest_xray": 4,
+        "dermoscopy": 0,
+        "fundus": 1,
+        "blood_smear": 0
+      }
+    },
+    "organ_s_ct": {
+      "family_name": "organ_s_ct",
+      "n_samples": 500,
+      "false_accepts": 14,
+      "false_accept_rate": 0.028,
+      "far_percent": 2.8,
+      "far_95ci": [
+        0.0168,
+        0.0464
+      ],
+      "precheck_rejections_count": 1,
+      "correctly_rejected_as_other": 486,
+      "destination_breakdown": {
+        "chest_xray": 14,
+        "dermoscopy": 0,
+        "fundus": 0,
+        "blood_smear": 0
+      }
+    },
+    "synthetic_lab_reports": {
+      "family_name": "synthetic_lab_reports",
+      "n_samples": 350,
+      "false_accepts": 350,
+      "false_accept_rate": 1.0,
+      "far_percent": 100.0,
+      "far_95ci": [
+        0.9891,
+        1.0
+      ],
+      "precheck_rejections_count": 0,
+      "correctly_rejected_as_other": 0,
+      "destination_breakdown": {
+        "chest_xray": 0,
+        "dermoscopy": 350,
+        "fundus": 0,
+        "blood_smear": 0
+      }
+    },
+    "synthetic_noise_blanks": {
+      "family_name": "synthetic_noise_blanks",
+      "n_samples": 130,
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "far_percent": 0.0,
+      "far_95ci": [
+        0.0,
+        0.0287
+      ],
+      "precheck_rejections_count": 30,
+      "correctly_rejected_as_other": 130,
+      "destination_breakdown": {
+        "chest_xray": 0,
+        "dermoscopy": 0,
+        "fundus": 0,
+        "blood_smear": 0
+      }
+    }
+  },
+  "target_modalities_true_accept_rates": {
+    "chest_xray": {
+      "n_samples": 400,
+      "correctly_accepted": 399,
+      "true_accept_rate": 0.9975,
+      "tar_percent": 99.75,
+      "tar_95ci": [
+        0.986,
+        0.9996
+      ]
+    },
+    "dermoscopy": {
+      "n_samples": 400,
+      "correctly_accepted": 396,
+      "true_accept_rate": 0.99,
+      "tar_percent": 99.0,
+      "tar_95ci": [
+        0.9746,
+        0.9961
+      ]
+    },
+    "fundus": {
+      "n_samples": 400,
+      "correctly_accepted": 397,
+      "true_accept_rate": 0.9925,
+      "tar_percent": 99.25,
+      "tar_95ci": [
+        0.9782,
+        0.9974
+      ]
+    },
+    "blood_smear": {
+      "n_samples": 400,
+      "correctly_accepted": 400,
+      "true_accept_rate": 1.0,
+      "tar_percent": 100.0,
+      "tar_95ci": [
+        0.9905,
+        1.0
+      ]
+    },
+    "overall_target_summary": {
+      "total_target_samples_evaluated": 1600,
+      "total_correctly_accepted": 1592,
+      "overall_true_accept_rate": 0.995,
+      "overall_tar_percent": 99.5,
+      "overall_tar_95ci": [
+        0.9902,
+        0.9975
+      ]
+    }
+  }
+}

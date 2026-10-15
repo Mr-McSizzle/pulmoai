@@ -230,8 +230,15 @@ function App() {
         </div>
 
         <footer className="workspace-footer">
-          <span><ShieldAlert size={14} /> PulmoAI is a research prototype, not an FDA-cleared medical device.</span>
-          <span>LOCAL WORKSPACE <i /> 4 ENGINES ONLINE · FASTAPI BACKEND</span>
+          <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-2 text-xs text-slate-600">
+            <span className="flex items-center gap-1.5 font-medium text-amber-800 bg-amber-50 px-2.5 py-1 rounded border border-amber-200">
+              <ShieldAlert size={14} className="text-amber-600 shrink-0" />
+              <span>Research prototype only. Not approved or cleared by US FDA, Indian CDSCO, or European EMA for diagnostic or clinical use.</span>
+            </span>
+            <span className="text-[11px] text-slate-400">
+              LOCAL WORKSPACE · ZERO OUTBOUND CALLS AT INFERENCE · FASTAPI BACKEND
+            </span>
+          </div>
         </footer>
       </main>
     </div>
