@@ -157,7 +157,7 @@ class ImageScreeningService:
         if not ckpt_path.exists():
             raise FileNotFoundError(
                 f"Model checkpoint for '{image_type}' not found at {ckpt_path}. "
-                "Ensure scripts/train_medmnist_models.py has completed."
+                "Ensure weights are downloaded from GitHub Release or trained locally via scripts/train_medmnist_models.py."
             )
 
         checkpoint = torch.load(ckpt_path, map_location="cpu", weights_only=False)

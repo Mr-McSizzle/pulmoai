@@ -668,6 +668,47 @@ def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, st
     return pil_img, "upright_unblurred; raw preserved"
 
 
+def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, float]]:
+    """Estimate image blur and skew to determine if quality is sufficient for OCR.
+
+    Thresholds calibrated on development images:
+    - Laplacian variance < 30.0 indicates severe defocus blur where stroke edges blend together.
+    - Projection profile skew >= 12.0 degrees indicates extreme tilt beyond reliable deskewing.
+
+    Returns:
+        (is_acceptable, decision_message, quality_metrics)
+    """
+    try:
+        import cv2
+        import numpy as np
+
+        arr = np.array(pil_img.convert("L"))
+        lap_var = float(cv2.Laplacian(arr, cv2.CV_64F).var())
+
+        h, w = arr.shape
+        center = (w // 2, h // 2)
+        best_score, best_angle = -1.0, 0.0
+        for angle in np.arange(-15.0, 15.5, 1.0):
+            M = cv2.getRotationMatrix2D(center, float(angle), 1.0)
+            rotated = cv2.warpAffine(
+                arr, M, (w, h), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=255
+            )
+            score = float(np.var(np.sum(rotated < 128, axis=1)))
+            if score > best_score:
+                best_score, best_angle = score, float(angle)
+
+        metrics = {"laplacian_variance": round(lap_var, 2), "estimated_skew_degrees": round(best_angle, 2)}
+        if lap_var < 30.0:
+            return False, "image quality too low, please re-scan", metrics
+        if abs(best_angle) >= 12.0:
+            return False, "image quality too low, please re-scan", metrics
+
+        return True, "acceptable", metrics
+    except Exception as e:
+        logger.warning("Error in check_image_quality: %s", e)
+        return True, "acceptable", {}
+
+
 # ---------------------------------------------------------------------------
 # Text Extraction: Digital PDF, Tesseract OCR, and Gemini
 # ---------------------------------------------------------------------------
@@ -787,6 +828,10 @@ def extract_text_from_bytes(
     try:
         import pytesseract
         raw_img = Image.open(io.BytesIO(file_bytes))
+        is_ok, quality_msg, _ = check_image_quality(raw_img)
+        if not is_ok:
+            logger.warning("Image rejected by quality gate: %s", quality_msg)
+            return "image quality too low, please re-scan", "refused_low_quality"
         preprocessed_img, _ = preprocess_lab_image_adaptive(raw_img)
         ocr_text = pytesseract.image_to_string(preprocessed_img)
         if ocr_text.strip():
@@ -1190,6 +1235,15 @@ def process_lab_report(
 
     # 2. Local extraction (PyMuPDF text layer or local Tesseract OCR)
     raw_text, method = extract_text_from_bytes(file_bytes, filename, mime_type)
+    if method == "refused_low_quality":
+        return {
+            "extraction_method": "refused_low_quality",
+            "extracted_tests": [],
+            "raw_text": "image quality too low, please re-scan",
+            "unmatched_lines": [],
+            "count": 0,
+        }
+
     extracted_items, unmatched = parse_lab_text(raw_text, sex=sex)
 
     return {

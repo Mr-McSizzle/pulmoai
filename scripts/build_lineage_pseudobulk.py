@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import time
 from pathlib import Path
 import anndata as ad
@@ -11,7 +12,7 @@ import pandas as pd
 from scipy import sparse
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-ATLAS_H5AD = Path("/Users/nisarg/Downloads/atlas-001.h5ad")
+ATLAS_H5AD = Path(os.environ.get("ATLAS_H5AD", Path.home() / "Downloads" / "atlas-001.h5ad"))
 ATLAS_PB_NPZ = PROJECT_ROOT / "data" / "processed" / "allcells_pseudobulk_counts.npz"
 OUTPUT_NPZ = PROJECT_ROOT / "data" / "processed" / "atlas_lineage_pseudobulk_5k.npz"
 OUTPUT_CSV = PROJECT_ROOT / "data" / "processed" / "atlas_lineage_metadata.csv"

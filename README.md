@@ -29,7 +29,7 @@ All metrics below are dynamically verified from versioned JSON audit reports in 
 | :--- | :--- | :--- | :--- | :--- |
 | **Module 1: Lung Atlas Classifier** | Single-Cell RNA-seq (30,566 genes, pseudobulk counts) | 16 GEO studies, 372 donor profiles (1.47M cells) | **64.78% Acc / 53.49% Bal-Acc / 0.5218 Macro-F1** (Dual-Rule); COVID recall: **21.05% (4/19)** | Leave-One-Study-Out CV across 16 hospital batches. Platt calibration provided as estimate. Majority class baseline: PF (48.12%). Melms post-mortem autopsy holdout (GSE171524): 25/26 predicted PF. |
 | **Module 2: Chronic Disease Risk Engine** | CDC NHANES Vitals & Labs (43 features) | 17,961 US adults (Train: Cycles H & I, n=12,105; Test: Cycle J, n=5,856) | **Diabetes: 0.8525 AUROC / 86.6% Acc**; HTN: 0.8384; High Chol: 0.8413; CVD: 0.7904; Stroke: 0.7733; COPD: 0.7479 | Evaluated on forward temporal Cycle J (2017-2018). Estimand: current doctor-diagnosed prevalence, NOT future incidence. Glycemic markers excluded to prevent circularity. OOF-derived Low/Mod/High risk tiers (RR up to 9.25x). |
-| **Module 3: Clinical Lab Report Reader** | Clinical PDF & Scanned Image Reports | Honest holdout: 4 hospital layouts (Templates A-D, n=350/cond) | **Clean PDF: 92.57% correct match, 0.00% silent numerical errors**; Rotated scans: **84.86%** with adaptive preprocessing (+16.57% over raw 68.29%) | Native PyMuPDF text layer prioritized. Adaptive blur/skew gating. Settled inclusive range limits [ref_min, ref_max]. 100% of extracted values blocked from automatic risk engine transfer without human confirmation. |
+| **Module 3: Clinical Lab Report Reader** | Clinical PDF & Scanned Image Reports | Honest holdout: 7 hospital/clinic layouts (Templates A-G, n=490/cond) | **Clean PDF: 94.90% accurate, 0.00% silent errors**; Rotated scans: **84.69%** adaptive (+25.51% over raw 59.18%); **Blur: 100% refused by Quality Gate (0.00% silent error)** | Native PyMuPDF text layer prioritized. Pre-OCR blur/skew quality gate. Settled inclusive range limits [ref_min, ref_max]. 100% of extracted values blocked from automatic risk engine transfer without human confirmation. |
 | **Module 4: Medical Image Screening & Gate** | MedMNIST v2 (64x64) + Negative Families | 5 medical modalities + 6 negative non-target families | **Modality Gate v3: 99.50% Target TAR** (X-ray 99.75%, Derma 99.00%, Fundus 99.25%, Smear 100.00%); **LOFO Macro FAR: 19.03%** | ResNet-18 modality classifier gate rejects cross-modality mismatches and non-medical photos. Pixel std pre-check (std < 0.040) eliminates blank/noise (FAR: 0.00%). Worst LOFO family: document layouts (100.0% FAR). Warning banner permanently active. Pneumonia restricted to pediatric ages 1-5; retina staging disabled. |
 | **Module 5: Future Mortality Risk Engine** | CDC NHANES Linked Mortality Files (1999-2014) | 47,281 eligible adults (8,828 deaths). Temporal holdout: 2011-2014 (n=11,411) | **Primary Prevention (n=5,899, 110 fatal CVD events): Full Cox C-index 0.8297 [0.7885, 0.8663], 5-yr AUROC 0.8234** vs PCE-input Cox 0.7864 vs Published PCE 0.7391 | 5-Year CVD Decile Calibration: O/E ratio 1.032 [0.910, 1.170], Brier 0.0184, intercept 0.0356. Discrimination gain over PCE inputs is statistically significant (delta C: +0.0432 [0.0244, 0.0658]). Asian subgroup C-index 0.8618 [0.8032, 0.9140]. Mohan 2005 IDRS Table 1 verified (AUROC 0.7798 vs 4-feature ML 0.8303). |
 
@@ -81,13 +81,13 @@ cd ..
 
 ## 4. Automated Test Suite
 
-Run all 53 unit, integration, estimand, and offline privacy tests:
+Run all 54 unit, integration, estimand, and offline privacy tests:
 
 ```bash
 PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
 ```
 
-All 53 tests execute in under 12 seconds with 100% pass rate.
+All 54 tests execute in under 12 seconds with 100% pass rate.
 
 ---
 
@@ -139,7 +139,7 @@ MPLCONFIGDIR="$PWD/.mplconfig" python3 scripts/generate_architecture_diagram.py
 | **NCHS Linked Mortality Files** | CDC NCHS National Death Index follow-up through 2015 | 47,281 eligible participants (8,828 deaths) | Public Domain (CDC Restricted-Use Data Perturbation Warning Applies) |
 | **MedMNIST v2 Benchmarks** | Zenodo / Yang et al. (Pneumonia, Derma, Retina, Blood, Chest) | 64x64 standardized biomedical images | Creative Commons Attribution 4.0 International (CC-BY 4.0) |
 | **Negative Modality Families** | CIFAR-100, BreastMNIST, OrganCMNIST, OrganSMNIST, Synthetic Blanks | 2,136 negative evaluation images | CC-BY 4.0 / Open Access / Internal Benchmark |
-| **Synthetic Lab Report Benchmark** | Templates A-F styled after clinical pathology & urgent care layouts | 2,520 evaluated analyte entities (seeds 999 & 777) | Apache 2.0 (Synthetic Research Benchmark) |
+| **Synthetic Lab Report Benchmark** | Templates A-G styled after clinical pathology & urgent care layouts | 3,430 evaluated analyte entities across seeds 777 & 999 | Apache 2.0 (Synthetic Research Benchmark) |
 | **HGNC Gene Nomenclature** | HUGO Gene Nomenclature Committee (EMBL-EBI / Wellcome Trust) | 43,000+ approved human gene symbols & aliases | Public Domain / Open Access (Free Academic & Commercial Use) |
 
 ---

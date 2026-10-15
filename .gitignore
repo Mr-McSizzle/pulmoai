@@ -20,6 +20,7 @@ reports/*
 !reports/evaluation_registry.json
 !reports/ood_benchmark.json
 !reports/audit_*.json
+!reports/test_run.txt
 final_report.md
 WALKTHROUGH.md
 FULL_MODEL_PLAN.md
@@ -36,6 +37,8 @@ models/pilot_best_logistic_regression.joblib
 models/medmnist/*.pt
 models/modality_gate_resnet18.pt
 models/modality_gate_resnet18_v2.pt
+models/modality_gate_resnet18_v3.pt
+models/*.pt
 
 # Frontend dependencies and cache (dist is kept so friend does not need Node.js)
 frontend/node_modules/

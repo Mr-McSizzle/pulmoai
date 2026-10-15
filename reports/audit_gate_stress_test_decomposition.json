@@ -1,0 +1,78 @@
+{
+  "metadata": {
+    "title": "Pass 6 (G4) Modality Gate Stress-Test Rejection Component Decomposition",
+    "timestamp": "2026-10-15T08:34:29Z",
+    "total_evaluated": 800,
+    "total_precheck_rejections": 100,
+    "total_classifier_rejections": 699,
+    "total_false_accepts": 1,
+    "overall_rejection_rate": 0.99875
+  },
+  "categories": {
+    "gaussian_noise_std_01": {
+      "label": "Gaussian noise (std=0.10)",
+      "total_evaluated": 100,
+      "precheck_rejections": 0,
+      "classifier_rejections": 100,
+      "false_accepts": 0,
+      "primary_rejection_component": "classifier_resnet18"
+    },
+    "gaussian_noise_std_02": {
+      "label": "Gaussian noise (std=0.20)",
+      "total_evaluated": 100,
+      "precheck_rejections": 0,
+      "classifier_rejections": 100,
+      "false_accepts": 0,
+      "primary_rejection_component": "classifier_resnet18"
+    },
+    "gaussian_noise_std_03": {
+      "label": "Gaussian noise (std=0.30)",
+      "total_evaluated": 100,
+      "precheck_rejections": 0,
+      "classifier_rejections": 100,
+      "false_accepts": 0,
+      "primary_rejection_component": "classifier_resnet18"
+    },
+    "uniform_noise": {
+      "label": "Uniform random noise",
+      "total_evaluated": 100,
+      "precheck_rejections": 0,
+      "classifier_rejections": 100,
+      "false_accepts": 0,
+      "primary_rejection_component": "classifier_resnet18"
+    },
+    "checkerboard_patterns": {
+      "label": "Checkerboard patterns",
+      "total_evaluated": 100,
+      "precheck_rejections": 0,
+      "classifier_rejections": 99,
+      "false_accepts": 1,
+      "primary_rejection_component": "classifier_resnet18"
+    },
+    "smooth_gradients": {
+      "label": "Smooth linear / radial gradients",
+      "total_evaluated": 100,
+      "precheck_rejections": 100,
+      "classifier_rejections": 0,
+      "false_accepts": 0,
+      "primary_rejection_component": "precheck"
+    },
+    "rendered_document_text": {
+      "label": "Rendered document text pages",
+      "total_evaluated": 100,
+      "precheck_rejections": 0,
+      "classifier_rejections": 100,
+      "false_accepts": 0,
+      "primary_rejection_component": "classifier_resnet18"
+    },
+    "desktop_screenshots": {
+      "label": "Desktop software screenshots",
+      "total_evaluated": 100,
+      "precheck_rejections": 0,
+      "classifier_rejections": 100,
+      "false_accepts": 0,
+      "primary_rejection_component": "classifier_resnet18"
+    }
+  },
+  "methodology_disclosure": "These 8 high-variance synthetic families were specifically designed after initial failures were observed and do not constitute an unseen holdout test. The primary headline metric for unseen distribution rejection remains the leave-one-family-out (LOFO) macro false-accept rate of 19.03% (with worst-family rate of 100% on document layouts)."
+}

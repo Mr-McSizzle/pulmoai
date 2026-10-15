@@ -97,7 +97,7 @@ ax.text(
 pages = [
     ("Overview Dashboard", "Route: /", "System health, dataset metrics, subsystem navigation & integrity flags", "#E0F2FE", "#0284C7"),
     ("Single-Cell Atlas", "Route: /analyze", "Pseudobulk upload, dual-rule classifier, whole-cell input contract", "#CCFBF1", "#0D9488"),
-    ("Lab Report Reader", "Route: /reports", "Adaptive deskew / blur gate, PyMuPDF text layer, Templates A-D", "#DBEAFE", "#2563EB"),
+    ("Lab Report Reader", "Route: /reports", "Adaptive deskew / blur gate, PyMuPDF text layer, Templates A-G", "#DBEAFE", "#2563EB"),
     ("Chronic & Survival Risk", "Route: /risk", "Prospective mortality, PCE & IDRS benchmarks, 6 current diagnoses", "#FFE4E6", "#E11D48"),
     ("Image Screening & Gate", "Route: /images", "ResNet-18 modality gate (LOFO FAR 19.03%), pediatric X-ray, retina safeguard", "#F3E8FF", "#7C3AED"),
     ("Performance Audit", "Route: /performance", "Leave-one-study-out tables, holdout calibration slopes, Brier skill scores", "#FEF3C7", "#D97706"),
@@ -250,7 +250,7 @@ data_blocks = [
     ),
     (
         "Standard Medical Dictionaries",
-        "LOINC and UCUM standardized clinical units\nMolar mass factors for SI-to-US conversions\nTemplates A-D styled after common clinical formats",
+        "LOINC and UCUM standardized clinical units\nMolar mass factors for SI-to-US conversions\nTemplates A-G styled after common clinical formats",
         "#2563EB",
     ),
     (
@@ -260,7 +260,7 @@ data_blocks = [
     ),
     (
         "MedMNIST & Modality Gate v3",
-        "ResNet-18 modality gate: 99.50% target TAR\nLOFO cross-validation: 19.03% macro FAR\nPixel std pre-check: 0.00% blank/noise FAR",
+        "ResNet-18 modality gate: 99.50% target TAR\nLOFO cross-validation: 19.03% macro FAR\nTwo-stage pre-check + classifier: 99.88% stress rejection",
         "#7C3AED",
     ),
 ]
