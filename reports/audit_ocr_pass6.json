@@ -1,0 +1,201 @@
+{
+  "metadata": {
+    "title": "PulmoAI Pass 6 (G3) Fresh Holdout OCR Evaluation with Quality Gate",
+    "benchmark_label": "synthetic set; real-world accuracy unknown",
+    "seed": 999,
+    "total_synthetic_documents": 70,
+    "total_entities_per_condition": 490,
+    "templates_evaluated": [
+      "template_a",
+      "template_b",
+      "template_c",
+      "template_d",
+      "template_e",
+      "template_f",
+      "template_g"
+    ],
+    "timestamp": "2026-10-15T08:40:41Z",
+    "total_runtime_seconds": 187.33
+  },
+  "condition_summaries": {
+    "clean_pdf": {
+      "condition": "clean_pdf",
+      "total_entities": 490,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 490,
+      "correct_count": 465,
+      "accuracy_on_accepted": 0.949,
+      "wrong_value_accepted_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_only_count": 25,
+      "flag_mismatch_rate_on_accepted": 0.051,
+      "not_detected_count": 0,
+      "not_detected_rate_on_accepted": 0.0,
+      "runtime_seconds": 0.31
+    },
+    "rotated_raw": {
+      "condition": "rotated_raw",
+      "total_entities": 490,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 490,
+      "correct_count": 290,
+      "accuracy_on_accepted": 0.5918,
+      "wrong_value_accepted_count": 89,
+      "silent_error_rate_on_accepted": 0.1816,
+      "flag_mismatch_only_count": 26,
+      "flag_mismatch_rate_on_accepted": 0.0531,
+      "not_detected_count": 85,
+      "not_detected_rate_on_accepted": 0.1735,
+      "runtime_seconds": 40.67
+    },
+    "rotated_adaptive": {
+      "condition": "rotated_adaptive",
+      "total_entities": 490,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 490,
+      "correct_count": 415,
+      "accuracy_on_accepted": 0.8469,
+      "wrong_value_accepted_count": 20,
+      "silent_error_rate_on_accepted": 0.0408,
+      "flag_mismatch_only_count": 25,
+      "flag_mismatch_rate_on_accepted": 0.051,
+      "not_detected_count": 30,
+      "not_detected_rate_on_accepted": 0.0612,
+      "runtime_seconds": 56.29
+    },
+    "blur": {
+      "condition": "blur",
+      "total_entities": 490,
+      "refused_for_quality_count": 490,
+      "refused_for_quality_rate": 1.0,
+      "accepted_entities_count": 0,
+      "correct_count": 0,
+      "accuracy_on_accepted": 0.0,
+      "wrong_value_accepted_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_only_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 0,
+      "not_detected_rate_on_accepted": 0.0,
+      "runtime_seconds": 6.17
+    },
+    "jpeg": {
+      "condition": "jpeg",
+      "total_entities": 490,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 490,
+      "correct_count": 396,
+      "accuracy_on_accepted": 0.8082,
+      "wrong_value_accepted_count": 26,
+      "silent_error_rate_on_accepted": 0.0531,
+      "flag_mismatch_only_count": 24,
+      "flag_mismatch_rate_on_accepted": 0.049,
+      "not_detected_count": 44,
+      "not_detected_rate_on_accepted": 0.0898,
+      "runtime_seconds": 37.78
+    },
+    "perspective": {
+      "condition": "perspective",
+      "total_entities": 490,
+      "refused_for_quality_count": 0,
+      "refused_for_quality_rate": 0.0,
+      "accepted_entities_count": 490,
+      "correct_count": 419,
+      "accuracy_on_accepted": 0.8551,
+      "wrong_value_accepted_count": 11,
+      "silent_error_rate_on_accepted": 0.0224,
+      "flag_mismatch_only_count": 25,
+      "flag_mismatch_rate_on_accepted": 0.051,
+      "not_detected_count": 35,
+      "not_detected_rate_on_accepted": 0.0714,
+      "runtime_seconds": 43.09
+    }
+  },
+  "quality_gate_policy": "If image is severely blurred (lap_var < 30.0) or excessively skewed (best_angle >= 12.0 deg), OCR execution is refused and 0 values are extracted.",
+  "silent_error_examples": [
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 3008,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 719.9,
+      "expected_value": 79.9
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 3012,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 44.0,
+      "expected_value": 44.4
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 3014,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 50.0,
+      "expected_value": 50.4
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 3016,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 61.0,
+      "expected_value": 61.6
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 3018,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 22.0,
+      "expected_value": 22.4
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_c",
+      "doc_id": 3022,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 712.8,
+      "expected_value": 72.8
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_d",
+      "doc_id": 3032,
+      "canonical_name": "triglycerides",
+      "parsed_value": 90.6,
+      "expected_value": 80.6
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_d",
+      "doc_id": 3032,
+      "canonical_name": "serum_creatinine",
+      "parsed_value": 0.0,
+      "expected_value": 0.8
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_d",
+      "doc_id": 3033,
+      "canonical_name": "fasting_glucose",
+      "parsed_value": 89.0,
+      "expected_value": 89.6
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_d",
+      "doc_id": 3035,
+      "canonical_name": "total_cholesterol",
+      "parsed_value": 127.0,
+      "expected_value": 127.2
+    }
+  ]
+}

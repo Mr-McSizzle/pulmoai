@@ -6,20 +6,17 @@ This document details the storage, distribution, provenance, training reproducti
 
 ## 1. Distribution and GitHub Releases
 
-Model weights are distributed through GitHub Releases attached to official release tags (e.g., `v0.3.1-audited`). Due to Git file size conventions and repository bloat avoidance, heavy neural network checkpoints (> 10 MB) are managed via release assets rather than raw git tracking.
+Model weights will be published as downloadable release assets attached to official GitHub Releases (no external download URLs are hosted yet). In accordance with open-source file size best practices and to prevent repository bloat, heavy neural network checkpoints (> 10 MB) are excluded from git tracking.
 
-### Downloading Pre-Trained Weights
-To download and verify all pre-trained model checkpoints:
-```bash
-python scripts/download_checkpoints.py
-```
-This script downloads assets from the repository's GitHub Release tag, places them into `models/` and `models/medmnist/`, and automatically verifies their SHA-256 integrity against `models/checksums.sha256`.
+### Obtaining Model Weights
+- **GitHub Release (Upcoming):** Once published, assets can be downloaded directly from the GitHub Release page into `models/` and `models/medmnist/`.
+- **Local Deterministic Retraining:** In the absence of pre-built release downloads, all checkpoints can be trained from scratch using the in-repo reproduction scripts documented in Section 2 below.
+- **Verification:** All local or downloaded weight files can be cryptographically verified against the authoritative SHA-256 digests in Section 3 using `shasum -a 256 -c models/checksums.sha256`.
 
 ### Missing Weights Error Check
-All PulmoAI services (`pulmoai.service`, `pulmoai.risk_service`, `pulmoai.image_service`, `pulmoai.future_risk_service`) perform upfront existence and integrity checks. If a model file is missing or corrupted, a `FileNotFoundError` or `RuntimeError` is raised with explicit remediation instructions:
+All PulmoAI services (`pulmoai.service`, `pulmoai.risk_service`, `pulmoai.image_service`, `pulmoai.future_risk_service`) perform upfront existence and integrity checks. If a weight file is missing, the service fails immediately with a clear, descriptive `FileNotFoundError`:
 ```text
-FileNotFoundError: Model checkpoint for 'chest_xray' not found at models/medmnist/pneumoniamnist_resnet18.pt.
-Run 'python scripts/download_checkpoints.py' or re-train via 'python scripts/train_medmnist_models.py'.
+FileNotFoundError: Model checkpoint for 'chest_xray' not found at models/medmnist/pneumoniamnist_resnet18.pt. Ensure weights are downloaded from GitHub Release or trained locally via scripts/train_medmnist_models.py.
 ```
 
 ---

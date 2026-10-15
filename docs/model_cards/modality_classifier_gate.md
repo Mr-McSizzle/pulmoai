@@ -25,10 +25,12 @@
   - OrganSMNIST Abdominal CT (Sagittal): 2.80% (95% CI: [1.68%, 4.64%])
   - Synthetic Lab Report Renderings: 100.00% (95% CI: [98.91%, 100.0%])
   - Synthetic Noise & Blanks (Pre-Checked): 0.00% (95% CI: [0.00%, 2.87%])
-- **Adversarial / Synthetic Noise Stress-Test ($n=800$, Wilson 95% CIs):**
-  - Evaluated families: Gaussian noise ($\sigma \in [0.10, 0.30]$), uniform noise, checkerboards, smooth linear/radial gradients, rendered text pages, screenshots.
-  - Overall Rejection Rate: **100.00%** (800 / 800, 95% CI: [99.52%, 100.00%])
-  - False-Accept Rate: **0.00%** (0 / 800, 95% CI: [0.00%, 0.48%])
+- **Adversarial / Synthetic Noise Stress-Test ($n=800$, Pass 6 Decomposition):**
+  - Evaluated families (n=100 each): Gaussian noise ($\sigma \in [0.10, 0.30]$), uniform noise, checkerboards, smooth linear/radial gradients, rendered document text, desktop screenshots.
+  - Component Decomposition: Dual-criterion pre-check (`lap_var < 5.0`) rejected 100/800 (smooth gradients); 5-class ResNet-18 classifier rejected 699/800; 1 false accept (checkerboard pattern).
+  - Overall Rejection Rate: **99.88%** (799 / 800, 95% CI: [99.27%, 99.98%])
+  - False-Accept Rate: **0.12%** (1 / 800, 95% CI: [0.02%, 0.73%])
+  - Holdout Disclosure: These 8 categories were designed post-failure to probe known vulnerabilities and do not constitute an unseen holdout benchmark. Headline generalization metric remains LOFO macro FAR 19.03%.
 - **Target True-Accept Rate (TAR / Recall) on Held-Out Test Sets:**
   - Chest X-ray: 99.75% (399 / 400)
   - Dermoscopy: 99.00% (396 / 400)

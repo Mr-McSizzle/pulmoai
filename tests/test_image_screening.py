@@ -109,6 +109,18 @@ class ImageScreeningUnitTest(unittest.TestCase):
         self.assertIn("not recognised", result["message"].lower())
         self.assertIsNone(result["predicted_class"])
 
+    def test_missing_weight_file_fails_with_clear_message(self) -> None:
+        """Verify service fails with a descriptive FileNotFoundError when weight file is missing."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            service = ImageScreeningService(model_dir=Path(tmp_dir))
+            dummy_img = Image.new("RGB", (64, 64), color=(128, 128, 128))
+            buf = io.BytesIO()
+            dummy_img.save(buf, format="PNG")
+            with self.assertRaises(FileNotFoundError) as ctx:
+                service.predict(buf.getvalue(), "chest_xray", enforce_modality_gate=False)
+            self.assertIn("Model checkpoint for 'chest_xray' not found", str(ctx.exception))
+
 
 class ImageScreeningAPITest(unittest.TestCase):
     """Integration tests for POST /api/image/predict endpoint."""
