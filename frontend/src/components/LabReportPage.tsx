@@ -328,18 +328,30 @@ Sex: Male`;
                 )}
               </div>
 
-              <button
-                className={`button-primary w-full text-xs py-2.5 flex items-center justify-center gap-2 text-white shadow ${
-                  allTestsConfirmed
-                    ? "bg-teal-600 hover:bg-teal-700 cursor-pointer"
-                    : "bg-slate-400 cursor-not-allowed opacity-60"
-                }`}
-                disabled={!allTestsConfirmed}
-                onClick={() => onTransferToRisk(riskFeatures)}
-              >
-                <span>Send to Chronic Risk Engine</span>
-                <ArrowRight size={14} />
-              </button>
+              {isScannedOrOcr ? (
+                <div className="p-3.5 rounded-xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-xs space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold text-amber-900 text-xs">
+                    <AlertTriangle size={16} className="text-amber-700 shrink-0" />
+                    <span>One-Click Transfer Disabled for Scanned Inputs</span>
+                  </div>
+                  <p className="text-[11px] text-amber-800 leading-relaxed font-normal">
+                    Due to potential optical character misread risk on scanned reports (silent error risk &gt; 5%), automated one-click transfer to risk calculators is disabled. Please verify each unconfirmed suggestion side-by-side with your original report and transcribe verified values into the Chronic Risk Engine manually.
+                  </p>
+                </div>
+              ) : (
+                <button
+                  className={`button-primary w-full text-xs py-2.5 flex items-center justify-center gap-2 text-white shadow ${
+                    allTestsConfirmed
+                      ? "bg-teal-600 hover:bg-teal-700 cursor-pointer"
+                      : "bg-slate-400 cursor-not-allowed opacity-60"
+                  }`}
+                  disabled={!allTestsConfirmed}
+                  onClick={() => onTransferToRisk(riskFeatures)}
+                >
+                  <span>Send to Chronic Risk Engine</span>
+                  <ArrowRight size={14} />
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -418,7 +430,8 @@ Sex: Male`;
               <div className="content-panel overflow-hidden p-0 border border-slate-200">
                 <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                    <FileCheck size={16} className="text-teal-600" /> Extracted Laboratory Biomarkers
+                    <FileCheck size={16} className="text-teal-600" />
+                    {isScannedOrOcr ? "Extracted Biomarkers (Unconfirmed Suggestions - OCR)" : "Extracted Laboratory Biomarkers"}
                   </h3>
                   <button
                     className="text-xs text-slate-600 hover:text-teal-700 flex items-center gap-1 font-medium"

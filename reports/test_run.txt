@@ -8,10 +8,6 @@ ok
 test_api_predict_unsupported_format (test_image_screening.ImageScreeningAPITest.test_api_predict_unsupported_format)
 Verify 415 Unsupported Media Type for non-image files. ... INFO:httpx2:HTTP Request: POST http://testserver/api/image/predict "HTTP/1.1 415 Unsupported Media Type"
 ok
-test_missing_weight_file_fails_with_clear_message (test_image_screening.ImageScreeningUnitTest.test_missing_weight_file_fails_with_clear_message)
-Verify service fails with a descriptive FileNotFoundError when weight file is missing. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-ok
 test_modality_gate_rejects_cross_modality_mismatch (test_image_screening.ImageScreeningUnitTest.test_modality_gate_rejects_cross_modality_mismatch)
 Verify Modality Gate refuses to run when image modality contradicts user selection. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
 ok
@@ -26,6 +22,9 @@ Verify internal confidence threshold guard triggers when gate is bypassed and th
 ok
 test_pneumonia_prediction_with_genuine_image (test_image_screening.ImageScreeningUnitTest.test_pneumonia_prediction_with_genuine_image)
 Verify chest_xray predicts binary label and returns required metadata with verified gate match. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
+ok
+test_missing_weight_file_fails_with_clear_message (test_image_screening.MissingWeightValidationTests.test_missing_weight_file_fails_with_clear_message)
+Verify service fails with a descriptive FileNotFoundError when weight file is missing. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
 ok
 test_empty_upload_is_rejected (test_inference_service.InferenceServiceInputTests.test_empty_upload_is_rejected) ... ok
 test_large_upload_is_rejected (test_inference_service.InferenceServiceInputTests.test_large_upload_is_rejected) ... ok
@@ -48,7 +47,7 @@ test_image_screening_inference_is_offline (test_privacy_offline.OfflineInference
 Verify medical image screening and modality gate make zero network calls. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
 ok
 test_local_report_reader_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_local_report_reader_inference_is_offline)
-Verify local lab report parser (without Gemini key) makes zero network calls. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x15fca6610>
+Verify local lab report parser (without Gemini key) makes zero network calls. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x177d2eb10>
 ok
 test_nhanes_risk_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_nhanes_risk_inference_is_offline)
 Verify NHANES chronic disease risk engine makes zero network calls. ... INFO:pulmoai.risk_service:Initialized HealthRiskService with targets: diabetes, hypertension, high_cholesterol, heart_disease, stroke, copd
@@ -56,7 +55,7 @@ ok
 test_scrna_seq_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_scrna_seq_inference_is_offline)
 Verify scRNA-seq classification makes zero network calls. ... ok
 test_api_report_extract_txt (test_report_reader.ReportReaderAPITests.test_api_report_extract_txt)
-Test POST /api/report/extract with a text report. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x160c92160>
+Test POST /api/report/extract with a text report. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x177807e70>
 INFO:httpx2:HTTP Request: POST http://testserver/api/report/extract "HTTP/1.1 200 OK"
 ok
 test_api_report_extract_unsupported_format (test_report_reader.ReportReaderAPITests.test_api_report_extract_unsupported_format)
@@ -122,6 +121,6 @@ Verify that condition predictions define estimand_type, label, and time_horizon.
 ok
 
 ----------------------------------------------------------------------
-Ran 56 tests in 6.393s
+Ran 56 tests in 6.976s
 
 OK

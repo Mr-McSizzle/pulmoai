@@ -219,10 +219,39 @@ To prevent corrupted or unreadable images from generating high silent error rate
 | **blur_sigma_1.2** | 392 | 196 (50.0%) | 196 | 168 | 85.71% | 14 | **7.14%** | 0 | 14 |
 | **blur_sigma_2.0** | 392 | 392 (100.0%) | 0 | 0 | 0.00% | 0 | **0.00%** | 0 | 0 |
 
-### 6.5 Clinical UI Safety Gate
+
+### 6.5 Pass 8 Fresh Holdout Benchmark Results (Seed 2026, Templates A-H) (I2)
+- **Benchmark Scope:** 56 synthetic documents across 8 templates (Templates A-H), totaling **392 entities per condition** (>= 350 required).
+- **Benchmark Classification:** *synthetic set; real-world accuracy unknown*.
+- **Image Preprocessing & Quality Gate (I2a-c):** Width normalization to 2400px (preventing 600 DPI over-thickening), Immerkaer Laplacian noise gating (`noise_sigma >= 1.5`), Unicode dash/bullet stripping, and HbA1c/HDL alias protection.
+- **False-Refusal Rate on Clean Raster Pages (I2c):** **0.00%** (threshold <= 5.0% satisfied).
+
+
+| Condition Evaluated | Total Entities | Refused for Quality | Accepted Entities | Correct Extractions | Accuracy on Accepted (%) | Silent Errors (Wrong Value) | Silent Error Rate on Accepted (%) | Flag Mismatches | Not Detected |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **clean_pdf** | 392 | 0 (0.0%) | 392 | 392 | 100.00% | 0 | **0.00%** | 0 | 0 |
+| **clean_raster_150dpi** | 392 | 0 (0.0%) | 392 | 390 | 99.49% | 2 | **0.51%** | 0 | 0 |
+| **clean_raster_200dpi** | 392 | 0 (0.0%) | 392 | 392 | 100.00% | 0 | **0.00%** | 0 | 0 |
+| **clean_raster_300dpi** | 392 | 0 (0.0%) | 392 | 351 | 89.54% | 5 | **1.28%** | 0 | 36 |
+| **clean_raster_150dpi_noise** | 392 | 392 (100.0%) | 0 | 0 | 0.00% | 0 | **0.00%** | 0 | 0 |
+| **clean_raster_200dpi_noise** | 392 | 392 (100.0%) | 0 | 0 | 0.00% | 0 | **0.00%** | 0 | 0 |
+| **clean_raster_300dpi_noise** | 392 | 392 (100.0%) | 0 | 0 | 0.00% | 0 | **0.00%** | 0 | 0 |
+| **skew_0deg** | 392 | 0 (0.0%) | 392 | 351 | 89.54% | 5 | **1.28%** | 0 | 36 |
+| **skew_3.5deg** | 392 | 0 (0.0%) | 392 | 383 | 97.70% | 2 | **0.51%** | 0 | 7 |
+| **skew_8deg** | 392 | 0 (0.0%) | 392 | 314 | 80.10% | 3 | **0.77%** | 4 | 71 |
+| **skew_11deg** | 392 | 0 (0.0%) | 392 | 208 | 53.06% | 29 | **7.40%** | 4 | 151 |
+| **skew_13deg** | 392 | 392 (100.0%) | 0 | 0 | 0.00% | 0 | **0.00%** | 0 | 0 |
+| **skew_20deg** | 392 | 392 (100.0%) | 0 | 0 | 0.00% | 0 | **0.00%** | 0 | 0 |
+| **blur_sigma_0.5** | 392 | 0 (0.0%) | 392 | 378 | 96.43% | 7 | **1.79%** | 0 | 7 |
+| **blur_sigma_0.8** | 392 | 0 (0.0%) | 392 | 382 | 97.45% | 2 | **0.51%** | 0 | 8 |
+| **blur_sigma_1.2** | 392 | 287 (73.2%) | 105 | 105 | 100.00% | 0 | **0.00%** | 0 | 0 |
+| **blur_sigma_2.0** | 392 | 392 (100.0%) | 0 | 0 | 0.00% | 0 | **0.00%** | 0 | 0 |
+
+### 6.6 Clinical UI Safety Gate (Pass 8 I2d)
 - **Persistent Warning Banner:** For all scanned or OCR-extracted inputs, UI displays: *'scanned input: values may be wrong (synthetic set; real-world accuracy unknown)'*.
 - **Side-by-Side Verification:** Parsed values are displayed alongside the raw extracted source text line snippet.
-- **Mandatory Individual Confirmation:** Every individual biomarker requires an explicit user checkbox confirmation before the 'Send to Chronic Risk Engine' action is enabled.
+- **Disabled One-Click Transfer for Scanned Inputs (I2d):** Automated one-click transfer to risk calculators is strictly disabled for scanned reports due to potential optical character misread risk. Users must manually verify and transcribe confirmed values into the Chronic Risk Engine.
+- **Mandatory Individual Confirmation:** For digital PDFs with text layers, every individual biomarker requires an explicit user checkbox confirmation before the 'Send to Chronic Risk Engine' action is enabled.
 
 ---
 
@@ -268,9 +297,21 @@ To prevent corrupted or unreadable images from generating high silent error rate
 
 ---
 
-## 9. Audit Verification Log & Resource Footprint (Pass 6 G5)
+## 9. Unverified Items & Remaining Limitations (Pass 8 I5)
+In strict compliance with Pass 8 audit criteria, the following items remain unverified or subject to explicit clinical/methodological limitations (no 'None'):
+1. **PCE Fatal-Only Endpoint Mismatch:** The 2013 ACC/AHA Pooled Cohort Equations were derived to predict 10-year fatal AND non-fatal hard ASCVD (myocardial infarction or stroke death/survival). In the NHANES Linked Mortality Files, only fatal cardiovascular events (underlying cause-of-death ICD-10 I00-I78) are observable. Consequently, absolute calibration of PCE is unverified; only rank-order discrimination (C-index, AUROC) is claimed and evaluated.
+2. **PCE White Equation Proxy for Non-White/Non-Black Populations:** Per Section 4.1 of the 2013 ACC/AHA Guideline, sex- and race-specific models were derived exclusively for Non-Hispanic African American and Non-Hispanic White cohorts. For Hispanic, Asian American, American Indian, and multiracial participants, the guideline prescribes applying Non-Hispanic White equations as a proxy. Discrimination and calibration in these populations remain unverified against true incident CVD cohorts.
+3. **IDRS Clinical Spectrum and Setting Shift:** The Indian Diabetes Risk Score (Mohan et al., JAPI 2005) was developed in Chennai (CURES cohort) specifically to screen for UNDIAGNOSED type 2 diabetes in an Asian Indian population. Evaluating IDRS on multi-ethnic US NHANES against self-reported diagnosed diabetes evaluates an established diagnosis rather than undetected asymptomatic hyperglycemia. Its performance for population-wide undiagnosed screening in the US remains unverified.
+4. **scRNA-seq Donor Identity & Multi-Sample Aggregation:** Single-cell sample grouping in the public lung atlas utilizes `gse_alias + orig.ident`. True clinical patient identity across multi-sample donors is unverified in public GEO submissions; pseudobulk profiles reflect technical sample groups rather than clinically de-duplicated patient individuals.
+5. **OCR Real-World Hospital & Smartphone Image Accuracy:** All OCR evaluations (Pass 6, Pass 7, Pass 8) are conducted on synthetic documents with simulated Gaussian noise, perspective skew, and optical blur. Real-world accuracy on paper lab reports photographed under uneven ambient lighting, crumpled paper, or diverse hospital EHR printouts remains unverified. Mandatory human verification is enforced in the UI and automated one-click transfer is disabled for scanned inputs.
+6. **MedMNIST Research-Only Resolution:** MedMNIST ResNet-18 classifiers operate on downsampled 64x64 pixel thumbnails for research benchmarking. Clinical sensitivity, specificity, and safety on full-resolution DICOM radiography and clinical pathology images remain unverified.
 
-### 9.1 Versioned Machine-Readable JSON Artifacts
+---
+
+## 10. Audit Verification Log & Resource Footprint (Pass 8 I5)
+
+### 10.1 Versioned Machine-Readable JSON Artifacts
+- `reports/audit_ocr_pass8.json`
 - `reports/audit_ocr_pass7.json`
 - `reports/audit_pce_variants.json`
 - `reports/audit_idrs_check.json`
@@ -286,7 +327,7 @@ To prevent corrupted or unreadable images from generating high silent error rate
 - `reports/audit_future_risk_v3.json`
 - `reports/audit_modality_gate_v3.json`
 
-### 9.2 Cryptographic Checkpoint & Data Hashes
+### 10.2 Cryptographic Checkpoint & Data Hashes
 | Component | Local File Path | Cryptographic SHA-256 Hash | Status |
 | :--- | :--- | :--- | :--- |
 | Lung Pseudobulk Training Data | `data/processed/allcells_pseudobulk_counts.npz` | `d5b73e19945fa33f1c82c9f4f81e7e9eac9db981b8fd82b11823ae781b682162` | Verified against LOGO-CV |
@@ -296,11 +337,11 @@ To prevent corrupted or unreadable images from generating high silent error rate
 | Future Risk Models Bundle (v3) | `models/future_risk_models_v3.joblib` | `76bc925d2fd9f955547528be5fda0940a755b647005e5bd36ca181c9f89adcc6` | Pass 4 Cox Models |
 | Modality Gate ResNet-18 (v3) | `models/modality_gate_resnet18_v3.pt` | `18617379bc35c25a3268b9405ad658c3ee7910370a87dcf71f39bd9d78e89d69` | Pass 4 5-Class Gate Checkpoint |
 
-### 9.3 System Footprint, Privacy & Test Verification
+### 10.3 System Footprint, Privacy & Test Verification
 - **Automated Test Suite:** 100% pass rate across **56 automated tests** in `tests/` across 6 test modules.
 - **Zero Outbound Calls Verification [Tested]:** `tests/test_privacy_offline.py` verifies 0 outbound network requests during inference across all 5 modules.
 - **Peak Execution RAM:** < 1.8 GB (well below 8 GB hardware ceiling).
 - **Free Disk Space:** > 16 GB (well above 3 GB safety margin).
 - **Model Weight Hygiene Policy:** Large neural network `.pt` weights have been untracked from git (`git rm --cached`) and are documented in `docs/WEIGHTS.md`. Tracked repository files > 1 MB are limited to 5 `.joblib` pipelines.
 
-*(End of Audited Technical Report v2 - Pass 6 Final)*
+*(End of Audited Technical Report v2 - Pass 8 Final)*
