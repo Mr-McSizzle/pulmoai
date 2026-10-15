@@ -111,10 +111,13 @@ class ImageScreeningService:
         if self._gate_model is not None:
             return self._gate_model
         candidate_paths = [
-            self.model_dir.parent / "models" / "modality_gate_resnet18_v3.pt",
+            PROJECT_ROOT / "models" / "modality_gate_resnet18_v3.pt",
+            self.model_dir.parent / "modality_gate_resnet18_v3.pt",
             self.model_dir / "modality_gate_resnet18_v3.pt",
-            self.model_dir.parent / "models" / "modality_gate_resnet18_v2.pt",
+            PROJECT_ROOT / "models" / "modality_gate_resnet18_v2.pt",
+            self.model_dir.parent / "modality_gate_resnet18_v2.pt",
             self.model_dir / "modality_gate_resnet18_v2.pt",
+            PROJECT_ROOT / "models" / "modality_gate_resnet18.pt",
             self.model_dir.parent / "modality_gate_resnet18.pt",
             self.model_dir / "modality_gate_resnet18.pt",
         ]
