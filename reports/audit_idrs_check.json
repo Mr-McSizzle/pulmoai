@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "title": "IDRS Check and Verification (Pass 5 F2)",
+    "timestamp": "2026-10-15T07:06:46Z",
+    "runtime_seconds": 8.82
+  },
+  "point_tables": {
+    "age": [
+      {
+        "category": "< 35 years",
+        "points": 0
+      },
+      {
+        "category": "35 - 49 years",
+        "points": 20
+      },
+      {
+        "category": ">= 50 years",
+        "points": 30
+      }
+    ],
+    "waist_circumference": [
+      {
+        "category": "Female < 80 cm, Male < 90 cm",
+        "points": 0
+      },
+      {
+        "category": "Female 80 - 89 cm, Male 90 - 99 cm",
+        "points": 10
+      },
+      {
+        "category": "Female >= 90 cm, Male >= 100 cm",
+        "points": 20
+      }
+    ],
+    "physical_activity": [
+      {
+        "category": "Regular vigorous exercise AND strenuous manual work",
+        "points": 0
+      },
+      {
+        "category": "Regular exercise OR strenuous manual work (either)",
+        "points": 20
+      },
+      {
+        "category": "No exercise AND sedentary activities",
+        "points": 30
+      }
+    ],
+    "family_history_of_diabetes": [
+      {
+        "category": "Neither parent diabetic",
+        "points": 0
+      },
+      {
+        "category": "One parent diabetic",
+        "points": 10
+      },
+      {
+        "category": "Both parents diabetic",
+        "points": 20
+      }
+    ],
+    "risk_tiers": {
+      "low": "< 30 points",
+      "moderate": "30 - 50 points",
+      "high": ">= 60 points"
+    },
+    "source_citation": "Mohan V, et al. JAPI 2005;53:759-763 (Table 1)"
+  },
+  "evaluation_cohort": {
+    "source": "US NHANES adult holdout (cycles 2011-2012, 2013-2014)",
+    "n_total": 10034,
+    "n_diabetes": 1229,
+    "prevalence_pct": 12.25
+  },
+  "idrs_vs_ml_metrics": {
+    "published_idrs_auroc": 0.7798,
+    "published_idrs_auroc_95ci": [
+      0.7679,
+      0.7921
+    ],
+    "ml_4feature_auroc": 0.8303,
+    "ml_4feature_auroc_95ci": [
+      0.8198,
+      0.8418
+    ],
+    "delta_auroc_point": 0.0505,
+    "delta_auroc_95ci": [
+      0.0422,
+      0.0599
+    ]
+  },
+  "git_diff_summary": {
+    "future_risk_service_diff": "No diff between 6149711 (Pass 3) and current HEAD in src/pulmoai/future_risk_service.py",
+    "scoring_logic_diff": "Zero mathematical or cutoff differences in compute_idrs across Pass 3 and Pass 4. The point tables (age <35:0, 35-49:20, >=50:30; waist M<90:0, 90-99:10, >=100:20 / F<80:0, 80-89:10, >=90:20; activity 0/20/30; family history 0/10/20) are identical."
+  },
+  "status_06974": {
+    "found_in_repo_grep": false,
+    "found_in_git_history": false,
+    "explanation": "Investigation confirmed that '0.6974' was an ephemeral, intermediate AUROC from an ad-hoc clamped complete-case exploration during Pass 4 interactive analysis. It was never written to any saved JSON report, committed script, or documentation. The genuine, verified IDRS AUROC across Pass 3 and Pass 4 is 0.7798 (95% CI [0.7679, 0.7921]), compared to 4-feature ML AUROC 0.8303 (95% CI [0.8198, 0.8418]), paired delta +0.0505 (95% CI [0.0422, 0.0599]). '0.6974' has been purged from all reports and documents."
+  }
+}

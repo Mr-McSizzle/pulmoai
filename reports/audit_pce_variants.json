@@ -1,0 +1,356 @@
+{
+  "metadata": {
+    "title": "Pass 5 F1 PCE Discrepancy & Variant Audit",
+    "timestamp": "2026-10-15T07:02:46Z",
+    "runtime_seconds": 74.11
+  },
+  "passes_comparison_table": {
+    "pass_2": {
+      "report": "Pass 2 (reports/audit_future_risk.json)",
+      "cohort_n": 5632,
+      "filter": "Age 40-79, complete cases, non-censored at 5yr (contained prior CVD)",
+      "pce_c_index": 0.7797,
+      "pce_5yr_auroc": 0.7684,
+      "cox_pce_inputs_c_index": 0.828,
+      "cox_pce_inputs_5yr_auroc": 0.8204,
+      "conclusion": "ML higher (prior CVD included in cohort)"
+    },
+    "pass_3": {
+      "report": "Pass 3 (reports/audit_future_risk_v2.json)",
+      "cohort_n": 5899,
+      "filter": "Strict primary prevention (Age 40-79, no prior CVD), unclamped PCE",
+      "pce_c_index": 0.7799,
+      "pce_5yr_auroc": 0.7739,
+      "cox_pce_inputs_c_index": 0.7864,
+      "cox_pce_inputs_5yr_auroc": 0.7771,
+      "delta_c_index": "+0.0066 [-0.0104, 0.0254]",
+      "conclusion": "No clear difference (CI crosses zero)"
+    },
+    "pass_4": {
+      "report": "Pass 4 (reports/audit_future_risk_v3.json)",
+      "cohort_n": 5899,
+      "filter": "Strict primary prevention (Age 40-79, no prior CVD), clamped with fallback to 5.0%",
+      "pce_c_index": 0.7391,
+      "pce_5yr_auroc": 0.7178,
+      "cox_pce_inputs_c_index": 0.7864,
+      "cox_pce_inputs_5yr_auroc": 0.7771,
+      "delta_c_index": "+0.0473 [0.0160, 0.0791]",
+      "conclusion": "Statistically significant gain (caused by fallback 5.0% for 303 high-risk participants)"
+    }
+  },
+  "cohort_and_variant_results": {
+    "full_cohort_imputed": {
+      "description": "Full primary-prevention holdout (n=5,899; routine labs median-imputed)",
+      "total_participants": 5899,
+      "variants": {
+        "unclamped": {
+          "variant_name": "Variant 1: Unclamped (Pass 3: mathematical formula evaluated directly)",
+          "n_evaluated": 5899,
+          "fatal_cvd_events": 110,
+          "pce_c_index": 0.78,
+          "pce_c_index_95ci": [
+            0.7375,
+            0.8219
+          ],
+          "pce_5yr_auroc": 0.7741,
+          "pce_5yr_auroc_95ci": [
+            0.7192,
+            0.8285
+          ],
+          "cox_c_index": 0.7864,
+          "cox_c_index_95ci": [
+            0.7503,
+            0.8227
+          ],
+          "cox_5yr_auroc": 0.7771,
+          "cox_5yr_auroc_95ci": [
+            0.7227,
+            0.8279
+          ],
+          "delta_c_index": 0.0064,
+          "delta_c_index_95ci": [
+            -0.0115,
+            0.0268
+          ],
+          "delta_5yr_auroc": 0.003,
+          "delta_5yr_auroc_95ci": [
+            -0.0221,
+            0.0309
+          ],
+          "gain_statistically_significant": false,
+          "conclusion": "No clear difference (CI crosses zero)"
+        },
+        "clamped_fallback_5": {
+          "variant_name": "Variant 2: Clamped with Fallback to 5.0% (Pass 4: out-of-bounds inputs -> 5.0%)",
+          "n_evaluated": 5899,
+          "fatal_cvd_events": 110,
+          "pce_c_index": 0.7391,
+          "pce_c_index_95ci": [
+            0.6968,
+            0.7831
+          ],
+          "pce_5yr_auroc": 0.7178,
+          "pce_5yr_auroc_95ci": [
+            0.6594,
+            0.7819
+          ],
+          "cox_c_index": 0.7864,
+          "cox_c_index_95ci": [
+            0.7503,
+            0.8227
+          ],
+          "cox_5yr_auroc": 0.7771,
+          "cox_5yr_auroc_95ci": [
+            0.7227,
+            0.8279
+          ],
+          "delta_c_index": 0.0473,
+          "delta_c_index_95ci": [
+            0.0201,
+            0.0801
+          ],
+          "delta_5yr_auroc": 0.0593,
+          "delta_5yr_auroc_95ci": [
+            0.0158,
+            0.1044
+          ],
+          "gain_statistically_significant": true,
+          "conclusion": "Statistically significant gain"
+        },
+        "clamped_boundary": {
+          "variant_name": "Variant 3: Boundary-Clamped (Clinical standard: clamped to physiological bounds)",
+          "n_evaluated": 5899,
+          "fatal_cvd_events": 110,
+          "pce_c_index": 0.7799,
+          "pce_c_index_95ci": [
+            0.7377,
+            0.8212
+          ],
+          "pce_5yr_auroc": 0.7735,
+          "pce_5yr_auroc_95ci": [
+            0.7187,
+            0.8278
+          ],
+          "cox_c_index": 0.7864,
+          "cox_c_index_95ci": [
+            0.7503,
+            0.8227
+          ],
+          "cox_5yr_auroc": 0.7771,
+          "cox_5yr_auroc_95ci": [
+            0.7227,
+            0.8279
+          ],
+          "delta_c_index": 0.0065,
+          "delta_c_index_95ci": [
+            -0.0108,
+            0.0264
+          ],
+          "delta_5yr_auroc": 0.0036,
+          "delta_5yr_auroc_95ci": [
+            -0.0217,
+            0.031
+          ],
+          "gain_statistically_significant": false,
+          "conclusion": "No clear difference (CI crosses zero)"
+        },
+        "excluded_if_out_of_bounds": {
+          "variant_name": "Variant 4: Out-of-Bounds Excluded (Restrict evaluation to valid range)",
+          "n_evaluated": 5596,
+          "fatal_cvd_events": 96,
+          "pce_c_index": 0.7761,
+          "pce_c_index_95ci": [
+            0.7279,
+            0.8255
+          ],
+          "pce_5yr_auroc": 0.761,
+          "pce_5yr_auroc_95ci": [
+            0.7009,
+            0.8221
+          ],
+          "cox_c_index": 0.7827,
+          "cox_c_index_95ci": [
+            0.738,
+            0.8262
+          ],
+          "cox_5yr_auroc": 0.7647,
+          "cox_5yr_auroc_95ci": [
+            0.7068,
+            0.8186
+          ],
+          "delta_c_index": 0.0066,
+          "delta_c_index_95ci": [
+            -0.0126,
+            0.0282
+          ],
+          "delta_5yr_auroc": 0.0037,
+          "delta_5yr_auroc_95ci": [
+            -0.024,
+            0.0306
+          ],
+          "gain_statistically_significant": false,
+          "conclusion": "No clear difference (CI crosses zero)"
+        }
+      }
+    },
+    "complete_case_subset": {
+      "description": "Complete-case primary-prevention holdout (n=5,187; non-missing TC, HDL, SBP)",
+      "total_participants": 5187,
+      "variants": {
+        "unclamped": {
+          "variant_name": "Variant 1: Unclamped (Pass 3: mathematical formula evaluated directly)",
+          "n_evaluated": 5187,
+          "fatal_cvd_events": 94,
+          "pce_c_index": 0.7835,
+          "pce_c_index_95ci": [
+            0.7379,
+            0.8262
+          ],
+          "pce_5yr_auroc": 0.7736,
+          "pce_5yr_auroc_95ci": [
+            0.7085,
+            0.8398
+          ],
+          "cox_c_index": 0.7915,
+          "cox_c_index_95ci": [
+            0.7532,
+            0.8317
+          ],
+          "cox_5yr_auroc": 0.7778,
+          "cox_5yr_auroc_95ci": [
+            0.7168,
+            0.834
+          ],
+          "delta_c_index": 0.008,
+          "delta_c_index_95ci": [
+            -0.0121,
+            0.0317
+          ],
+          "delta_5yr_auroc": 0.0042,
+          "delta_5yr_auroc_95ci": [
+            -0.0274,
+            0.0363
+          ],
+          "gain_statistically_significant": false,
+          "conclusion": "No clear difference (CI crosses zero)"
+        },
+        "clamped_fallback_5": {
+          "variant_name": "Variant 2: Clamped with Fallback to 5.0% (Pass 4: out-of-bounds inputs -> 5.0%)",
+          "n_evaluated": 5187,
+          "fatal_cvd_events": 94,
+          "pce_c_index": 0.7332,
+          "pce_c_index_95ci": [
+            0.6797,
+            0.7813
+          ],
+          "pce_5yr_auroc": 0.7046,
+          "pce_5yr_auroc_95ci": [
+            0.6414,
+            0.7797
+          ],
+          "cox_c_index": 0.7915,
+          "cox_c_index_95ci": [
+            0.7532,
+            0.8317
+          ],
+          "cox_5yr_auroc": 0.7778,
+          "cox_5yr_auroc_95ci": [
+            0.7168,
+            0.834
+          ],
+          "delta_c_index": 0.0583,
+          "delta_c_index_95ci": [
+            0.0253,
+            0.0965
+          ],
+          "delta_5yr_auroc": 0.0732,
+          "delta_5yr_auroc_95ci": [
+            0.015,
+            0.1234
+          ],
+          "gain_statistically_significant": true,
+          "conclusion": "Statistically significant gain"
+        },
+        "clamped_boundary": {
+          "variant_name": "Variant 3: Boundary-Clamped (Clinical standard: clamped to physiological bounds)",
+          "n_evaluated": 5187,
+          "fatal_cvd_events": 94,
+          "pce_c_index": 0.7832,
+          "pce_c_index_95ci": [
+            0.7387,
+            0.8261
+          ],
+          "pce_5yr_auroc": 0.7729,
+          "pce_5yr_auroc_95ci": [
+            0.7081,
+            0.8383
+          ],
+          "cox_c_index": 0.7915,
+          "cox_c_index_95ci": [
+            0.7532,
+            0.8317
+          ],
+          "cox_5yr_auroc": 0.7778,
+          "cox_5yr_auroc_95ci": [
+            0.7168,
+            0.834
+          ],
+          "delta_c_index": 0.0083,
+          "delta_c_index_95ci": [
+            -0.0122,
+            0.0312
+          ],
+          "delta_5yr_auroc": 0.0049,
+          "delta_5yr_auroc_95ci": [
+            -0.0256,
+            0.0351
+          ],
+          "gain_statistically_significant": false,
+          "conclusion": "No clear difference (CI crosses zero)"
+        },
+        "excluded_if_out_of_bounds": {
+          "variant_name": "Variant 4: Out-of-Bounds Excluded (Restrict evaluation to valid range)",
+          "n_evaluated": 4900,
+          "fatal_cvd_events": 81,
+          "pce_c_index": 0.774,
+          "pce_c_index_95ci": [
+            0.7255,
+            0.8287
+          ],
+          "pce_5yr_auroc": 0.7564,
+          "pce_5yr_auroc_95ci": [
+            0.6882,
+            0.8217
+          ],
+          "cox_c_index": 0.7838,
+          "cox_c_index_95ci": [
+            0.7424,
+            0.8312
+          ],
+          "cox_5yr_auroc": 0.7616,
+          "cox_5yr_auroc_95ci": [
+            0.6965,
+            0.8239
+          ],
+          "delta_c_index": 0.0098,
+          "delta_c_index_95ci": [
+            -0.0127,
+            0.0352
+          ],
+          "delta_5yr_auroc": 0.0052,
+          "delta_5yr_auroc_95ci": [
+            -0.0265,
+            0.0424
+          ],
+          "gain_statistically_significant": false,
+          "conclusion": "No clear difference (CI crosses zero)"
+        }
+      }
+    }
+  },
+  "guideline_verdict": {
+    "correct_variant_designation": "Complete-case evaluation with boundary-clamped or unclamped inputs",
+    "rationale": "Per the 2013 ACC/AHA Guideline (Goff et al.): 1. Inputs must be complete: clinical risk scoring tools in practice are applied when a clinician has actual laboratory measurements, not imputed population medians. 2. Clamping fallback to 5.0% (Pass 4) was an artificial implementation artifact that misclassified 303 high-risk individuals (with true CVD mortality of 4.62% vs 1.72% baseline) as low risk (5.0%), falsely deflating PCE discrimination from 0.7800 to 0.7391. 3. When evaluated correctly (either unclamped or boundary-clamped, on complete cases or full cohort), PCE achieves C-index of 0.773-0.780 and 5-year AUROC of 0.767-0.774. 4. Crucially, the conclusion of whether ML achieves a 'statistically significant gain' over PCE on identical inputs depends entirely on this choice: under the correct unclamped or boundary-clamped variants, the paired difference 95% CI includes zero, demonstrating NO CLEAR DIFFERENCE between ML Cox and published PCE.",
+    "significant_gain_depends_on_variant": true
+  }
+}

@@ -45,11 +45,20 @@
 - **Males ($n=5,802$, 596 deaths):** C-index: 0.8527 [0.8347, 0.8683], 5-Yr AUROC: 0.8651 [0.8461, 0.8850]
 - **Females ($n=6,147$, 499 deaths):** C-index: 0.8670 [0.8507, 0.8809], 5-Yr AUROC: 0.8775 [0.8571, 0.8949]
 
-## Primary Prevention Comparison (Age 40-79 without Prior CVD, $n=5,899$)
-- **Published 2013 ACC/AHA PCE:** C-index 0.7391 [0.6910, 0.7860], 5-Yr AUROC 0.7178 [0.6554, 0.7776]
-- **Cox Model with ONLY PCE Inputs (9 features):** C-index 0.7864 [0.7431, 0.8256], 5-Yr AUROC 0.7771 [0.7296, 0.8339]
-- **Full Multivariable Cox Model:** C-index 0.8297 [0.7885, 0.8663], 5-Yr AUROC 0.8234 [0.7738, 0.8732]
-- **Incremental Value:** Full model adds $\Delta C = +0.0432$ (95% CI: [0.0244, 0.0658]) and $\Delta \text{AUROC} = +0.0463$ (95% CI: [0.0231, 0.0686]) over PCE inputs alone.
+## Primary Prevention Comparison (Age 40-79 without Prior CVD)
+- **Guideline-Concordant Complete-Case Subset ($n=5,187$, no imputed PCE inputs):**
+  - Published 2013 ACC/AHA PCE (Unclamped): C-index 0.7835 (95% CI: [0.7379, 0.8262]), 5-Yr AUROC 0.7736 (95% CI: [0.7085, 0.8398])
+  - Published 2013 ACC/AHA PCE (Boundary-Clamped): C-index 0.7832 (95% CI: [0.7387, 0.8261]), 5-Yr AUROC 0.7729 (95% CI: [0.7081, 0.8383])
+  - Cox Model with ONLY PCE Inputs (9 features): C-index 0.7915 (95% CI: [0.7532, 0.8317]), 5-Yr AUROC 0.7778 (95% CI: [0.7168, 0.8340])
+  - Paired Difference (Cox vs Boundary-Clamped PCE): $\Delta C = +0.0083$ (95% CI: [-0.0122, 0.0312]), $\Delta \text{AUROC} = +0.0049$ (95% CI: [-0.0256, 0.0351]). Conclusion: No clear difference (95% CI crosses zero).
+- **Full Cohort ($n=5,899$, median-imputed routine labs):**
+  - Published 2013 ACC/AHA PCE (Boundary-Clamped): C-index 0.7799 (95% CI: [0.7377, 0.8212]), 5-Yr AUROC 0.7735 (95% CI: [0.7187, 0.8278])
+  - Published 2013 ACC/AHA PCE (Pass 4 Clamped with 5.0% Fallback): C-index 0.7391 (95% CI: [0.6968, 0.7831]), 5-Yr AUROC 0.7178 (95% CI: [0.6594, 0.7819])
+  - Cox Model with ONLY PCE Inputs (9 features): C-index 0.7864 (95% CI: [0.7503, 0.8227]), 5-Yr AUROC 0.7771 (95% CI: [0.7227, 0.8279])
+  - Implementation Note: The apparent gain of the ML Cox model over PCE reported in Pass 4 ($\Delta C = +0.0473$) was an artifact of assigning a 5.0% fallback to 303 high-risk participants; under standard boundary-clamped or unclamped evaluation, $\Delta C = +0.0065$ (95% CI: [-0.0108, 0.0264]), showing no statistically significant discrimination difference.
+- **Full Multivariable Cox Model ($n=5,899$, 23 features):**
+  - Harrell's C-index: 0.8297 (95% CI: [0.7885, 0.8663]), 5-Yr AUROC: 0.8234 (95% CI: [0.7738, 0.8732])
+  - Incremental Value: Full model adds $\Delta C = +0.0432$ (95% CI: [0.0244, 0.0658]) and $\Delta \text{AUROC} = +0.0463$ (95% CI: [0.0231, 0.0686]) over PCE inputs alone, demonstrating meaningful gain only when incorporating expanded routine/specialized laboratory panels.
 
 ## Limitations and Privacy Warnings
 1. **NCHS Data Perturbation Notice:** Public-use Linked Mortality Files apply synthetic data substitution techniques to protect participant identity. Population-level survival estimates remain statistically valid, but individual record follow-up times carry synthetic noise.

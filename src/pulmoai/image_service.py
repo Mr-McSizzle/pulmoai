@@ -198,9 +198,14 @@ class ImageScreeningService:
         if enforce_modality_gate and gate_model is not None and expected_gate_class is not None:
             try:
                 gate_pil = Image.open(io.BytesIO(image_bytes)).convert("RGB").resize((64, 64), Image.Resampling.BICUBIC)
-                # Low-entropy / pixel standard deviation pre-check (Pass 4 E5)
+                # Low-entropy / low-texture pre-check (Pass 4 E5, extended in Pass 5 F6)
+                # Rejects near-constant inputs (std < 0.040) and artificial smooth gradients (lap_var < 5.0)
                 arr = np.array(gate_pil).astype(float) / 255.0
-                if arr.std() < 0.040:
+                arr_gray = (arr[:, :, 0] * 0.299 + arr[:, :, 1] * 0.587 + arr[:, :, 2] * 0.114) * 255.0
+                lap_var = float(
+                    (arr_gray[:-2, 1:-1] + arr_gray[2:, 1:-1] + arr_gray[1:-1, :-2] + arr_gray[1:-1, 2:] - 4 * arr_gray[1:-1, 1:-1]).var()
+                )
+                if arr.std() < 0.040 or lap_var < 5.0:
                     g_pred = "other"
                     g_conf = 1.0
                 else:

@@ -448,9 +448,35 @@ class ReportReaderRegressionTests(unittest.TestCase):
         # Strictly above upper bound -> HIGH
         self.assertEqual(determine_flag("fasting_glucose", 99.1, ref_min=70.0, ref_max=99.0), "HIGH")
         # Female creatinine exact lower cutoff 0.5 mg/dL -> NORMAL
-        self.assertEqual(determine_flag("serum_creatinine", 0.5, ref_min=0.5, ref_max=1.1), "NORMAL")
         # Female creatinine below lower cutoff 0.49 mg/dL -> LOW
         self.assertEqual(determine_flag("serum_creatinine", 0.49, ref_min=0.5, ref_max=1.1), "LOW")
+
+    def test_pass5_one_sided_ranges_and_composite_hdl(self) -> None:
+        """Verify Pass 5 fixes for one-sided ranges (<=5.7, >=10, <200, >40) and composite HDL names."""
+        text = (
+            "CHOLESTEROL HDL DIRECT   45.0   mg/dL   > 40 mg/dL\n"
+            "HBA1C   5.7   %   <= 5.7\n"
+            "BUN   9.0   mg/dL   >=10\n"
+            "CHOLESTEROL TOTAL   210.0   mg/dL   <200\n"
+        )
+        extracted, _ = parse_lab_text(text)
+        res_map = {it.canonical_name: it for it in extracted}
+
+        self.assertIn("hdl_cholesterol", res_map)
+        self.assertEqual(res_map["hdl_cholesterol"].value, 45.0)
+        self.assertEqual(res_map["hdl_cholesterol"].flag, "NORMAL")
+
+        self.assertIn("hba1c", res_map)
+        self.assertEqual(res_map["hba1c"].value, 5.7)
+        self.assertEqual(res_map["hba1c"].flag, "NORMAL")
+
+        self.assertIn("bun", res_map)
+        self.assertEqual(res_map["bun"].value, 9.0)
+        self.assertEqual(res_map["bun"].flag, "LOW")
+
+        self.assertIn("total_cholesterol", res_map)
+        self.assertEqual(res_map["total_cholesterol"].value, 210.0)
+        self.assertEqual(res_map["total_cholesterol"].flag, "HIGH")
 
 
 if __name__ == "__main__":

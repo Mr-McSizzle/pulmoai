@@ -1,0 +1,163 @@
+{
+  "metadata": {
+    "title": "Noise Pre-Check and Modality Gate Audit on High-Variance Inputs (Pass 5 F6)",
+    "timestamp": "2026-10-15T07:21:37Z",
+    "runtime_seconds": 14.3,
+    "total_samples_evaluated": 800,
+    "total_false_accepts": 0,
+    "overall_rejection_rate": 1.0,
+    "overall_rejection_rate_95ci_wilson": [
+      0.9952,
+      1.0
+    ],
+    "overall_false_accept_rate": 0.0,
+    "overall_false_accept_rate_95ci_wilson": [
+      0.0,
+      0.0048
+    ]
+  },
+  "precheck_architecture": {
+    "low_entropy_std_threshold": 0.04,
+    "synthetic_gradient_laplacian_threshold": 5.0,
+    "resnet18_modality_classes": [
+      "chest_xray",
+      "dermoscopy",
+      "fundus",
+      "blood_smear",
+      "other"
+    ],
+    "lofo_macro_far": 0.1903,
+    "worst_left_out_family": "synthetic_lab_reports (100.0%)",
+    "domain_boundaries_warning": "The Modality Gate recognizes only the specific image distributions it was trained on (pediatric chest x-ray, dermoscopy, fundus, blood smear, and specific training negatives). It cannot guarantee rejection of unseen out-of-domain photographic, histological, or synthetic formats."
+  },
+  "categories": {
+    "gaussian_noise_std_0.1": {
+      "total_tested": 100,
+      "rejections": 100,
+      "rejection_rate": 1.0,
+      "rejection_rate_95ci_wilson": [
+        0.963,
+        1.0
+      ],
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "false_accept_rate_95ci_wilson": [
+        0.0,
+        0.037
+      ],
+      "false_accept_details": []
+    },
+    "gaussian_noise_std_0.2": {
+      "total_tested": 100,
+      "rejections": 100,
+      "rejection_rate": 1.0,
+      "rejection_rate_95ci_wilson": [
+        0.963,
+        1.0
+      ],
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "false_accept_rate_95ci_wilson": [
+        0.0,
+        0.037
+      ],
+      "false_accept_details": []
+    },
+    "gaussian_noise_std_0.3": {
+      "total_tested": 100,
+      "rejections": 100,
+      "rejection_rate": 1.0,
+      "rejection_rate_95ci_wilson": [
+        0.963,
+        1.0
+      ],
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "false_accept_rate_95ci_wilson": [
+        0.0,
+        0.037
+      ],
+      "false_accept_details": []
+    },
+    "uniform_noise": {
+      "total_tested": 100,
+      "rejections": 100,
+      "rejection_rate": 1.0,
+      "rejection_rate_95ci_wilson": [
+        0.963,
+        1.0
+      ],
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "false_accept_rate_95ci_wilson": [
+        0.0,
+        0.037
+      ],
+      "false_accept_details": []
+    },
+    "checkerboards": {
+      "total_tested": 100,
+      "rejections": 100,
+      "rejection_rate": 1.0,
+      "rejection_rate_95ci_wilson": [
+        0.963,
+        1.0
+      ],
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "false_accept_rate_95ci_wilson": [
+        0.0,
+        0.037
+      ],
+      "false_accept_details": []
+    },
+    "smooth_gradients": {
+      "total_tested": 100,
+      "rejections": 100,
+      "rejection_rate": 1.0,
+      "rejection_rate_95ci_wilson": [
+        0.963,
+        1.0
+      ],
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "false_accept_rate_95ci_wilson": [
+        0.0,
+        0.037
+      ],
+      "false_accept_details": []
+    },
+    "rendered_text_pages": {
+      "total_tested": 100,
+      "rejections": 100,
+      "rejection_rate": 1.0,
+      "rejection_rate_95ci_wilson": [
+        0.963,
+        1.0
+      ],
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "false_accept_rate_95ci_wilson": [
+        0.0,
+        0.037
+      ],
+      "false_accept_details": []
+    },
+    "screenshots_ui_cards": {
+      "total_tested": 100,
+      "rejections": 100,
+      "rejection_rate": 1.0,
+      "rejection_rate_95ci_wilson": [
+        0.963,
+        1.0
+      ],
+      "false_accepts": 0,
+      "false_accept_rate": 0.0,
+      "false_accept_rate_95ci_wilson": [
+        0.0,
+        0.037
+      ],
+      "false_accept_details": []
+    }
+  }
+}
