@@ -1,0 +1,478 @@
+{
+  "metadata": {
+    "title": "PulmoAI Future Risk Audit Pass 4 (E3 & E4)",
+    "timestamp": "2026-10-15T02:20:55Z",
+    "evaluation_design": "Temporal holdout (Train: 1999-2010, Test: 2011-2014) linked to CDC Public-Use Linked Mortality Files (Dec 31, 2019 cutoff)",
+    "training_cohort_size": 35332,
+    "holdout_cohort_size": 11949,
+    "holdout_all_cause_deaths": 1095,
+    "holdout_cvd_deaths": 347
+  },
+  "primary_prevention_cvd_comparison_e3": {
+    "cohort_description": "Ages 40-79 years without prior cardiovascular disease (MCQ160B/C/D/E/F = 0) on temporal holdout (2011-2014)",
+    "sample_size_holdout": 5899,
+    "fatal_cvd_events_total_followup": 110,
+    "fatal_cvd_events_5yr": 65,
+    "models": {
+      "published_pce_2013": {
+        "display_name": "Published 2013 ACC/AHA Pooled Cohort Equations (9 inputs)",
+        "c_index": 0.7391,
+        "c_index_95ci": [
+          0.691,
+          0.786
+        ],
+        "auroc_5yr": 0.7178,
+        "auroc_5yr_95ci": [
+          0.6554,
+          0.7776
+        ]
+      },
+      "cox_pce_inputs_only": {
+        "display_name": "In-repo Cox PH Model (Trained on 1999-2010 using ONLY 9 PCE inputs)",
+        "c_index": 0.7864,
+        "c_index_95ci": [
+          0.7431,
+          0.8256
+        ],
+        "auroc_5yr": 0.7771,
+        "auroc_5yr_95ci": [
+          0.7296,
+          0.8339
+        ]
+      },
+      "cox_full_multivariable": {
+        "display_name": "Full Multivariable Cox PH Model (Adding vitals, lifestyle, and specialized labs)",
+        "c_index": 0.8297,
+        "c_index_95ci": [
+          0.7885,
+          0.8663
+        ],
+        "auroc_5yr": 0.8234,
+        "auroc_5yr_95ci": [
+          0.7738,
+          0.8732
+        ]
+      }
+    },
+    "paired_comparisons": {
+      "full_cox_vs_pce_inputs_cox": {
+        "delta_c_index": 0.0432,
+        "delta_c_index_95ci": [
+          0.0244,
+          0.0658
+        ],
+        "delta_auroc_5yr": 0.0463,
+        "delta_auroc_5yr_95ci": [
+          0.0231,
+          0.0686
+        ],
+        "interpretation": "Added value supported by CI"
+      },
+      "pce_inputs_cox_vs_published_pce": {
+        "delta_c_index": 0.0473,
+        "delta_c_index_95ci": [
+          0.016,
+          0.0791
+        ],
+        "delta_auroc_5yr": 0.0593,
+        "delta_auroc_5yr_95ci": [
+          0.0193,
+          0.1097
+        ],
+        "interpretation": "Added value supported by CI"
+      }
+    },
+    "predictor_breakdown": {
+      "pce_inputs": [
+        "age",
+        "sex_male",
+        "race_black",
+        "total_cholesterol",
+        "hdl_cholesterol",
+        "systolic_bp",
+        "bp_medication",
+        "current_smoker",
+        "target_diabetes"
+      ],
+      "added_non_lab_predictors": [
+        "bmi",
+        "waist_cm",
+        "diastolic_bp",
+        "pulse_bpm",
+        "drinks_per_day",
+        "physically_active",
+        "target_hypertension"
+      ],
+      "added_specialized_lab_predictors_requiring_blood_draws": [
+        "fasting_glucose",
+        "hba1c",
+        "serum_creatinine",
+        "bun",
+        "albumin",
+        "uric_acid"
+      ],
+      "clinical_barrier_note": "Specialized lab tests (fasting glucose, HbA1c, serum creatinine, BUN, albumin, uric acid) require venipuncture and laboratory assays that a patient visiting an exploratory web interface or routine health checkup commonly does not possess."
+    },
+    "race_handling_disclosure": "Per the 2013 ACC/AHA Guideline (Goff et al., Circulation 2014;129:S49-S73, Section 4.1), because sex- and race-specific pooled cohort models were derived exclusively for Non-Hispanic African American and Non-Hispanic White cohorts, the guideline explicitly specifies using the Non-Hispanic White equations for individuals of other racial and ethnic backgrounds (e.g., Hispanic, Asian American, American Indian, multiracial). Risk estimates may under- or over-estimate risk in these populations."
+  },
+  "subgroup_metrics_with_bootstrap_95ci_e4": {
+    "non_hispanic_asian": {
+      "subgroup": "Non-Hispanic Asian (NHANES race_ethnicity = 6.0)",
+      "n_subjects": 1529,
+      "deaths_observed": 53,
+      "c_index": 0.8618,
+      "c_index_95ci": [
+        0.8032,
+        0.914
+      ],
+      "auroc_5yr": 0.8834,
+      "auroc_5yr_95ci": [
+        0.8146,
+        0.9465
+      ]
+    },
+    "males": {
+      "subgroup": "Males (sex_male = 1)",
+      "n_subjects": 5802,
+      "deaths_observed": 596,
+      "c_index": 0.8527,
+      "c_index_95ci": [
+        0.8347,
+        0.8683
+      ],
+      "auroc_5yr": 0.8651,
+      "auroc_5yr_95ci": [
+        0.8461,
+        0.885
+      ]
+    },
+    "females": {
+      "subgroup": "Females (sex_male = 0)",
+      "n_subjects": 6147,
+      "deaths_observed": 499,
+      "c_index": 0.867,
+      "c_index_95ci": [
+        0.8507,
+        0.8809
+      ],
+      "auroc_5yr": 0.8775,
+      "auroc_5yr_95ci": [
+        0.8571,
+        0.8949
+      ]
+    }
+  },
+  "decile_calibration_all_cause": {
+    "target": "all_cause_mortality",
+    "n_evaluated": 11905,
+    "observed_5yr_events": 745,
+    "expected_5yr_events": 739.6,
+    "observed_to_expected_ratio": 1.007,
+    "oe_ratio_95ci": [
+      0.937,
+      1.082
+    ],
+    "calibration_in_the_large_intercept": 0.0096,
+    "raw_brier_score_5yr": 0.0468,
+    "intercept_recalibrated_brier_5yr": 0.0468,
+    "decile_calibration_table": [
+      {
+        "decile_index": 1,
+        "decile_range": "(-0.000201, 0.00258]",
+        "n_subjects": 1191,
+        "observed_events": 6,
+        "observed_rate": 0.005,
+        "observed_95ci": [
+          0.0017,
+          0.0092
+        ],
+        "mean_predicted_risk": 0.0019,
+        "predicted_to_observed_ratio": 0.385
+      },
+      {
+        "decile_index": 2,
+        "decile_range": "(0.00258, 0.00425]",
+        "n_subjects": 1190,
+        "observed_events": 8,
+        "observed_rate": 0.0067,
+        "observed_95ci": [
+          0.0025,
+          0.0118
+        ],
+        "mean_predicted_risk": 0.0033,
+        "predicted_to_observed_ratio": 0.498
+      },
+      {
+        "decile_index": 3,
+        "decile_range": "(0.00425, 0.00672]",
+        "n_subjects": 1191,
+        "observed_events": 11,
+        "observed_rate": 0.0092,
+        "observed_95ci": [
+          0.0042,
+          0.0151
+        ],
+        "mean_predicted_risk": 0.0054,
+        "predicted_to_observed_ratio": 0.583
+      },
+      {
+        "decile_index": 4,
+        "decile_range": "(0.00672, 0.011]",
+        "n_subjects": 1190,
+        "observed_events": 9,
+        "observed_rate": 0.0076,
+        "observed_95ci": [
+          0.0034,
+          0.0126
+        ],
+        "mean_predicted_risk": 0.0086,
+        "predicted_to_observed_ratio": 1.142
+      },
+      {
+        "decile_index": 5,
+        "decile_range": "(0.011, 0.0179]",
+        "n_subjects": 1191,
+        "observed_events": 16,
+        "observed_rate": 0.0134,
+        "observed_95ci": [
+          0.0076,
+          0.0202
+        ],
+        "mean_predicted_risk": 0.0141,
+        "predicted_to_observed_ratio": 1.049
+      },
+      {
+        "decile_index": 6,
+        "decile_range": "(0.0179, 0.0309]",
+        "n_subjects": 1190,
+        "observed_events": 27,
+        "observed_rate": 0.0227,
+        "observed_95ci": [
+          0.0143,
+          0.0311
+        ],
+        "mean_predicted_risk": 0.0237,
+        "predicted_to_observed_ratio": 1.047
+      },
+      {
+        "decile_index": 7,
+        "decile_range": "(0.0309, 0.0526]",
+        "n_subjects": 1190,
+        "observed_events": 34,
+        "observed_rate": 0.0286,
+        "observed_95ci": [
+          0.0193,
+          0.0387
+        ],
+        "mean_predicted_risk": 0.0407,
+        "predicted_to_observed_ratio": 1.425
+      },
+      {
+        "decile_index": 8,
+        "decile_range": "(0.0526, 0.0929]",
+        "n_subjects": 1191,
+        "observed_events": 62,
+        "observed_rate": 0.0521,
+        "observed_95ci": [
+          0.0395,
+          0.0647
+        ],
+        "mean_predicted_risk": 0.07,
+        "predicted_to_observed_ratio": 1.344
+      },
+      {
+        "decile_index": 9,
+        "decile_range": "(0.0929, 0.19]",
+        "n_subjects": 1190,
+        "observed_events": 149,
+        "observed_rate": 0.1252,
+        "observed_95ci": [
+          0.1067,
+          0.1445
+        ],
+        "mean_predicted_risk": 0.1343,
+        "predicted_to_observed_ratio": 1.072
+      },
+      {
+        "decile_index": 10,
+        "decile_range": "(0.19, 1.0]",
+        "n_subjects": 1191,
+        "observed_events": 423,
+        "observed_rate": 0.3552,
+        "observed_95ci": [
+          0.3283,
+          0.3829
+        ],
+        "mean_predicted_risk": 0.319,
+        "predicted_to_observed_ratio": 0.898
+      }
+    ]
+  },
+  "decile_calibration_cardiovascular_e4": {
+    "target": "cardiovascular_mortality",
+    "n_evaluated": 11411,
+    "observed_5yr_events": 244,
+    "expected_5yr_events": 236.4,
+    "observed_to_expected_ratio": 1.032,
+    "oe_ratio_95ci": [
+      0.91,
+      1.17
+    ],
+    "calibration_in_the_large_intercept": 0.0356,
+    "raw_brier_score_5yr": 0.0184,
+    "intercept_recalibrated_brier_5yr": 0.0184,
+    "decile_calibration_table": [
+      {
+        "decile_index": 1,
+        "decile_range": "(-0.000729, 0.001]",
+        "n_subjects": 1142,
+        "observed_events": 2,
+        "observed_rate": 0.0018,
+        "observed_95ci": [
+          0.0,
+          0.0044
+        ],
+        "mean_predicted_risk": 0.0008,
+        "predicted_to_observed_ratio": 0.447
+      },
+      {
+        "decile_index": 2,
+        "decile_range": "(0.001, 0.00153]",
+        "n_subjects": 1141,
+        "observed_events": 1,
+        "observed_rate": 0.0009,
+        "observed_95ci": [
+          0.0,
+          0.0026
+        ],
+        "mean_predicted_risk": 0.0012,
+        "predicted_to_observed_ratio": 1.424
+      },
+      {
+        "decile_index": 3,
+        "decile_range": "(0.00153, 0.00224]",
+        "n_subjects": 1141,
+        "observed_events": 1,
+        "observed_rate": 0.0009,
+        "observed_95ci": [
+          0.0,
+          0.0026
+        ],
+        "mean_predicted_risk": 0.0019,
+        "predicted_to_observed_ratio": 2.131
+      },
+      {
+        "decile_index": 4,
+        "decile_range": "(0.00224, 0.00344]",
+        "n_subjects": 1141,
+        "observed_events": 0,
+        "observed_rate": 0.0,
+        "observed_95ci": [
+          0.0,
+          0.0009
+        ],
+        "mean_predicted_risk": 0.0028,
+        "predicted_to_observed_ratio": 280.127
+      },
+      {
+        "decile_index": 5,
+        "decile_range": "(0.00344, 0.00546]",
+        "n_subjects": 1141,
+        "observed_events": 5,
+        "observed_rate": 0.0044,
+        "observed_95ci": [
+          0.0009,
+          0.0088
+        ],
+        "mean_predicted_risk": 0.0044,
+        "predicted_to_observed_ratio": 0.997
+      },
+      {
+        "decile_index": 6,
+        "decile_range": "(0.00546, 0.00901]",
+        "n_subjects": 1141,
+        "observed_events": 5,
+        "observed_rate": 0.0044,
+        "observed_95ci": [
+          0.0009,
+          0.0088
+        ],
+        "mean_predicted_risk": 0.007,
+        "predicted_to_observed_ratio": 1.604
+      },
+      {
+        "decile_index": 7,
+        "decile_range": "(0.00901, 0.0152]",
+        "n_subjects": 1141,
+        "observed_events": 7,
+        "observed_rate": 0.0061,
+        "observed_95ci": [
+          0.0018,
+          0.0114
+        ],
+        "mean_predicted_risk": 0.0118,
+        "predicted_to_observed_ratio": 1.929
+      },
+      {
+        "decile_index": 8,
+        "decile_range": "(0.0152, 0.0268]",
+        "n_subjects": 1141,
+        "observed_events": 9,
+        "observed_rate": 0.0079,
+        "observed_95ci": [
+          0.0035,
+          0.0131
+        ],
+        "mean_predicted_risk": 0.0201,
+        "predicted_to_observed_ratio": 2.542
+      },
+      {
+        "decile_index": 9,
+        "decile_range": "(0.0268, 0.0553]",
+        "n_subjects": 1141,
+        "observed_events": 42,
+        "observed_rate": 0.0368,
+        "observed_95ci": [
+          0.0263,
+          0.0482
+        ],
+        "mean_predicted_risk": 0.0385,
+        "predicted_to_observed_ratio": 1.045
+      },
+      {
+        "decile_index": 10,
+        "decile_range": "(0.0553, 0.946]",
+        "n_subjects": 1141,
+        "observed_events": 172,
+        "observed_rate": 0.1507,
+        "observed_95ci": [
+          0.1306,
+          0.1718
+        ],
+        "mean_predicted_risk": 0.1187,
+        "predicted_to_observed_ratio": 0.788
+      }
+    ]
+  },
+  "idrs_diabetes_comparison_e1": {
+    "sample_size_holdout": 10034,
+    "diabetes_cases": 1229,
+    "prevalence_pct": 12.25,
+    "published_idrs_auroc": 0.7798,
+    "published_idrs_auroc_95ci": [
+      0.7676,
+      0.7916
+    ],
+    "ml_4feature_auroc": 0.8303,
+    "ml_4feature_auroc_95ci": [
+      0.8188,
+      0.8398
+    ],
+    "delta_auroc_point": 0.0505,
+    "delta_auroc_95ci": [
+      0.0417,
+      0.0588
+    ],
+    "spectrum_shift_note": "IDRS was developed by Mohan et al. (JAPI 2005) in Chennai, India (CURES cohort) specifically to screen for UNDIAGNOSED type 2 diabetes in an Asian Indian population. Evaluating IDRS on US NHANES against self-reported DIAGNOSED diabetes evaluates a different clinical phenotype (known diagnosis rather than undetected asymptomatic hyperglycemia) in a multi-ethnic US population."
+  }
+}

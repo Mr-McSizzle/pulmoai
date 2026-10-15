@@ -1,0 +1,396 @@
+{
+  "audit_metadata": {
+    "module": "Single-Cell Lung Atlas Classifier",
+    "audit_timestamp": "2026-10-14T19:30:00Z",
+    "audit_type": "Rigorous Leave-One-Study-Out Empirical Re-evaluation",
+    "deployed_artifact": "ensemble_benchmark_best.joblib"
+  },
+  "part_1a_artifact_verification": {
+    "deployed_artifact_file": "models/ensemble_benchmark_best.joblib",
+    "deployed_pipeline_architecture": "CalibratedClassifierCV(cv=5, method='sigmoid', estimator=Pipeline([('select', SelectKBest(k=500)), ('classifier', Pipeline([('scale', StandardScaler()), ('classifier', LinearSVC(C=0.1, class_weight='balanced'))]))]))",
+    "input_type": "raw_gene_counts",
+    "input_contract": "30,566 human genes normalized via CPM followed by log1p",
+    "uses_hallmark_pathways": false,
+    "training_cohort_scale": {
+      "total_profiles": 372,
+      "source_studies": 16,
+      "total_single_cells": 1470730,
+      "class_breakdown": {
+        "Donor": 128,
+        "COPD": 46,
+        "PF": 179,
+        "COVID19": 19
+      }
+    },
+    "melms_donors_in_training_set": {
+      "is_in_deployed_model": false,
+      "melms_donor_count": 26,
+      "melms_composition": "19 severe COVID-19 autopsy, 7 normal controls (GSE171524)",
+      "explanation": "Tested: The deployed model artifact was fit strictly on data/processed/allcells_pseudobulk_counts.npz, which contains exactly 16 atlas studies (372 profiles, 19 COVID donors). The 26 Melms donors were evaluated separately in research benchmarks B and D, but are NOT present in the deployed model checkpoint."
+    }
+  },
+  "part_1b_number_reconciliation": {
+    "finding": "The numbers previously cited in the report came from different, non-unified experimental runs rather than the deployed pipeline.",
+    "discrepancies_identified": {
+      "overall_accuracy_66_4": {
+        "reported_number": 0.664,
+        "actual_deployed_logo_accuracy": 0.629,
+        "provenance": "Tested: 66.4% (247/372 = 0.663978) was produced by the 'Pathway Scores Only (Hallmark 50)' run in reports/lung_v2_benchmark.json, or conflated with Donor recall (85/128 = 0.6641) in reports/allcells_atlas/analysis_summary.json. The pathway run had 0% COVID-19 recall (0/19)."
+      },
+      "macro_f1_0_584": {
+        "reported_number": 0.584,
+        "actual_deployed_logo_macro_f1": 0.4555,
+        "provenance": "Tested: Conflated across earlier uncalibrated test iterations where balanced accuracy and macro-F1 were mixed."
+      },
+      "donor_recall_70_3": {
+        "reported_number": 0.703,
+        "actual_deployed_donor_recall": 0.6641,
+        "provenance": "Tested: Produced by reports/lung_v3_benchmark.json Configuration C (Hallmark pathway scores, atlas only, Donor recall = 90/128 = 70.31%)."
+      },
+      "copd_recall_73_9": {
+        "reported_number": 0.739,
+        "actual_deployed_copd_recall": 0.6304,
+        "provenance": "Tested: Produced by reports/ensemble_benchmark/analysis_summary.json (COPD recall = 34/46 = 73.91%)."
+      },
+      "pf_recall_69_8": {
+        "reported_number": 0.698,
+        "actual_deployed_pf_recall": 0.6704,
+        "provenance": "Tested: Produced by reports/lung_v2_benchmark.json 'Pathway Scores Only' (PF recall = 124/179 = 69.27% ~ 125/179 = 69.83%)."
+      },
+      "covid_recall_10_5": {
+        "reported_number": 0.105,
+        "actual_deployed_covid_recall": 0.0,
+        "provenance": "Tested: Produced by reports/lung_v3_benchmark.json Configuration A (Common Gene Set, COVID recall = 2/19 = 10.53%)."
+      },
+      "baseline_majority_accuracy": {
+        "reported_number": 0.344,
+        "actual_correct_majority_baseline": 0.4812,
+        "provenance": "Tested: The old report claimed a baseline prior of 34.4%, which was the Donor proportion (128/372 = 34.41%). However, the true majority class is Pulmonary Fibrosis (PF, n=179), so the true majority-class baseline is 179/372 = 48.12%."
+      }
+    }
+  },
+  "part_1c_rigorous_evaluation": {
+    "validation_protocol": "Leave-One-Study-Out Cross-Validation (LOGO-CV) across all 16 atlas studies",
+    "majority_class_baseline": {
+      "majority_class": "PF",
+      "majority_support": 179,
+      "total_profiles": 372,
+      "baseline_accuracy": 0.4812
+    },
+    "overall_metrics": {
+      "accuracy": 0.629,
+      "balanced_accuracy": 0.4912,
+      "macro_f1": 0.4555,
+      "weighted_f1": 0.653
+    },
+    "per_class_metrics": {
+      "Donor": {
+        "precision": 0.8416,
+        "recall": 0.6641,
+        "f1": 0.7424,
+        "support": 128
+      },
+      "COPD": {
+        "precision": 0.2339,
+        "recall": 0.6304,
+        "f1": 0.3412,
+        "support": 46
+      },
+      "PF": {
+        "precision": 0.8219,
+        "recall": 0.6704,
+        "f1": 0.7385,
+        "support": 179
+      },
+      "COVID19": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 19
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "Donor",
+        "COPD",
+        "PF",
+        "COVID19"
+      ],
+      "matrix": [
+        [
+          85,
+          38,
+          5,
+          0
+        ],
+        [
+          5,
+          29,
+          12,
+          0
+        ],
+        [
+          3,
+          55,
+          120,
+          1
+        ],
+        [
+          8,
+          2,
+          9,
+          0
+        ]
+      ]
+    },
+    "covid_recall_by_cohort": {
+      "GSE158127": {
+        "n_covid_donors": 12,
+        "correct_predictions": 0,
+        "recall": 0.0
+      },
+      "GSE171668": {
+        "n_covid_donors": 7,
+        "correct_predictions": 0,
+        "recall": 0.0
+      },
+      "Melms_GSE171524_Autopsy_External": {
+        "n_covid_donors": 19,
+        "correct_predictions": 0,
+        "recall": 0.0,
+        "status": "External out-of-training validation; autopsy whole-lung tissue with distinct library prep."
+      }
+    },
+    "melms_external_validation": {
+      "cohort": "Melms et al. Autopsy Whole-Lung (GSE171524)",
+      "total_samples": 26,
+      "matched_genes_to_atlas": 14907,
+      "covid_donors": 19,
+      "covid_correct": 0,
+      "covid_recall": 0.0,
+      "donor_controls": 7,
+      "donor_correct": 1,
+      "donor_recall": 0.1429,
+      "overall_accuracy": 0.0385,
+      "melms_confusion_matrix": [
+        [
+          1,
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          19,
+          0
+        ]
+      ]
+    },
+    "platt_probability_calibration": {
+      "brier_score": 0.5392,
+      "expected_calibration_error_ece": 0.1121,
+      "bin_details": [
+        {
+          "bin_lower": 0.0,
+          "bin_upper": 0.1,
+          "count": 0,
+          "accuracy": 0.0,
+          "confidence": 0.0,
+          "abs_calibration_error": 0.0
+        },
+        {
+          "bin_lower": 0.1,
+          "bin_upper": 0.2,
+          "count": 0,
+          "accuracy": 0.0,
+          "confidence": 0.0,
+          "abs_calibration_error": 0.0
+        },
+        {
+          "bin_lower": 0.2,
+          "bin_upper": 0.3,
+          "count": 0,
+          "accuracy": 0.0,
+          "confidence": 0.0,
+          "abs_calibration_error": 0.0
+        },
+        {
+          "bin_lower": 0.3,
+          "bin_upper": 0.4,
+          "count": 16,
+          "accuracy": 0.3125,
+          "confidence": 0.3492,
+          "abs_calibration_error": 0.0367
+        },
+        {
+          "bin_lower": 0.4,
+          "bin_upper": 0.5,
+          "count": 31,
+          "accuracy": 0.5806,
+          "confidence": 0.457,
+          "abs_calibration_error": 0.1237
+        },
+        {
+          "bin_lower": 0.5,
+          "bin_upper": 0.6,
+          "count": 51,
+          "accuracy": 0.4706,
+          "confidence": 0.5481,
+          "abs_calibration_error": 0.0775
+        },
+        {
+          "bin_lower": 0.6,
+          "bin_upper": 0.7,
+          "count": 52,
+          "accuracy": 0.5192,
+          "confidence": 0.6591,
+          "abs_calibration_error": 0.1399
+        },
+        {
+          "bin_lower": 0.7,
+          "bin_upper": 0.8,
+          "count": 63,
+          "accuracy": 0.6984,
+          "confidence": 0.7542,
+          "abs_calibration_error": 0.0558
+        },
+        {
+          "bin_lower": 0.8,
+          "bin_upper": 0.9,
+          "count": 118,
+          "accuracy": 0.7288,
+          "confidence": 0.8522,
+          "abs_calibration_error": 0.1234
+        },
+        {
+          "bin_lower": 0.9,
+          "bin_upper": 1.0,
+          "count": 41,
+          "accuracy": 0.7317,
+          "confidence": 0.9261,
+          "abs_calibration_error": 0.1944
+        }
+      ]
+    },
+    "coverage_vs_accuracy_curve": [
+      {
+        "coverage_percent": 100,
+        "min_confidence_threshold": 0.3037,
+        "samples_retained": 372,
+        "accuracy": 0.629,
+        "macro_f1": 0.4555
+      },
+      {
+        "coverage_percent": 95,
+        "min_confidence_threshold": 0.4161,
+        "samples_retained": 353,
+        "accuracy": 0.6431,
+        "macro_f1": 0.4594
+      },
+      {
+        "coverage_percent": 90,
+        "min_confidence_threshold": 0.4726,
+        "samples_retained": 335,
+        "accuracy": 0.6478,
+        "macro_f1": 0.461
+      },
+      {
+        "coverage_percent": 85,
+        "min_confidence_threshold": 0.5174,
+        "samples_retained": 316,
+        "accuracy": 0.6582,
+        "macro_f1": 0.4685
+      },
+      {
+        "coverage_percent": 80,
+        "min_confidence_threshold": 0.5547,
+        "samples_retained": 298,
+        "accuracy": 0.6745,
+        "macro_f1": 0.4783
+      },
+      {
+        "coverage_percent": 75,
+        "min_confidence_threshold": 0.5882,
+        "samples_retained": 279,
+        "accuracy": 0.681,
+        "macro_f1": 0.4827
+      },
+      {
+        "coverage_percent": 70,
+        "min_confidence_threshold": 0.6352,
+        "samples_retained": 260,
+        "accuracy": 0.6923,
+        "macro_f1": 0.4894
+      },
+      {
+        "coverage_percent": 60,
+        "min_confidence_threshold": 0.699,
+        "samples_retained": 223,
+        "accuracy": 0.722,
+        "macro_f1": 0.5167
+      },
+      {
+        "coverage_percent": 50,
+        "min_confidence_threshold": 0.768,
+        "samples_retained": 186,
+        "accuracy": 0.7258,
+        "macro_f1": 0.5235
+      },
+      {
+        "coverage_percent": 40,
+        "min_confidence_threshold": 0.8067,
+        "samples_retained": 149,
+        "accuracy": 0.7315,
+        "macro_f1": 0.531
+      },
+      {
+        "coverage_percent": 30,
+        "min_confidence_threshold": 0.8464,
+        "samples_retained": 112,
+        "accuracy": 0.7411,
+        "macro_f1": 0.7323
+      }
+    ],
+    "study_clustered_bootstrap_95ci": {
+      "iterations": 1000,
+      "accuracy_95ci": [
+        0.4131,
+        0.8329
+      ],
+      "balanced_accuracy_95ci": [
+        0.3605,
+        0.7291
+      ],
+      "macro_f1_95ci": [
+        0.3256,
+        0.6211
+      ]
+    }
+  },
+  "part_1d_corrected_counts_everywhere": {
+    "studies": 16,
+    "profiles": 372,
+    "cells": 1470730,
+    "covid_donors_in_deployed_training": 19,
+    "melms_donors_external": 26,
+    "class_distribution": {
+      "Donor": 128,
+      "COPD": 46,
+      "PF": 179,
+      "COVID19": 19
+    }
+  }
+}

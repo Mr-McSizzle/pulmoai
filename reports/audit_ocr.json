@@ -1,0 +1,768 @@
+{
+  "evaluation_note": "synthetic test set; real-world accuracy unknown",
+  "description": "Honest entity-level evaluation of PulmoAI laboratory report reader across 5 synthetic clinical report layouts (including Indian diagnostic chains: Dr Lal, SRL/Agilus, Metropolis) and 6 physical degradation tiers (native digital PDF, clean OCR scan, rotation, blur, JPEG compression, and phone-style perspective distortion).",
+  "unsupported_claims_removed": [
+    "LabCorp / Quest validation claims removed (not evaluated on proprietary commercial formats).",
+    ">99.5% entity identification claim removed (true only for clean digital PDFs with embedded text layers; severely drops on scanned images)."
+  ],
+  "sex_specific_reference_ranges": {
+    "hemoglobin": {
+      "male": "13.5 - 17.5 g/dL",
+      "female": "12.0 - 15.5 g/dL"
+    },
+    "serum_creatinine": {
+      "male": "0.7 - 1.3 mg/dL",
+      "female": "0.5 - 1.1 mg/dL"
+    },
+    "hdl_cholesterol": {
+      "male": ">= 40 mg/dL",
+      "female": ">= 50 mg/dL"
+    }
+  },
+  "transfer_safety_rule": "Requires explicit clinician/user confirmation before transferring extracted values; transfer blocked when confidence < 0.70.",
+  "aggregate_metrics": {
+    "total_layouts": 5,
+    "total_degradation_tiers": 6,
+    "total_evaluations": 204,
+    "total_exact_matches": 165,
+    "overall_exact_match_accuracy": 0.8088
+  },
+  "degradation_breakdown": {
+    "clean_pdf": {
+      "total_targets": 34,
+      "exact_matches": 33,
+      "detected": 33,
+      "value_mismatches": 0,
+      "missed": 1,
+      "exact_match_accuracy": 0.9706,
+      "detection_recall": 0.9706,
+      "value_fidelity": 1.0
+    },
+    "clean_ocr": {
+      "total_targets": 34,
+      "exact_matches": 32,
+      "detected": 33,
+      "value_mismatches": 1,
+      "missed": 1,
+      "exact_match_accuracy": 0.9412,
+      "detection_recall": 0.9706,
+      "value_fidelity": 0.9697
+    },
+    "rotation": {
+      "total_targets": 34,
+      "exact_matches": 23,
+      "detected": 23,
+      "value_mismatches": 0,
+      "missed": 11,
+      "exact_match_accuracy": 0.6765,
+      "detection_recall": 0.6765,
+      "value_fidelity": 1.0
+    },
+    "blur": {
+      "total_targets": 34,
+      "exact_matches": 19,
+      "detected": 19,
+      "value_mismatches": 0,
+      "missed": 15,
+      "exact_match_accuracy": 0.5588,
+      "detection_recall": 0.5588,
+      "value_fidelity": 1.0
+    },
+    "jpeg_compression": {
+      "total_targets": 34,
+      "exact_matches": 32,
+      "detected": 33,
+      "value_mismatches": 1,
+      "missed": 1,
+      "exact_match_accuracy": 0.9412,
+      "detection_recall": 0.9706,
+      "value_fidelity": 0.9697
+    },
+    "perspective": {
+      "total_targets": 34,
+      "exact_matches": 26,
+      "detected": 26,
+      "value_mismatches": 0,
+      "missed": 8,
+      "exact_match_accuracy": 0.7647,
+      "detection_recall": 0.7647,
+      "value_fidelity": 1.0
+    }
+  },
+  "layout_breakdown": {
+    "dr_lal_pathlabs": {
+      "layout_name": "Dr Lal PathLabs Style (Indian Corporate Chain)",
+      "pdf_exact_accuracy": 1.0,
+      "clean_ocr_accuracy": 0.8571,
+      "perspective_accuracy": 1.0,
+      "overall_exact_accuracy": 0.7619
+    },
+    "srl_agilus_diagnostics": {
+      "layout_name": "Agilus Diagnostics / SRL Style (Indian Pathology)",
+      "pdf_exact_accuracy": 0.8571,
+      "clean_ocr_accuracy": 0.8571,
+      "perspective_accuracy": 0.8571,
+      "overall_exact_accuracy": 0.8571
+    },
+    "metropolis_healthcare": {
+      "layout_name": "Metropolis Healthcare Style (Indian Specialty Care)",
+      "pdf_exact_accuracy": 1.0,
+      "clean_ocr_accuracy": 1.0,
+      "perspective_accuracy": 0.0,
+      "overall_exact_accuracy": 0.5
+    },
+    "standard_hospital_emr": {
+      "layout_name": "Standard Hospital EMR Style (Electronic Export)",
+      "pdf_exact_accuracy": 1.0,
+      "clean_ocr_accuracy": 1.0,
+      "perspective_accuracy": 1.0,
+      "overall_exact_accuracy": 0.9524
+    },
+    "compact_clinic_summary": {
+      "layout_name": "Compact Clinic Summary Style (Narrative Walk-in Format)",
+      "pdf_exact_accuracy": 1.0,
+      "clean_ocr_accuracy": 1.0,
+      "perspective_accuracy": 1.0,
+      "overall_exact_accuracy": 1.0
+    }
+  },
+  "detailed_results_by_layout": {
+    "dr_lal_pathlabs": {
+      "layout_name": "Dr Lal PathLabs Style (Indian Corporate Chain)",
+      "patient_sex": "male",
+      "tier_results": {
+        "clean_pdf": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "pdf_text_layer",
+          "errors": []
+        },
+        "clean_ocr": {
+          "total_targets": 7,
+          "exact_matches": 6,
+          "test_detected_count": 7,
+          "value_mismatches": 1,
+          "missed_count": 0,
+          "exact_match_accuracy": 0.8571,
+          "detection_recall": 1.0,
+          "value_fidelity": 0.8571,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "serum_creatinine",
+              "expected_val": 1.1,
+              "extracted_val": 0.7,
+              "reason": "value_mismatch"
+            }
+          ]
+        },
+        "rotation": {
+          "total_targets": 7,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 1,
+          "exact_match_accuracy": 0.8571,
+          "detection_recall": 0.8571,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 0.8571,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "fasting_glucose",
+              "expected_val": 108.0,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "blur": {
+          "total_targets": 7,
+          "exact_matches": 0,
+          "test_detected_count": 0,
+          "value_mismatches": 0,
+          "missed_count": 7,
+          "exact_match_accuracy": 0.0,
+          "detection_recall": 0.0,
+          "value_fidelity": 0.0,
+          "flag_accuracy": 0.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "fasting_glucose",
+              "expected_val": 108.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "hba1c",
+              "expected_val": 6.2,
+              "reason": "missed_test"
+            },
+            {
+              "test": "total_cholesterol",
+              "expected_val": 215.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "hdl_cholesterol",
+              "expected_val": 42.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "triglycerides",
+              "expected_val": 165.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "serum_creatinine",
+              "expected_val": 1.1,
+              "reason": "missed_test"
+            },
+            {
+              "test": "hemoglobin",
+              "expected_val": 14.5,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "jpeg_compression": {
+          "total_targets": 7,
+          "exact_matches": 6,
+          "test_detected_count": 7,
+          "value_mismatches": 1,
+          "missed_count": 0,
+          "exact_match_accuracy": 0.8571,
+          "detection_recall": 1.0,
+          "value_fidelity": 0.8571,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "serum_creatinine",
+              "expected_val": 1.1,
+              "extracted_val": 1.0,
+              "reason": "value_mismatch"
+            }
+          ]
+        },
+        "perspective": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        }
+      }
+    },
+    "srl_agilus_diagnostics": {
+      "layout_name": "Agilus Diagnostics / SRL Style (Indian Pathology)",
+      "patient_sex": "female",
+      "tier_results": {
+        "clean_pdf": {
+          "total_targets": 7,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 1,
+          "exact_match_accuracy": 0.8571,
+          "detection_recall": 0.8571,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 0.8571,
+          "extraction_method": "pdf_text_layer",
+          "errors": [
+            {
+              "test": "ldl_cholesterol",
+              "expected_val": 104.0,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "clean_ocr": {
+          "total_targets": 7,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 1,
+          "exact_match_accuracy": 0.8571,
+          "detection_recall": 0.8571,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 0.8571,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "ldl_cholesterol",
+              "expected_val": 104.0,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "rotation": {
+          "total_targets": 7,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 1,
+          "exact_match_accuracy": 0.8571,
+          "detection_recall": 0.8571,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 0.7143,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "hba1c",
+              "expected_flag": "NORMAL",
+              "extracted_flag": "HIGH",
+              "reason": "flag_mismatch"
+            },
+            {
+              "test": "ldl_cholesterol",
+              "expected_val": 104.0,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "blur": {
+          "total_targets": 7,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 1,
+          "exact_match_accuracy": 0.8571,
+          "detection_recall": 0.8571,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 0.8571,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "ldl_cholesterol",
+              "expected_val": 104.0,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "jpeg_compression": {
+          "total_targets": 7,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 1,
+          "exact_match_accuracy": 0.8571,
+          "detection_recall": 0.8571,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 0.8571,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "ldl_cholesterol",
+              "expected_val": 104.0,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "perspective": {
+          "total_targets": 7,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 1,
+          "exact_match_accuracy": 0.8571,
+          "detection_recall": 0.8571,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 0.8571,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "ldl_cholesterol",
+              "expected_val": 104.0,
+              "reason": "missed_test"
+            }
+          ]
+        }
+      }
+    },
+    "metropolis_healthcare": {
+      "layout_name": "Metropolis Healthcare Style (Indian Specialty Care)",
+      "patient_sex": "male",
+      "tier_results": {
+        "clean_pdf": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "pdf_text_layer",
+          "errors": []
+        },
+        "clean_ocr": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        },
+        "rotation": {
+          "total_targets": 7,
+          "exact_matches": 0,
+          "test_detected_count": 0,
+          "value_mismatches": 0,
+          "missed_count": 7,
+          "exact_match_accuracy": 0.0,
+          "detection_recall": 0.0,
+          "value_fidelity": 0.0,
+          "flag_accuracy": 0.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "fasting_glucose",
+              "expected_val": 138.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "total_cholesterol",
+              "expected_val": 232.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "triglycerides",
+              "expected_val": 210.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "hdl_cholesterol",
+              "expected_val": 36.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "serum_creatinine",
+              "expected_val": 1.4,
+              "reason": "missed_test"
+            },
+            {
+              "test": "alt",
+              "expected_val": 48.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "ast",
+              "expected_val": 54.0,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "blur": {
+          "total_targets": 7,
+          "exact_matches": 0,
+          "test_detected_count": 0,
+          "value_mismatches": 0,
+          "missed_count": 7,
+          "exact_match_accuracy": 0.0,
+          "detection_recall": 0.0,
+          "value_fidelity": 0.0,
+          "flag_accuracy": 0.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "fasting_glucose",
+              "expected_val": 138.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "total_cholesterol",
+              "expected_val": 232.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "triglycerides",
+              "expected_val": 210.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "hdl_cholesterol",
+              "expected_val": 36.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "serum_creatinine",
+              "expected_val": 1.4,
+              "reason": "missed_test"
+            },
+            {
+              "test": "alt",
+              "expected_val": 48.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "ast",
+              "expected_val": 54.0,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "jpeg_compression": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        },
+        "perspective": {
+          "total_targets": 7,
+          "exact_matches": 0,
+          "test_detected_count": 0,
+          "value_mismatches": 0,
+          "missed_count": 7,
+          "exact_match_accuracy": 0.0,
+          "detection_recall": 0.0,
+          "value_fidelity": 0.0,
+          "flag_accuracy": 0.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "fasting_glucose",
+              "expected_val": 138.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "total_cholesterol",
+              "expected_val": 232.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "triglycerides",
+              "expected_val": 210.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "hdl_cholesterol",
+              "expected_val": 36.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "serum_creatinine",
+              "expected_val": 1.4,
+              "reason": "missed_test"
+            },
+            {
+              "test": "alt",
+              "expected_val": 48.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "ast",
+              "expected_val": 54.0,
+              "reason": "missed_test"
+            }
+          ]
+        }
+      }
+    },
+    "standard_hospital_emr": {
+      "layout_name": "Standard Hospital EMR Style (Electronic Export)",
+      "patient_sex": "female",
+      "tier_results": {
+        "clean_pdf": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "pdf_text_layer",
+          "errors": []
+        },
+        "clean_ocr": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        },
+        "rotation": {
+          "total_targets": 7,
+          "exact_matches": 5,
+          "test_detected_count": 5,
+          "value_mismatches": 0,
+          "missed_count": 2,
+          "exact_match_accuracy": 0.7143,
+          "detection_recall": 0.7143,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 0.7143,
+          "extraction_method": "tesseract_ocr",
+          "errors": [
+            {
+              "test": "bun",
+              "expected_val": 16.0,
+              "reason": "missed_test"
+            },
+            {
+              "test": "serum_creatinine",
+              "expected_val": 0.9,
+              "reason": "missed_test"
+            }
+          ]
+        },
+        "blur": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        },
+        "jpeg_compression": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        },
+        "perspective": {
+          "total_targets": 7,
+          "exact_matches": 7,
+          "test_detected_count": 7,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        }
+      }
+    },
+    "compact_clinic_summary": {
+      "layout_name": "Compact Clinic Summary Style (Narrative Walk-in Format)",
+      "patient_sex": "male",
+      "tier_results": {
+        "clean_pdf": {
+          "total_targets": 6,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "pdf_text_layer",
+          "errors": []
+        },
+        "clean_ocr": {
+          "total_targets": 6,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        },
+        "rotation": {
+          "total_targets": 6,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        },
+        "blur": {
+          "total_targets": 6,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        },
+        "jpeg_compression": {
+          "total_targets": 6,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        },
+        "perspective": {
+          "total_targets": 6,
+          "exact_matches": 6,
+          "test_detected_count": 6,
+          "value_mismatches": 0,
+          "missed_count": 0,
+          "exact_match_accuracy": 1.0,
+          "detection_recall": 1.0,
+          "value_fidelity": 1.0,
+          "flag_accuracy": 1.0,
+          "extraction_method": "tesseract_ocr",
+          "errors": []
+        }
+      }
+    }
+  }
+}

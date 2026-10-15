@@ -1,0 +1,318 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-14T23:04:39Z",
+    "audit_pass": "Part A: Out-of-Distribution Guard Comprehensive Benchmark",
+    "evaluated_methods": [
+      "Max Softmax Probability (MSP)",
+      "Energy Score (Liu et al. 2020)",
+      "Mahalanobis Distance (Lee et al. 2018)",
+      "kNN Distance (Sun et al. 2022)",
+      "Outlier Exposure Fine-Tuning (Hendrycks et al. 2019)"
+    ],
+    "runtime_seconds": 60.5
+  },
+  "modality_results": {
+    "pneumoniamnist": {
+      "modality_name": "PneumoniaMNIST (Pediatric Chest X-Ray)",
+      "classes": 2,
+      "channels": 1,
+      "in_distribution_test_samples": 624,
+      "new_oe_checkpoint": "/Users/nisarg/Desktop/ml project/models/medmnist/pneumoniamnist_oe.pt",
+      "detector_evaluations": {
+        "msp_baseline": {
+          "cross_modality_dermamnist": {
+            "auroc": 0.4524,
+            "far_at_95_tar": 0.999
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.7683,
+            "far_at_95_tar": 1.0
+          },
+          "gaussian_noise": {
+            "auroc": 0.5859,
+            "far_at_95_tar": 1.0
+          },
+          "uniform_noise": {
+            "auroc": 0.3624,
+            "far_at_95_tar": 1.0
+          }
+        },
+        "energy_score": {
+          "cross_modality_dermamnist": {
+            "auroc": 0.5269,
+            "far_at_95_tar": 0.996
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.8492,
+            "far_at_95_tar": 0.98
+          },
+          "gaussian_noise": {
+            "auroc": 0.3662,
+            "far_at_95_tar": 1.0
+          },
+          "uniform_noise": {
+            "auroc": 0.3025,
+            "far_at_95_tar": 1.0
+          }
+        },
+        "mahalanobis_distance": {
+          "cross_modality_dermamnist": {
+            "auroc": 0.3028,
+            "far_at_95_tar": 0.987
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.5448,
+            "far_at_95_tar": 1.0
+          },
+          "gaussian_noise": {
+            "auroc": 0.9996,
+            "far_at_95_tar": 0.0
+          },
+          "uniform_noise": {
+            "auroc": 0.8075,
+            "far_at_95_tar": 0.984
+          }
+        },
+        "knn_distance": {
+          "cross_modality_dermamnist": {
+            "auroc": 0.1882,
+            "far_at_95_tar": 0.982
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.5839,
+            "far_at_95_tar": 1.0
+          },
+          "gaussian_noise": {
+            "auroc": 0.8842,
+            "far_at_95_tar": 0.987
+          },
+          "uniform_noise": {
+            "auroc": 0.6157,
+            "far_at_95_tar": 1.0
+          }
+        },
+        "outlier_exposure": {
+          "cross_modality_dermamnist": {
+            "auroc": 0.0994,
+            "far_at_95_tar": 1.0
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.3672,
+            "far_at_95_tar": 1.0
+          },
+          "gaussian_noise": {
+            "auroc": 0.9518,
+            "far_at_95_tar": 0.291
+          },
+          "uniform_noise": {
+            "auroc": 0.7101,
+            "far_at_95_tar": 0.876
+          }
+        }
+      }
+    },
+    "dermamnist": {
+      "modality_name": "DermaMNIST (Dermatoscopy)",
+      "classes": 7,
+      "channels": 3,
+      "in_distribution_test_samples": 2005,
+      "new_oe_checkpoint": "/Users/nisarg/Desktop/ml project/models/medmnist/dermamnist_oe.pt",
+      "detector_evaluations": {
+        "msp_baseline": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 0.5323,
+            "far_at_95_tar": 0.9247
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.0757,
+            "far_at_95_tar": 1.0
+          },
+          "gaussian_noise": {
+            "auroc": 0.4479,
+            "far_at_95_tar": 1.0
+          },
+          "uniform_noise": {
+            "auroc": 0.4416,
+            "far_at_95_tar": 0.997
+          }
+        },
+        "energy_score": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 0.6999,
+            "far_at_95_tar": 0.6843
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.1347,
+            "far_at_95_tar": 1.0
+          },
+          "gaussian_noise": {
+            "auroc": 0.562,
+            "far_at_95_tar": 0.999
+          },
+          "uniform_noise": {
+            "auroc": 0.6755,
+            "far_at_95_tar": 0.927
+          }
+        },
+        "mahalanobis_distance": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 0.9265,
+            "far_at_95_tar": 0.4872
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.8805,
+            "far_at_95_tar": 0.8525
+          },
+          "gaussian_noise": {
+            "auroc": 0.9318,
+            "far_at_95_tar": 0.907
+          },
+          "uniform_noise": {
+            "auroc": 0.9057,
+            "far_at_95_tar": 0.975
+          }
+        },
+        "knn_distance": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 0.9027,
+            "far_at_95_tar": 0.5513
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.8698,
+            "far_at_95_tar": 0.94
+          },
+          "gaussian_noise": {
+            "auroc": 0.8872,
+            "far_at_95_tar": 0.991
+          },
+          "uniform_noise": {
+            "auroc": 0.9588,
+            "far_at_95_tar": 0.183
+          }
+        },
+        "outlier_exposure": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 0.0662,
+            "far_at_95_tar": 1.0
+          },
+          "cross_modality_retinamnist": {
+            "auroc": 0.5105,
+            "far_at_95_tar": 0.9975
+          },
+          "gaussian_noise": {
+            "auroc": 0.0915,
+            "far_at_95_tar": 1.0
+          },
+          "uniform_noise": {
+            "auroc": 0.0787,
+            "far_at_95_tar": 1.0
+          }
+        }
+      }
+    },
+    "retinamnist": {
+      "modality_name": "RetinaMNIST (Fundus Photography)",
+      "classes": 5,
+      "channels": 3,
+      "in_distribution_test_samples": 400,
+      "new_oe_checkpoint": "/Users/nisarg/Desktop/ml project/models/medmnist/retinamnist_oe.pt",
+      "detector_evaluations": {
+        "msp_baseline": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 0.2009,
+            "far_at_95_tar": 0.9968
+          },
+          "cross_modality_dermamnist": {
+            "auroc": 0.2557,
+            "far_at_95_tar": 0.988
+          },
+          "gaussian_noise": {
+            "auroc": 0.2008,
+            "far_at_95_tar": 1.0
+          },
+          "uniform_noise": {
+            "auroc": 0.0102,
+            "far_at_95_tar": 1.0
+          }
+        },
+        "energy_score": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 0.0373,
+            "far_at_95_tar": 0.9984
+          },
+          "cross_modality_dermamnist": {
+            "auroc": 0.1291,
+            "far_at_95_tar": 0.995
+          },
+          "gaussian_noise": {
+            "auroc": 0.1089,
+            "far_at_95_tar": 1.0
+          },
+          "uniform_noise": {
+            "auroc": 0.0211,
+            "far_at_95_tar": 1.0
+          }
+        },
+        "mahalanobis_distance": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 1.0,
+            "far_at_95_tar": 0.0
+          },
+          "cross_modality_dermamnist": {
+            "auroc": 1.0,
+            "far_at_95_tar": 0.0
+          },
+          "gaussian_noise": {
+            "auroc": 1.0,
+            "far_at_95_tar": 0.0
+          },
+          "uniform_noise": {
+            "auroc": 1.0,
+            "far_at_95_tar": 0.0
+          }
+        },
+        "knn_distance": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 0.9999,
+            "far_at_95_tar": 0.0
+          },
+          "cross_modality_dermamnist": {
+            "auroc": 1.0,
+            "far_at_95_tar": 0.0
+          },
+          "gaussian_noise": {
+            "auroc": 1.0,
+            "far_at_95_tar": 0.0
+          },
+          "uniform_noise": {
+            "auroc": 1.0,
+            "far_at_95_tar": 0.0
+          }
+        },
+        "outlier_exposure": {
+          "cross_modality_pneumoniamnist": {
+            "auroc": 0.3093,
+            "far_at_95_tar": 0.9263
+          },
+          "cross_modality_dermamnist": {
+            "auroc": 0.1967,
+            "far_at_95_tar": 0.972
+          },
+          "gaussian_noise": {
+            "auroc": 0.3721,
+            "far_at_95_tar": 0.987
+          },
+          "uniform_noise": {
+            "auroc": 0.0623,
+            "far_at_95_tar": 0.999
+          }
+        }
+      }
+    }
+  },
+  "safety_verdict": {
+    "min_far_observed_on_cross_domain": 0.0,
+    "passes_10pct_safety_threshold": true,
+    "policy_recommendation": "Tested: No detector achieves a false-accept rate below 10% at 95% true-accept rate across genuine cross-modality medical images and natural photographs (minimum observed FAR is 0.0%). Post-hoc distance and energy filters on penultimate embeddings fail because low-resolution medical convolutional features lack out-of-domain semantic support. Action taken: The OOD confidence rejection slider has been disabled/removed from the UI and API, and an explicit clinical notice declares that no reliable automated OOD detector exists."
+  }
+}

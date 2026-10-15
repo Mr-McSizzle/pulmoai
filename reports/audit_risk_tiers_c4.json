@@ -1,0 +1,397 @@
+{
+  "metadata": {
+    "audit_step": "Section C4: Risk API Tiers, Target Definitions, and Cohort Harmonization",
+    "timestamp": "2026-10-14T19:02:12Z",
+    "total_adults_evaluated": 17961,
+    "train_n": 12105,
+    "test_n": 5856,
+    "runtime_seconds": 160.08
+  },
+  "target_results": {
+    "diabetes": {
+      "target_id": "diabetes",
+      "target_name": "Diabetes (Diagnosed)",
+      "target_column": "target_diabetes",
+      "variable_definition": {
+        "code": "DIQ010",
+        "questionnaire": "Diabetes Questionnaire (DIQ)",
+        "text": "Doctor or other health professional ever told respondent they have diabetes",
+        "coding": "DIQ010 == 1 -> Positive (1.0); DIQ010 in [2, 3] -> Negative (0.0); 7, 9, blank -> Excluded (NaN)",
+        "estimand_nature": "Self-reported clinical diagnosis; cross-sectional prevalent status"
+      },
+      "sample_counts": {
+        "train_valid_n": 12098,
+        "train_positive_n": 1571,
+        "train_prevalence": 0.1299,
+        "test_cycle_j_valid_n": 5852,
+        "test_cycle_j_positive_n": 878,
+        "test_cycle_j_prevalence": 0.15
+      },
+      "out_of_fold_cutoffs": {
+        "low_tier_upper_bound": 0.0571,
+        "high_tier_lower_bound": 0.221,
+        "derivation_method": "5-fold out-of-fold training predictions (percentiles 50% and 80%)"
+      },
+      "cycle_j_tier_performance": {
+        "Low": {
+          "n_respondents": 2212,
+          "n_observed_events": 30,
+          "observed_event_rate": 0.0136,
+          "mean_predicted_probability": 0.025,
+          "fraction_of_test_cohort": 0.378
+        },
+        "Moderate": {
+          "n_respondents": 1873,
+          "n_observed_events": 184,
+          "observed_event_rate": 0.0982,
+          "mean_predicted_probability": 0.1255,
+          "fraction_of_test_cohort": 0.3201
+        },
+        "High": {
+          "n_respondents": 1767,
+          "n_observed_events": 664,
+          "observed_event_rate": 0.3758,
+          "mean_predicted_probability": 0.4261,
+          "fraction_of_test_cohort": 0.3019
+        }
+      },
+      "relative_risk_high_vs_low": 27.63
+    },
+    "hypertension": {
+      "target_id": "hypertension",
+      "target_name": "Essential Hypertension",
+      "target_column": "target_hypertension",
+      "variable_definition": {
+        "code": "BPQ020",
+        "questionnaire": "Blood Pressure / Cholesterol Questionnaire (BPQ)",
+        "text": "Ever told respondent had high blood pressure / hypertension",
+        "coding": "BPQ020 == 1 -> Positive (1.0); BPQ020 == 2 -> Negative (0.0); 7, 9, blank -> Excluded (NaN)",
+        "estimand_nature": "Self-reported doctor diagnosis; cross-sectional prevalent status"
+      },
+      "sample_counts": {
+        "train_valid_n": 12094,
+        "train_positive_n": 4241,
+        "train_prevalence": 0.3507,
+        "test_cycle_j_valid_n": 5846,
+        "test_cycle_j_positive_n": 2130,
+        "test_cycle_j_prevalence": 0.3644
+      },
+      "out_of_fold_cutoffs": {
+        "low_tier_upper_bound": 0.2902,
+        "high_tier_lower_bound": 0.6337,
+        "derivation_method": "5-fold out-of-fold training predictions (percentiles 50% and 80%)"
+      },
+      "cycle_j_tier_performance": {
+        "Low": {
+          "n_respondents": 2423,
+          "n_observed_events": 229,
+          "observed_event_rate": 0.0945,
+          "mean_predicted_probability": 0.1212,
+          "fraction_of_test_cohort": 0.4145
+        },
+        "Moderate": {
+          "n_respondents": 1820,
+          "n_observed_events": 736,
+          "observed_event_rate": 0.4044,
+          "mean_predicted_probability": 0.474,
+          "fraction_of_test_cohort": 0.3113
+        },
+        "High": {
+          "n_respondents": 1603,
+          "n_observed_events": 1165,
+          "observed_event_rate": 0.7268,
+          "mean_predicted_probability": 0.7654,
+          "fraction_of_test_cohort": 0.2742
+        }
+      },
+      "relative_risk_high_vs_low": 7.69
+    },
+    "high_cholesterol": {
+      "target_id": "high_cholesterol",
+      "target_name": "Hypercholesterolemia",
+      "target_column": "target_high_cholesterol",
+      "variable_definition": {
+        "code": "BPQ080",
+        "questionnaire": "Blood Pressure / Cholesterol Questionnaire (BPQ)",
+        "text": "Doctor or health professional ever told respondent had high cholesterol",
+        "coding": "BPQ080 == 1 -> Positive (1.0); BPQ080 == 2 -> Negative (0.0); 7, 9, blank -> Excluded (NaN)",
+        "estimand_nature": "Self-reported doctor diagnosis; cross-sectional prevalent status"
+      },
+      "sample_counts": {
+        "train_valid_n": 12026,
+        "train_positive_n": 3969,
+        "train_prevalence": 0.33,
+        "test_cycle_j_valid_n": 5817,
+        "test_cycle_j_positive_n": 1959,
+        "test_cycle_j_prevalence": 0.3368
+      },
+      "out_of_fold_cutoffs": {
+        "low_tier_upper_bound": 0.322,
+        "high_tier_lower_bound": 0.5498,
+        "derivation_method": "5-fold out-of-fold training predictions (percentiles 50% and 80%)"
+      },
+      "cycle_j_tier_performance": {
+        "Low": {
+          "n_respondents": 2720,
+          "n_observed_events": 340,
+          "observed_event_rate": 0.125,
+          "mean_predicted_probability": 0.1427,
+          "fraction_of_test_cohort": 0.4676
+        },
+        "Moderate": {
+          "n_respondents": 1960,
+          "n_observed_events": 877,
+          "observed_event_rate": 0.4474,
+          "mean_predicted_probability": 0.4457,
+          "fraction_of_test_cohort": 0.3369
+        },
+        "High": {
+          "n_respondents": 1137,
+          "n_observed_events": 742,
+          "observed_event_rate": 0.6526,
+          "mean_predicted_probability": 0.6276,
+          "fraction_of_test_cohort": 0.1955
+        }
+      },
+      "relative_risk_high_vs_low": 5.22
+    },
+    "heart_disease": {
+      "target_id": "heart_disease",
+      "target_name": "Cardiovascular Disease (Composite)",
+      "target_column": "target_heart_disease",
+      "variable_definition": {
+        "code": "MCQ160C, MCQ160D, MCQ160E",
+        "questionnaire": "Medical Conditions Questionnaire (MCQ)",
+        "text": "Ever told had coronary heart disease (MCQ160C), angina (MCQ160D), or heart attack / MI (MCQ160E)",
+        "coding": "(MCQ160C == 1) | (MCQ160D == 1) | (MCQ160E == 1) -> Positive (1.0); all == 2 -> Negative (0.0); else NaN",
+        "estimand_nature": "Self-reported prior clinical event history; cross-sectional prevalent status"
+      },
+      "sample_counts": {
+        "train_valid_n": 11440,
+        "train_positive_n": 827,
+        "train_prevalence": 0.0723,
+        "test_cycle_j_valid_n": 5534,
+        "test_cycle_j_positive_n": 457,
+        "test_cycle_j_prevalence": 0.0826
+      },
+      "out_of_fold_cutoffs": {
+        "low_tier_upper_bound": 0.0354,
+        "high_tier_lower_bound": 0.1157,
+        "derivation_method": "5-fold out-of-fold training predictions (percentiles 50% and 80%)"
+      },
+      "cycle_j_tier_performance": {
+        "Low": {
+          "n_respondents": 2378,
+          "n_observed_events": 21,
+          "observed_event_rate": 0.0088,
+          "mean_predicted_probability": 0.0163,
+          "fraction_of_test_cohort": 0.4297
+        },
+        "Moderate": {
+          "n_respondents": 1770,
+          "n_observed_events": 113,
+          "observed_event_rate": 0.0638,
+          "mean_predicted_probability": 0.0677,
+          "fraction_of_test_cohort": 0.3198
+        },
+        "High": {
+          "n_respondents": 1386,
+          "n_observed_events": 323,
+          "observed_event_rate": 0.233,
+          "mean_predicted_probability": 0.2224,
+          "fraction_of_test_cohort": 0.2505
+        }
+      },
+      "relative_risk_high_vs_low": 26.48
+    },
+    "stroke": {
+      "target_id": "stroke",
+      "target_name": "Cerebrovascular Disease (Stroke)",
+      "target_column": "target_stroke",
+      "variable_definition": {
+        "code": "MCQ160F",
+        "questionnaire": "Medical Conditions Questionnaire (MCQ)",
+        "text": "Doctor or other health professional ever told respondent had a stroke",
+        "coding": "MCQ160F == 1 -> Positive (1.0); MCQ160F == 2 -> Negative (0.0); 7, 9, blank -> Excluded (NaN)",
+        "estimand_nature": "Self-reported prior clinical event history; cross-sectional prevalent status"
+      },
+      "sample_counts": {
+        "train_valid_n": 11478,
+        "train_positive_n": 411,
+        "train_prevalence": 0.0358,
+        "test_cycle_j_valid_n": 5559,
+        "test_cycle_j_positive_n": 273,
+        "test_cycle_j_prevalence": 0.0491
+      },
+      "out_of_fold_cutoffs": {
+        "low_tier_upper_bound": 0.022,
+        "high_tier_lower_bound": 0.0531,
+        "derivation_method": "5-fold out-of-fold training predictions (percentiles 50% and 80%)"
+      },
+      "cycle_j_tier_performance": {
+        "Low": {
+          "n_respondents": 2434,
+          "n_observed_events": 15,
+          "observed_event_rate": 0.0062,
+          "mean_predicted_probability": 0.0128,
+          "fraction_of_test_cohort": 0.4378
+        },
+        "Moderate": {
+          "n_respondents": 1698,
+          "n_observed_events": 76,
+          "observed_event_rate": 0.0448,
+          "mean_predicted_probability": 0.0352,
+          "fraction_of_test_cohort": 0.3055
+        },
+        "High": {
+          "n_respondents": 1427,
+          "n_observed_events": 182,
+          "observed_event_rate": 0.1275,
+          "mean_predicted_probability": 0.0951,
+          "fraction_of_test_cohort": 0.2567
+        }
+      },
+      "relative_risk_high_vs_low": 20.56
+    },
+    "copd": {
+      "target_id": "copd",
+      "target_name": "Chronic Obstructive Pulmonary Disease",
+      "target_column": "target_copd",
+      "variable_definition": {
+        "code": "MCQ160G, MCQ160K",
+        "questionnaire": "Medical Conditions Questionnaire (MCQ)",
+        "text": "Ever told had emphysema (MCQ160G) or chronic bronchitis (MCQ160K)",
+        "coding": "(MCQ160G == 1) | (MCQ160K == 1) -> Positive (1.0); both == 2 -> Negative (0.0); else NaN",
+        "estimand_nature": "Self-reported clinical diagnosis; cross-sectional prevalent status"
+      },
+      "sample_counts": {
+        "train_valid_n": 11458,
+        "train_positive_n": 756,
+        "train_prevalence": 0.066,
+        "test_cycle_j_valid_n": 5557,
+        "test_cycle_j_positive_n": 450,
+        "test_cycle_j_prevalence": 0.081
+      },
+      "out_of_fold_cutoffs": {
+        "low_tier_upper_bound": 0.0497,
+        "high_tier_lower_bound": 0.0922,
+        "derivation_method": "5-fold out-of-fold training predictions (percentiles 50% and 80%)"
+      },
+      "cycle_j_tier_performance": {
+        "Low": {
+          "n_respondents": 2350,
+          "n_observed_events": 64,
+          "observed_event_rate": 0.0272,
+          "mean_predicted_probability": 0.0333,
+          "fraction_of_test_cohort": 0.4229
+        },
+        "Moderate": {
+          "n_respondents": 1784,
+          "n_observed_events": 127,
+          "observed_event_rate": 0.0712,
+          "mean_predicted_probability": 0.0676,
+          "fraction_of_test_cohort": 0.321
+        },
+        "High": {
+          "n_respondents": 1423,
+          "n_observed_events": 259,
+          "observed_event_rate": 0.182,
+          "mean_predicted_probability": 0.1518,
+          "fraction_of_test_cohort": 0.2561
+        }
+      },
+      "relative_risk_high_vs_low": 6.69
+    }
+  },
+  "chd_prevalence_decomposition": {
+    "claimed_prevalence_comparison": {
+      "isolated_chd_mcq160c": {
+        "prevalence": 0.0477,
+        "percentage": "4.8% (or ~4.2% age-adjusted / weighted)",
+        "description": "Ever told you had coronary heart disease (MCQ160C strictly alone)"
+      },
+      "composite_cvd_target_heart_disease": {
+        "prevalence": 0.0826,
+        "percentage": "8.3%",
+        "description": "Composite: Coronary Heart Disease (MCQ160C) OR Angina Pectoris (MCQ160D) OR Heart Attack/MI (MCQ160E)"
+      }
+    },
+    "tested_finding": "Tested: The 4.2% figure corresponds to isolated coronary heart disease (MCQ160C alone), whereas PulmoAI's deployed target_heart_disease is a broader clinical composite including angina pectoris (MCQ160D) and myocardial infarction (MCQ160E), raising the unweighted Cycle J prevalence to 8.26% (8.3%)."
+  },
+  "cohort_reconciliation": {
+    "cycles_evaluated": {
+      "Cycle_G_2011_2012": "Excluded from adult risk modeling; used in legacy tests",
+      "Cycle_H_2013_2014": {
+        "total_respondents": 10175,
+        "adults_ge_18": 6113
+      },
+      "Cycle_I_2015_2016": {
+        "total_respondents": 9971,
+        "adults_ge_18": 5992
+      },
+      "Cycle_J_2017_2018": {
+        "total_respondents": 9254,
+        "adults_ge_18": 5856
+      }
+    },
+    "partition_sizes": {
+      "training_cycles_H_and_I": 12105,
+      "testing_cycle_J": 5856,
+      "total_adults": 17961,
+      "earlier_report_reported_train": 12056,
+      "earlier_report_reported_test": 5905,
+      "shift_difference": 49,
+      "tested_explanation": "Tested: The total adult cohort across Cycles H, I, and J is identical at exactly 17,961 (12,105 + 5,856 = 17,961 vs 12,056 + 5,905 = 17,961). The 49-case shift occurred due to an earlier index alignment where 49 Cycle I individuals were assigned into the holdout partition. The canonical partition strictly uses the cycle column: Cycles 2013-2014 and 2015-2016 (n=12,105) for training, and Cycle 2017-2018 (n=5,856) for holdout testing."
+    }
+  },
+  "validated_tier_cutoffs": {
+    "diabetes": {
+      "low_threshold": 0.0571,
+      "high_threshold": 0.221,
+      "training_oof_percentiles": {
+        "low_cutoff_p50": 0.0571,
+        "high_cutoff_p80": 0.221
+      }
+    },
+    "hypertension": {
+      "low_threshold": 0.2902,
+      "high_threshold": 0.6337,
+      "training_oof_percentiles": {
+        "low_cutoff_p50": 0.2902,
+        "high_cutoff_p80": 0.6337
+      }
+    },
+    "high_cholesterol": {
+      "low_threshold": 0.322,
+      "high_threshold": 0.5498,
+      "training_oof_percentiles": {
+        "low_cutoff_p50": 0.322,
+        "high_cutoff_p80": 0.5498
+      }
+    },
+    "heart_disease": {
+      "low_threshold": 0.0354,
+      "high_threshold": 0.1157,
+      "training_oof_percentiles": {
+        "low_cutoff_p50": 0.0354,
+        "high_cutoff_p80": 0.1157
+      }
+    },
+    "stroke": {
+      "low_threshold": 0.022,
+      "high_threshold": 0.0531,
+      "training_oof_percentiles": {
+        "low_cutoff_p50": 0.022,
+        "high_cutoff_p80": 0.0531
+      }
+    },
+    "copd": {
+      "low_threshold": 0.0497,
+      "high_threshold": 0.0922,
+      "training_oof_percentiles": {
+        "low_cutoff_p50": 0.0497,
+        "high_cutoff_p80": 0.0922
+      }
+    }
+  }
+}

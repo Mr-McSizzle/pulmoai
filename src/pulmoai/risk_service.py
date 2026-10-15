@@ -20,11 +20,11 @@ DEFAULT_MODEL_PATH = PROJECT_ROOT / "models" / "nhanes_risk_models.joblib"
 
 CONDITION_METADATA = {
     "diabetes": {
-        "display_name": "Type 2 Diabetes",
-        "description": "Cross-sectional probability of prevalent Type 2 diabetes from clinical markers (HbA1c/glucose withheld).",
+        "display_name": "Diabetes (Diagnosed)",
+        "description": "Cross-sectional probability of current self-reported diabetes diagnosis from clinical markers (HbA1c/glucose withheld).",
         "estimand_type": "current_prevalent_status",
-        "estimand_label": "Current Prevalent Status (Biomarker Phenotype)",
-        "estimand_description": "Estimates cross-sectional probability of current undiagnosed or diagnosed Type 2 diabetes from metabolic and lipid markers; NOT a prospective 10-year incident risk.",
+        "estimand_label": "Current Prevalent Status (Self-reported Diagnosis)",
+        "estimand_description": "Estimates cross-sectional probability of a CURRENT self-reported diabetes diagnosis from metabolic and lipid markers; NOT prospective future disease incidence.",
         "time_horizon": "Current cross-sectional status",
         "icon": "activity",
     },
@@ -33,7 +33,7 @@ CONDITION_METADATA = {
         "description": "Probability of doctor-diagnosed high blood pressure / chronic hypertension.",
         "estimand_type": "survey_reported_history",
         "estimand_label": "Survey-Reported Clinical Diagnosis History",
-        "estimand_description": "Estimates probability of existing or doctor-diagnosed hypertension in adult survey examination cohorts. Not a future incident risk.",
+        "estimand_description": "Estimates probability of a CURRENT or doctor-diagnosed hypertension in adult survey cohorts; NOT future disease incidence.",
         "time_horizon": "Lifetime doctor diagnosis",
         "icon": "heart",
     },
@@ -42,7 +42,7 @@ CONDITION_METADATA = {
         "description": "Probability of doctor-diagnosed dyslipidemia and high blood cholesterol.",
         "estimand_type": "survey_reported_history",
         "estimand_label": "Survey-Reported Clinical Diagnosis History",
-        "estimand_description": "Estimates probability of doctor-diagnosed hypercholesterolemia or active dyslipidemia from measured lipid panel and history.",
+        "estimand_description": "Estimates probability of a CURRENT doctor-diagnosed hypercholesterolemia from lipid panel and history; NOT future disease incidence.",
         "time_horizon": "Lifetime doctor diagnosis",
         "icon": "droplet",
     },
@@ -51,7 +51,7 @@ CONDITION_METADATA = {
         "description": "Probability of prior doctor-diagnosed coronary heart disease, angina, or heart attack.",
         "estimand_type": "survey_reported_history",
         "estimand_label": "Survey-Reported Prior Clinical Event",
-        "estimand_description": "Estimates probability of prior doctor-diagnosed ischemic heart disease or myocardial infarction history; NOT a future event forecaster.",
+        "estimand_description": "Estimates probability of prior doctor-diagnosed ischemic heart disease or myocardial infarction; NOT future disease incidence.",
         "time_horizon": "Prior clinical event history",
         "icon": "shield-alert",
     },
@@ -60,7 +60,7 @@ CONDITION_METADATA = {
         "description": "Probability of prior doctor-diagnosed cerebrovascular accident / ischemic stroke.",
         "estimand_type": "survey_reported_history",
         "estimand_label": "Survey-Reported Prior Clinical Event",
-        "estimand_description": "Estimates probability of prior doctor-diagnosed cerebrovascular accident history. Not a future incident event forecaster.",
+        "estimand_description": "Estimates probability of prior doctor-diagnosed cerebrovascular accident; NOT future disease incidence.",
         "time_horizon": "Prior clinical event history",
         "icon": "alert-circle",
     },
@@ -69,10 +69,24 @@ CONDITION_METADATA = {
         "description": "Probability of doctor-diagnosed chronic bronchitis, emphysema, or irreversible airflow obstruction.",
         "estimand_type": "survey_reported_history",
         "estimand_label": "Survey-Reported Clinical Diagnosis History",
-        "estimand_description": "Estimates probability of doctor-diagnosed chronic bronchitis or emphysema history in civilian adults.",
+        "estimand_description": "Estimates probability of doctor-diagnosed chronic bronchitis or emphysema in civilian adults; NOT future disease incidence.",
         "time_horizon": "Lifetime doctor diagnosis",
         "icon": "wind",
     },
+}
+
+# ---------------------------------------------------------------------------
+# Validated Out-Of-Fold (OOF) Training Risk Tier Cutoffs
+# Derived from 5-fold cross-validation on Cycles H & I (2013-2016, n=12,105)
+# Low: < 50th percentile | Moderate: 50th - 80th percentile | High: >= 80th percentile
+# ---------------------------------------------------------------------------
+TIER_CUTOFFS_OOF: dict[str, dict[str, float]] = {
+    "diabetes": {"low": 0.0571, "high": 0.2210},
+    "hypertension": {"low": 0.2902, "high": 0.6337},
+    "high_cholesterol": {"low": 0.3220, "high": 0.5498},
+    "heart_disease": {"low": 0.0354, "high": 0.1157},
+    "stroke": {"low": 0.0220, "high": 0.0531},
+    "copd": {"low": 0.0497, "high": 0.0922},
 }
 
 
@@ -149,14 +163,13 @@ class HealthRiskService:
                 logger.warning("Prediction error for %s: %s; falling back to NaN", target_id, e)
                 calibrated_risk = None
 
-            # Categorize clinical risk level
+            # Categorize clinical risk level using validated out-of-fold training cutoffs (percentiles 50% and 80%)
+            cutoffs = TIER_CUTOFFS_OOF.get(target_id, {"low": 0.15, "high": 0.50})
             if calibrated_risk is not None:
-                if calibrated_risk < 0.15:
+                if calibrated_risk < cutoffs["low"]:
                     risk_category = "Low"
-                elif calibrated_risk < 0.35:
+                elif calibrated_risk < cutoffs["high"]:
                     risk_category = "Moderate"
-                elif calibrated_risk < 0.60:
-                    risk_category = "Elevated"
                 else:
                     risk_category = "High"
             else:
@@ -186,8 +199,8 @@ class HealthRiskService:
             "contributing_factors": contributing_factors,
             "features_provided_count": non_null_count,
             "estimand_clarification": (
-                "All outputs estimate cross-sectional prevalence or survey-reported lifetime doctor diagnoses "
-                "in adult examination cohorts; they do NOT forecast 10-year prospective future incidence."
+                "All outputs estimate prevalence and the probability of a CURRENT self-reported diagnosis "
+                "in adult examination cohorts; they do NOT forecast future disease incidence."
             ),
             "disclaimer": (
                 "Exploratory statistical health screening only. This model estimates population-level "

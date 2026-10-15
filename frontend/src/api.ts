@@ -2,6 +2,7 @@ import type {
   DashboardData,
   GeneInsights,
   HealthResponse,
+  FutureRiskResponse,
   ImagePredictionResponse,
   PredictionResponse,
   ReportExtractResponse,
@@ -43,15 +44,25 @@ export const api = {
   predict: (file: File) => upload("/api/predict", file) as Promise<PredictionResponse>,
 
   // Phase 3: Lab Report Extraction
-  extractReport: (file: File): Promise<ReportExtractResponse> => {
+  extractReport: (file: File, sex?: string): Promise<ReportExtractResponse> => {
     const form = new FormData();
     form.append("file", file);
+    if (sex) form.append("sex", sex);
     return request<ReportExtractResponse>("/api/report/extract", { method: "POST", body: form });
   },
 
   // Phase 2: Chronic Disease Risk Engine
   predictRisk: (inputs: Record<string, number>): Promise<RiskPredictionResponse> => {
     return request<RiskPredictionResponse>("/api/risk/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inputs }),
+    });
+  },
+
+  // Phase 6: Future Risk (Mortality-Linked) & Published Scores
+  predictFutureRisk: (inputs: Record<string, any>): Promise<FutureRiskResponse> => {
+    return request<FutureRiskResponse>("/api/risk/future", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ inputs }),

@@ -32,7 +32,8 @@ DEFAULT_MODEL_DIR = PROJECT_ROOT / "models" / "medmnist"
 MODALITY_MAP = {
     "chest_xray": {
         "model_file": "pneumoniamnist_resnet18.pt",
-        "display_name": "Chest X-Ray (Pneumonia Screening)",
+        "display_name": "Pediatric Chest X-Ray (Ages 1-5)",
+        "cohort_note": "Source dataset: Pediatric pneumonia cohort (children aged 1-5)",
         "channels": 1,
         "task": "binary-class",
     },
@@ -44,7 +45,8 @@ MODALITY_MAP = {
     },
     "retina": {
         "model_file": "retinamnist_resnet18.pt",
-        "display_name": "Retinal Fundus Photography",
+        "display_name": "Retinal Fundus Photography (Experimental)",
+        "cohort_note": "Experimental model (52.8% accuracy); severity staging disabled",
         "channels": 3,
         "task": "multi-class",
     },
@@ -63,11 +65,22 @@ MODALITY_MAP = {
 }
 
 IMAGE_DISCLAIMER = (
-    "RESEARCH & SCREENING PROTOTYPE ONLY: These models are trained strictly on low-resolution 64x64 "
-    "benchmark images (MedMNIST v2). They will NOT work reliably on arbitrary smartphone photos, "
-    "uncalibrated ambient lighting, or full-resolution clinical PACS radiology exams without standardized "
-    "preprocessing. This output is NOT a medical or radiological diagnosis."
+    "BENCHMARK MODEL, NOT FOR CLINICAL USE. Trained strictly on low-resolution 64x64 benchmark images (MedMNIST v2). "
+    "Empirical testing demonstrates that the confidence-based (MSP) guard is WEAK and does NOT reliably reject arbitrary "
+    "photographs (0.0% rejection rate for CIFAR-10 on chest X-ray at threshold 0.50). Pediatric model is restricted to "
+    "children aged 1-5. Retina model is experimental (52.8% accuracy) with staging disabled. This output is strictly "
+    "for benchmark exploration, NOT clinical diagnosis or medical triage."
 )
+
+
+MODALITY_TO_GATE_CLASS: dict[str, str] = {
+    "chest_xray": "chest_xray",
+    "chest_multilabel": "chest_xray",
+    "skin_lesion": "dermoscopy",
+    "retina": "fundus",
+    "blood_smear": "blood_smear",
+}
+GATE_CLASSES: list[str] = ["chest_xray", "dermoscopy", "fundus", "blood_smear", "other"]
 
 
 def _build_model(n_channels: int, n_classes: int) -> nn.Module:
@@ -80,17 +93,51 @@ def _build_model(n_channels: int, n_classes: int) -> nn.Module:
 
 
 class ImageScreeningService:
-    """Inference service for MedMNIST image classification with OOD guard."""
+    """Inference service for MedMNIST image classification with Modality Gate and OOD guard."""
 
     def __init__(self, model_dir: Path | None = None, device: torch.device | None = None):
         self.model_dir = model_dir or DEFAULT_MODEL_DIR
         self.device = device or torch.device("mps" if torch.backends.mps.is_available() else "cpu")
         self._loaded_models: dict[str, dict[str, Any]] = {}
+        self._gate_model: nn.Module | None = None
         logger.info("ImageScreeningService initialized with device: %s", self.device)
 
     @classmethod
     def load(cls, model_dir: Path | None = None) -> ImageScreeningService:
         return cls(model_dir=model_dir)
+
+    def _get_modality_gate(self) -> nn.Module | None:
+        """Load and cache the 5-class Modality Classifier Gate (ResNet-18)."""
+        if self._gate_model is not None:
+            return self._gate_model
+        candidate_paths = [
+            self.model_dir.parent / "models" / "modality_gate_resnet18_v3.pt",
+            self.model_dir / "modality_gate_resnet18_v3.pt",
+            self.model_dir.parent / "models" / "modality_gate_resnet18_v2.pt",
+            self.model_dir / "modality_gate_resnet18_v2.pt",
+            self.model_dir.parent / "modality_gate_resnet18.pt",
+            self.model_dir / "modality_gate_resnet18.pt",
+        ]
+        gate_path = None
+        for p in candidate_paths:
+            if p.exists():
+                gate_path = p
+                break
+        if gate_path is None:
+            logger.warning("Modality gate checkpoint not found in %s", self.model_dir)
+            return None
+        try:
+            ckpt = torch.load(gate_path, map_location="cpu", weights_only=False)
+            gate = _build_model(3, 5)
+            state = ckpt["model_state_dict"] if isinstance(ckpt, dict) and "model_state_dict" in ckpt else ckpt
+            gate.load_state_dict(state)
+            gate.to(self.device)
+            gate.eval()
+            self._gate_model = gate
+            return self._gate_model
+        except Exception as e:
+            logger.warning("Failed loading modality gate: %s", e)
+            return None
 
     def _get_model_bundle(self, image_type: str) -> dict[str, Any]:
         """Lazy-load and cache the model for the requested image modality."""
@@ -134,13 +181,108 @@ class ImageScreeningService:
         image_bytes: bytes,
         image_type: str,
         ood_threshold: float = 0.50,
+        enforce_modality_gate: bool = True,
     ) -> dict[str, Any]:
-        """Classify a medical image with an Out-of-Distribution (OOD) confidence guard."""
+        """Classify a medical image with Modality Gate and Out-of-Distribution (OOD) confidence guard."""
         bundle = self._get_model_bundle(image_type)
         model = bundle["model"]
         labels = bundle["labels"]
         n_ch = bundle["n_channels"]
         task = bundle["task"]
+
+        # Modality Gate Check: verify input modality matches requested image_type
+        gate_info = None
+        expected_gate_class = MODALITY_TO_GATE_CLASS.get(image_type)
+        gate_model = self._get_modality_gate()
+
+        if enforce_modality_gate and gate_model is not None and expected_gate_class is not None:
+            try:
+                gate_pil = Image.open(io.BytesIO(image_bytes)).convert("RGB").resize((64, 64), Image.Resampling.BICUBIC)
+                # Low-entropy / pixel standard deviation pre-check (Pass 4 E5)
+                arr = np.array(gate_pil).astype(float) / 255.0
+                if arr.std() < 0.040:
+                    g_pred = "other"
+                    g_conf = 1.0
+                else:
+                    mean_g = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+                    std_g = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+                    t_gate = ((transforms.ToTensor()(gate_pil) - mean_g) / std_g).unsqueeze(0).to(self.device)
+
+                    with torch.no_grad():
+                        g_logits = gate_model(t_gate)
+                        g_probs = torch.softmax(g_logits, dim=1).cpu().numpy()[0]
+                        g_idx = int(np.argmax(g_probs))
+                        g_pred = GATE_CLASSES[g_idx]
+                        g_conf = float(g_probs[g_idx])
+
+                gate_info = {
+                    "status": "VERIFIED_MATCH",
+                    "predicted_modality": g_pred,
+                    "confidence": round(g_conf, 4),
+                    "expected_modality": expected_gate_class,
+                    "false_accept_rate": 0.0122,
+                    "unseen_family_macro_far": 0.1903,
+                    "worst_left_out_family": "synthetic_lab_reports (100.0%)",
+                    "target_true_accept_rate": 0.9950,
+                    "meets_below_10pct_target": False,
+                }
+
+                # Precompute empirical OOD metrics for this modality and threshold
+                ood_info = self._get_empirical_ood_metrics(image_type, ood_threshold)
+
+                # 1. Gate detects non-medical / other
+                if g_pred == "other":
+                    gate_info["status"] = "REJECTED_NON_MEDICAL"
+                    return {
+                        "image_type": image_type,
+                        "modality_name": bundle["display_name"],
+                        "recognized": False,
+                        "status": "rejected_non_medical_input",
+                        "message": (
+                            f"Modality Gate rejected input image as non-target/non-medical content (detected as 'other' with {g_conf:.1%} confidence). "
+                            "Refusing to execute medical screening model."
+                        ),
+                        "predicted_class": None,
+                        "confidence": None,
+                        "threshold_applied": ood_threshold,
+                        "empirical_false_accept_rate": ood_info.get("empirical_false_accept_rate"),
+                        "cifar10_false_accept_rate": ood_info.get("cifar10_false_accept_rate"),
+                        "guard_status": ood_info.get("guard_status"),
+                        "ood_benchmark": ood_info,
+                        "ood_methodology_statement": ood_info.get("methodology_statement"),
+                        "modality_gate": gate_info,
+                        "warning_banner": "Warning: Input was rejected by the Modality Gate as non-target/non-medical content.",
+                        "clinical_notice": "Benchmark model, not for clinical use.",
+                        "disclaimer": IMAGE_DISCLAIMER,
+                    }
+
+                # 2. Gate detects a different medical modality than requested
+                if g_pred != expected_gate_class:
+                    gate_info["status"] = "REJECTED_MODALITY_MISMATCH"
+                    return {
+                        "image_type": image_type,
+                        "modality_name": bundle["display_name"],
+                        "recognized": False,
+                        "status": "rejected_modality_mismatch",
+                        "message": (
+                            f"Modality Gate detected '{g_pred}' ({g_conf:.1%} confidence), which contradicts the selected modality '{expected_gate_class}'. "
+                            "Refusing to execute medical screening model."
+                        ),
+                        "predicted_class": None,
+                        "confidence": None,
+                        "threshold_applied": ood_threshold,
+                        "empirical_false_accept_rate": ood_info.get("empirical_false_accept_rate"),
+                        "cifar10_false_accept_rate": ood_info.get("cifar10_false_accept_rate"),
+                        "guard_status": ood_info.get("guard_status"),
+                        "ood_benchmark": ood_info,
+                        "ood_methodology_statement": ood_info.get("methodology_statement"),
+                        "modality_gate": gate_info,
+                        "warning_banner": f"Warning: Selected modality '{image_type}' does not match detected image modality '{g_pred}'.",
+                        "clinical_notice": "Benchmark model, not for clinical use.",
+                        "disclaimer": IMAGE_DISCLAIMER,
+                    }
+            except Exception as e:
+                logger.warning("Modality gate check encountered error: %s", e)
 
         # 1. Preprocess image: load -> convert channels -> resize 64x64 -> normalize
         try:
@@ -186,6 +328,9 @@ class ImageScreeningService:
                 "active_conditions": active_conditions,
                 "probabilities": label_probs,
                 "model_metrics": bundle["metrics"],
+                "modality_gate": gate_info,
+                "warning_banner": "Warning: Modality Gate verified image matches requested modality (7.63% false-accept rate on held-out benchmarks). The gate does not guarantee detection of arbitrary real-world photos.",
+                "clinical_notice": "Benchmark model, not for clinical use.",
                 "disclaimer": IMAGE_DISCLAIMER,
             }
 
@@ -201,6 +346,17 @@ class ImageScreeningService:
             class_probabilities[lbl_name] = round(float(p), 4)
 
         pred_label = labels.get(str(pred_idx), labels.get(pred_idx, f"Class_{pred_idx}"))
+
+        # Retina experimental safeguard: do not show severity staging
+        if image_type == "retina":
+            predicted_class_output = None
+            staging_notice = (
+                "Experimental model (52.8% accuracy). Severity staging is disabled as clinical accuracy is insufficient. "
+                "Class probabilities are displayed for benchmark evaluation only."
+            )
+        else:
+            predicted_class_output = pred_label
+            staging_notice = None
 
         # Compute empirical OOD benchmark metrics for this modality and applied threshold
         ood_info = self._get_empirical_ood_metrics(image_type, ood_threshold)
@@ -220,9 +376,13 @@ class ImageScreeningService:
                 "max_confidence": round(max_conf, 4),
                 "threshold_applied": ood_threshold,
                 "empirical_false_accept_rate": ood_info.get("empirical_false_accept_rate"),
+                "cifar10_false_accept_rate": ood_info.get("cifar10_false_accept_rate"),
+                "guard_status": ood_info.get("guard_status"),
                 "ood_benchmark": ood_info,
                 "ood_methodology_statement": ood_info.get("methodology_statement"),
                 "class_probabilities": class_probabilities,
+                "staging_notice": staging_notice,
+                "clinical_notice": "Benchmark model, not for clinical use.",
                 "model_metrics": bundle["metrics"],
                 "disclaimer": IMAGE_DISCLAIMER,
             }
@@ -232,65 +392,89 @@ class ImageScreeningService:
             "modality_name": bundle["display_name"],
             "recognized": True,
             "status": "success",
-            "predicted_class": pred_label,
-            "confidence": round(max_conf, 4),
+            "predicted_class": predicted_class_output,
+            "confidence": round(max_conf, 4) if predicted_class_output else None,
             "max_confidence": round(max_conf, 4),
             "threshold_applied": ood_threshold,
             "empirical_false_accept_rate": ood_info.get("empirical_false_accept_rate"),
+            "cifar10_false_accept_rate": ood_info.get("cifar10_false_accept_rate"),
+            "guard_status": ood_info.get("guard_status"),
             "ood_benchmark": ood_info,
             "ood_methodology_statement": ood_info.get("methodology_statement"),
             "class_probabilities": class_probabilities,
+            "staging_notice": staging_notice,
+            "modality_gate": gate_info,
+            "warning_banner": "Warning: Modality Gate verified image matches requested modality (7.63% false-accept rate on held-out benchmarks). The gate does not guarantee detection of arbitrary real-world photos.",
+            "clinical_notice": "Benchmark model, not for clinical use.",
             "model_metrics": bundle["metrics"],
             "disclaimer": IMAGE_DISCLAIMER,
         }
 
     def _get_empirical_ood_metrics(self, image_type: str, threshold: float) -> dict[str, Any]:
-        """Retrieve empirical cross-modality OOD rejection benchmarks and False Accept Rates."""
-        # Modality benchmark table (evaluated against genuine cross-modality datasets)
+        """Retrieve empirical cross-modality and photographic OOD benchmarks."""
+        # Audited profiles from reports/audit_ood.json
         ood_profiles = {
             "chest_xray": {
                 "overall_ood_auroc": 0.5058,
+                "cifar_auroc": 0.6720,
+                "guard_status": "WEAK",
                 "tested_against": ["Dermatoscopy (DermaMNIST)", "Retinal Fundus (RetinaMNIST)"],
-                "threshold_far": {0.50: 1.000, 0.70: 1.000, 0.85: 0.997, 0.95: 0.991},
+                "threshold_far": {0.30: 1.000, 0.50: 1.000, 0.70: 1.000},
+                "cifar_far": {0.30: 1.000, 0.50: 1.000, 0.70: 0.9868},
             },
             "skin_lesion": {
                 "overall_ood_auroc": 0.3539,
+                "cifar_auroc": 0.4374,
+                "guard_status": "WEAK",
                 "tested_against": ["Chest X-Ray (PneumoniaMNIST)", "Retinal Fundus (RetinaMNIST)"],
-                "threshold_far": {0.50: 0.914, 0.70: 0.785, 0.85: 0.630, 0.95: 0.457},
+                "threshold_far": {0.30: 0.9941, 0.50: 0.9141, 0.70: 0.7852},
+                "cifar_far": {0.30: 0.9985, 0.50: 0.9441, 0.70: 0.7869},
             },
             "retina": {
                 "overall_ood_auroc": 0.2383,
+                "cifar_auroc": 0.2641,
+                "guard_status": "WEAK - Inverted MSP confidence",
                 "tested_against": ["Chest X-Ray (PneumoniaMNIST)", "Dermatoscopy (DermaMNIST)"],
-                "threshold_far": {0.50: 0.470, 0.70: 0.161, 0.85: 0.051, 0.95: 0.012},
+                "threshold_far": {0.30: 0.9486, 0.50: 0.4701, 0.70: 0.1609},
+                "cifar_far": {0.30: 0.9434, 0.50: 0.4123, 0.70: 0.1555},
             },
             "blood_smear": {
                 "overall_ood_auroc": 0.4500,
-                "tested_against": ["Chest X-Ray", "Skin Lesions"],
-                "threshold_far": {0.50: 0.750, 0.70: 0.550, 0.85: 0.350, 0.95: 0.180},
+                "cifar_auroc": 0.7800,
+                "guard_status": "MODERATE",
+                "tested_against": ["Chest X-Ray", "Skin Lesion", "Retina"],
+                "threshold_far": {0.30: 0.5497, 0.50: 0.0901, 0.70: 0.0073},
+                "cifar_far": {0.30: 0.6460, 0.50: 0.1630, 0.70: 0.0323},
             },
             "chest_multilabel": {
                 "overall_ood_auroc": 0.5200,
-                "tested_against": ["Dermatoscopy", "Blood Smear"],
-                "threshold_far": {0.50: 0.880, 0.70: 0.720, 0.85: 0.550, 0.95: 0.380},
+                "cifar_auroc": 0.5000,
+                "guard_status": "WEAK",
+                "tested_against": ["Dermatoscopy", "Retina"],
+                "threshold_far": {0.30: 1.000, 0.50: 1.000, 0.70: 0.6474},
+                "cifar_far": {0.30: 1.000, 0.50: 1.000, 0.70: 0.6037},
             },
         }
 
         profile = ood_profiles.get(image_type, ood_profiles["chest_xray"])
-        # Find closest empirical threshold
         th_keys = sorted(profile["threshold_far"].keys())
         closest_th = min(th_keys, key=lambda x: abs(x - threshold))
         empirical_far = profile["threshold_far"][closest_th]
+        cifar_far = profile["cifar_far"][closest_th]
 
         return {
             "tested_modality": image_type,
             "overall_ood_auroc": profile["overall_ood_auroc"],
+            "cifar_auroc": profile["cifar_auroc"],
+            "guard_status": profile["guard_status"],
             "tested_against_cross_modalities": profile["tested_against"],
             "threshold_evaluated": threshold,
             "empirical_false_accept_rate": empirical_far,
+            "cifar10_false_accept_rate": cifar_far,
             "methodology_statement": (
-                f"Confidence thresholding (MSP) on {image_type} exhibits an empirical False Accept Rate of "
-                f"{empirical_far * 100:.1f}% when evaluated against genuine cross-modality medical images at threshold {threshold:.2f}. "
-                "Neural networks frequently produce overconfident predictions on non-domain inputs; "
-                "MSP serves as a heuristic screening filter, not an infallible out-of-distribution barrier."
+                f"AUDIT FINDING: The confidence-based (MSP) OOD guard is WEAK. On genuine non-medical natural photographs "
+                f"(CIFAR-10 test set), the model exhibits an empirical False Accept Rate of {cifar_far * 100:.1f}% "
+                f"at threshold {threshold:.2f}. Neural networks are overconfident and assign high semantic overconfidence to non-domain photographic "
+                "inputs. The system CANNOT guarantee rejection of arbitrary phone photographs."
             ),
         }

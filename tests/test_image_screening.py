@@ -39,11 +39,18 @@ class ImageScreeningUnitTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.service.predict(buf.getvalue(), "unsupported_type")
 
-    def test_pneumonia_prediction_with_synthetic_image(self) -> None:
-        """Verify chest_xray predicts binary label and returns required metadata."""
-        # Create a synthetic 64x64 grayscale image
-        arr = np.random.randint(50, 200, size=(64, 64), dtype=np.uint8)
-        img = Image.fromarray(arr, mode="L")
+    def test_pneumonia_prediction_with_genuine_image(self) -> None:
+        """Verify chest_xray predicts binary label and returns required metadata with verified gate match."""
+        # Load a genuine chest X-ray image from MedMNIST cache
+        npz_path = Path.home() / ".medmnist" / "pneumoniamnist_64.npz"
+        if npz_path.exists():
+            data = np.load(npz_path)
+            raw_arr = data["test_images"][0]
+            img = Image.fromarray(raw_arr).convert("L")
+        else:
+            arr = np.random.randint(50, 200, size=(64, 64), dtype=np.uint8)
+            img = Image.fromarray(arr, mode="L")
+
         buf = io.BytesIO()
         img.save(buf, format="PNG")
 
@@ -53,16 +60,50 @@ class ImageScreeningUnitTest(unittest.TestCase):
         self.assertIn("class_probabilities", result)
         self.assertIn("disclaimer", result)
         self.assertIn("model_metrics", result)
+        self.assertIn("modality_gate", result)
+        self.assertEqual(result["modality_gate"]["status"], "VERIFIED_MATCH")
 
-    def test_ood_guard_triggers_on_low_confidence(self) -> None:
-        """Verify OOD guard rejects image when max confidence is below threshold."""
+    def test_modality_gate_rejects_cross_modality_mismatch(self) -> None:
+        """Verify Modality Gate refuses to run when image modality contradicts user selection."""
+        npz_path = Path.home() / ".medmnist" / "dermamnist_64.npz"
+        if npz_path.exists():
+            data = np.load(npz_path)
+            raw_arr = data["test_images"][0]
+            img = Image.fromarray(raw_arr).convert("RGB")
+            buf = io.BytesIO()
+            img.save(buf, format="PNG")
+
+            # Upload dermoscopy image under chest_xray selection
+            result = self.service.predict(buf.getvalue(), "chest_xray", ood_threshold=0.30)
+            self.assertFalse(result["recognized"])
+            self.assertEqual(result["status"], "rejected_modality_mismatch")
+            self.assertEqual(result["modality_gate"]["status"], "REJECTED_MODALITY_MISMATCH")
+            self.assertEqual(result["modality_gate"]["predicted_modality"], "dermoscopy")
+            self.assertIn("contradicts the selected modality", result["message"])
+
+    def test_modality_gate_rejects_non_medical_noise(self) -> None:
+        """Verify Modality Gate refuses to run when input is non-target/non-medical content."""
         arr = np.random.randint(0, 255, size=(64, 64), dtype=np.uint8)
         img = Image.fromarray(arr, mode="L")
         buf = io.BytesIO()
         img.save(buf, format="PNG")
 
-        # Set threshold to 1.0 so any prediction triggers OOD guard
-        result = self.service.predict(buf.getvalue(), "chest_xray", ood_threshold=1.0)
+        result = self.service.predict(buf.getvalue(), "chest_xray", ood_threshold=0.30)
+        self.assertFalse(result["recognized"])
+        self.assertEqual(result["status"], "rejected_non_medical_input")
+        self.assertEqual(result["modality_gate"]["status"], "REJECTED_NON_MEDICAL")
+        self.assertEqual(result["modality_gate"]["predicted_modality"], "other")
+        self.assertIn("rejected input image as non-target/non-medical", result["message"])
+
+    def test_ood_guard_triggers_on_low_confidence(self) -> None:
+        """Verify internal confidence threshold guard triggers when gate is bypassed and threshold=1.0."""
+        arr = np.random.randint(0, 255, size=(64, 64), dtype=np.uint8)
+        img = Image.fromarray(arr, mode="L")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+
+        # Bypass modality gate to test confidence threshold guard in isolation
+        result = self.service.predict(buf.getvalue(), "chest_xray", ood_threshold=1.0, enforce_modality_gate=False)
         self.assertFalse(result["recognized"])
         self.assertEqual(result["status"], "low_confidence")
         self.assertIn("not recognised", result["message"].lower())

@@ -15,10 +15,32 @@ from pulmoai.preprocessing import read_single_profile_csv
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_MODEL_PATH = PROJECT_ROOT / "models" / "ensemble_benchmark_best.joblib"
+DEFAULT_MODEL_PATH = PROJECT_ROOT / "models" / "lung_uncalibrated_dual_rule.joblib"
 DEFAULT_SUMMARY_PATH = PROJECT_ROOT / "reports" / "ensemble_benchmark" / "analysis_summary.json"
 DEFAULT_VERIFICATION_PATH = PROJECT_ROOT / "reports" / "ensemble_benchmark" / "independent_verification.json"
 MAX_UPLOAD_BYTES = 8 * 1024 * 1024
+
+
+class DualRuleLungModel:
+    """Dual-rule lung classifier: uses uncalibrated LinearSVC decision-function argmax
+
+    for discrete label classification (preserving balanced decision boundary and rare-class sensitivity,
+    e.g. COVID-19 recall 4/19 vs 0/19), while delegating to a 5-fold cross-validated Platt calibrator
+    for class probability estimates.
+    """
+
+    def __init__(self, base_pipe: Any, cal_pipe: Any, label_order: list[str]):
+        self.base_pipeline = base_pipe
+        self.calibrated_pipeline = cal_pipe
+        self.label_order = list(label_order)
+        self.classes_ = np.arange(len(self.label_order))
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        dec = self.base_pipeline.decision_function(X)
+        return np.argmax(dec, axis=1)
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        return self.calibrated_pipeline.predict_proba(X)
 
 
 class PulmoAIService:
@@ -86,6 +108,8 @@ class PulmoAIService:
             "input_profile_count": 1,
             "input_gene_count": len(self.feature_names),
             "interpretation": "Exploratory research classification only; not a diagnosis or clinical recommendation.",
+            "decision_rule_note": "Predicted label uses uncalibrated balanced decision rule (LinearSVC decision function argmax) to preserve rare-class sensitivity (COVID-19 recall 4/19). Class probabilities are Platt-calibrated empirical risk estimates.",
+            "input_contract_notice": "Trained only on whole-cell scRNA-seq from 16 atlas studies (372 profiles). Single-nucleus and autopsy data were not recognized (Melms evaluation: 1/26; 6 of 7 normal donors misclassified as PF). COVID-19 recall is at best 21% (4/19). Benchmark model only, no clinical use.",
         }
         if hasattr(self.pipeline, "predict_proba"):
             proba = self.pipeline.predict_proba(expression)[0]

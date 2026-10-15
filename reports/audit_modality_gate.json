@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "audit_step": "Section C2: Modality Classifier Gate",
+    "model_architecture": "ResNet-18 (64x64 input, 3 channels, 5 classes)",
+    "classes": [
+      "chest_xray",
+      "dermoscopy",
+      "fundus",
+      "blood_smear",
+      "other"
+    ],
+    "timestamp": "2026-10-14T19:06:15Z",
+    "compute_device": "mps",
+    "train_samples_total": 5980,
+    "test_samples_total": 2386,
+    "runtime_seconds": 69.86
+  },
+  "evaluation_metrics": {
+    "overall_accuracy": 0.9715,
+    "false_accept_rate_for_other": 0.0763,
+    "false_accept_rate_on_cifar_photos": 0.06,
+    "meets_below_10pct_target": true,
+    "per_class_metrics": {
+      "chest_xray": {
+        "precision": 0.995,
+        "recall": 0.99,
+        "f1_score": 0.9925,
+        "support": 400
+      },
+      "dermoscopy": {
+        "precision": 0.8677,
+        "recall": 1.0,
+        "f1_score": 0.9292,
+        "support": 400
+      },
+      "fundus": {
+        "precision": 1.0,
+        "recall": 0.9975,
+        "f1_score": 0.9987,
+        "support": 400
+      },
+      "blood_smear": {
+        "precision": 1.0,
+        "recall": 0.9925,
+        "f1_score": 0.9962,
+        "support": 400
+      },
+      "other": {
+        "precision": 0.9932,
+        "recall": 0.9237,
+        "f1_score": 0.9572,
+        "support": 786
+      }
+    },
+    "confusion_matrix": [
+      [
+        396,
+        0,
+        0,
+        0,
+        4
+      ],
+      [
+        0,
+        400,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        399,
+        0,
+        1
+      ],
+      [
+        0,
+        3,
+        0,
+        397,
+        0
+      ],
+      [
+        2,
+        58,
+        0,
+        0,
+        726
+      ]
+    ],
+    "confusion_matrix_labels": [
+      "chest_xray",
+      "dermoscopy",
+      "fundus",
+      "blood_smear",
+      "other"
+    ]
+  },
+  "integration_policy": {
+    "mismatch_behavior": "If gate predicted modality != user-selected modality, reject request and refuse to execute screening model.",
+    "warning_banner_status": "Warning banner maintained because model is trained on curated datasets (MedMNIST, CIFAR) and does not guarantee detection of arbitrary arbitrary real-world photos."
+  }
+}

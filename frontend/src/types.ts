@@ -62,6 +62,8 @@ export interface PredictionResponse {
   probabilities_available: boolean;
   class_probabilities?: Record<string, number> | null;
   interpretation: string;
+  decision_rule_note?: string | null;
+  input_contract_notice?: string | null;
 }
 
 export interface GeneCoefficient {
@@ -154,5 +156,64 @@ export interface ImagePredictionResponse {
   probabilities?: Record<string, number>;
   class_probabilities?: Record<string, number>;
   model_metrics?: Record<string, number>;
+  cifar10_false_accept_rate?: number | null;
+  guard_status?: string | null;
+  staging_notice?: string | null;
+  clinical_notice?: string;
   disclaimer: string;
 }
+
+// ---------------------------------------------------------------------------
+// Phase 6: Future Risk (Mortality-Linked) & Published Scores Schemas
+// ---------------------------------------------------------------------------
+
+export interface FutureRiskTimeHorizon {
+  risk_probability: number;
+  risk_percent: number;
+}
+
+export interface FutureRiskEndpoint {
+  display_name: string;
+  estimand_type: string;
+  estimand_label: string;
+  estimand_description: string;
+  time_horizons: Record<string, FutureRiskTimeHorizon>;
+  risk_tier_5yr: "Low" | "Moderate" | "High" | string;
+  tier_cutoffs_5yr: Record<string, number>;
+  benchmark_metrics: Record<string, number>;
+}
+
+export interface PCEScoreResult {
+  display_name: string;
+  eligible: boolean;
+  eligibility_criteria: string;
+  estimated_10yr_ascvd_risk_pct: number | null;
+  risk_category: string | null;
+  benchmark_c_index_on_holdout: number;
+  benchmark_5yr_auroc_on_holdout: number;
+  citation: string;
+}
+
+export interface IDRSScoreResult {
+  display_name: string;
+  score: number;
+  risk_tier: "Low" | "Moderate" | "High" | string;
+  interpretation: string;
+  components: Record<string, number>;
+  benchmark_auroc_on_holdout: number;
+  citation: string;
+}
+
+export interface FutureRiskResponse {
+  future_endpoints: Record<string, FutureRiskEndpoint>;
+  published_scores: {
+    pooled_cohort_equations_pce: PCEScoreResult;
+    indian_diabetes_risk_score_idrs: IDRSScoreResult;
+    [key: string]: any;
+  };
+  features_provided_count: number;
+  nchs_privacy_perturbation_warning?: string;
+  estimand_clarification: string;
+  disclaimer: string;
+}
+

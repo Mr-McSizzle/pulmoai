@@ -17,9 +17,11 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from pulmoai.service import MAX_UPLOAD_BYTES, PulmoAIService
 from pulmoai.report_reader import process_lab_report
 from pulmoai.risk_service import HealthRiskService
+from pulmoai.future_risk_service import FutureRiskService
 from pulmoai.image_service import ImageScreeningService
 from backend.schemas import (
     DashboardResponse,
+    FutureRiskResponse,
     GeneInsightsResponse,
     HealthResponse,
     ImagePredictionResponse,
@@ -68,6 +70,15 @@ async def lifespan(app: FastAPI):
         app.state.risk_service = None
         app.state.risk_model_error = "NHANES risk model artifact could not be loaded; check server logs."
         logger.exception("NHANES risk model startup failed")
+
+    try:
+        app.state.future_risk_service = FutureRiskService.load()
+        app.state.future_risk_model_error = None
+        logger.info("Loaded FutureRiskService successfully")
+    except Exception:
+        app.state.future_risk_service = None
+        app.state.future_risk_model_error = "Future risk models artifact could not be loaded; check server logs."
+        logger.exception("Future risk model startup failed")
     yield
 
 
@@ -105,6 +116,19 @@ def require_risk_service(request: Request) -> HealthRiskService:
         except Exception:
             raise HTTPException(status_code=503, detail=getattr(
                 request.app.state, "risk_model_error", "NHANES risk model service is unavailable."
+            ))
+    return service
+
+
+def require_future_risk_service(request: Request) -> FutureRiskService:
+    service = getattr(request.app.state, "future_risk_service", None)
+    if service is None:
+        try:
+            service = FutureRiskService.load()
+            request.app.state.future_risk_service = service
+        except Exception:
+            raise HTTPException(status_code=503, detail=getattr(
+                request.app.state, "future_risk_model_error", "Future risk model service is unavailable."
             ))
     return service
 
@@ -227,6 +251,7 @@ MAX_REPORT_BYTES = 10 * 1024 * 1024  # 10 MB limit for lab PDFs/photos
 @app.post("/api/report/extract", response_model=ReportExtractResponse)
 async def extract_report(
     file: Annotated[UploadFile, File(description="Lab report PDF or photo (PNG, JPG, TIFF)")],
+    sex: Annotated[str | None, Form(description="Patient biological sex (male/female) for sex-specific reference ranges")] = None,
 ) -> ReportExtractResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
@@ -244,7 +269,7 @@ async def extract_report(
         raise HTTPException(status_code=413, detail="File exceeds the 10 MB upload limit.")
 
     try:
-        extraction_result = process_lab_report(contents, file.filename, file.content_type)
+        extraction_result = process_lab_report(contents, file.filename, file.content_type, sex=sex)
         return ReportExtractResponse(**extraction_result)
     except Exception as error:
         logger.exception("Lab report extraction failed")
@@ -263,6 +288,20 @@ def predict_chronic_risk(
     except Exception as error:
         logger.exception("Risk prediction calculation failed")
         raise HTTPException(status_code=500, detail="An error occurred while calculating chronic disease risk.") from error
+
+
+@app.post("/api/risk/future", response_model=FutureRiskResponse)
+def predict_future_mortality_risk(
+    request: Request,
+    payload: RiskPredictionRequest,
+) -> FutureRiskResponse:
+    future_service = require_future_risk_service(request)
+    try:
+        result = future_service.predict_future_risk(payload.inputs)
+        return FutureRiskResponse(**result)
+    except Exception as error:
+        logger.exception("Future risk prediction calculation failed")
+        raise HTTPException(status_code=500, detail="An error occurred while calculating prospective future risk.") from error
 
 
 # ---------------------------------------------------------------------------
