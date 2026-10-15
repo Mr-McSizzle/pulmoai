@@ -90,11 +90,13 @@ CANONICAL_TESTS: list[CanonicalTestDef] = [
         category="Lipid Panel",
         target_unit="mg/dL",
         aliases=[
-            "hdl cholesterol", "hdl-cholesterol", "hdl-c", "hdl",
-            "high density lipoprotein", "cholesterol, hdl",
+            "cholesterol hdl direct", "cholesterol, hdl direct", "cholesterol - hdl direct",
+            "cholesterol hdl", "cholesterol, hdl", "cholesterol-hdl",
             "hdl cholesterol - direct", "hdl cholesterol direct",
             "hdl - direct", "hdl direct", "hdl-cholesterol - direct",
-            "hdl - cholesterol",
+            "hdl - cholesterol", "hdl cholesterol", "hdl-cholesterol", "hdl-c", "hdl",
+            "high density lipoprotein",
+            "direct hdl cholesterol", "direct hdl",
         ],
         ref_min=40.0,
         ref_max=100.0,
@@ -119,8 +121,13 @@ CANONICAL_TESTS: list[CanonicalTestDef] = [
         category="Lipid Panel",
         target_unit="mg/dL",
         aliases=[
-            "ldl cholesterol", "ldl-cholesterol", "ldl-c", "ldl",
-            "low density lipoprotein", "cholesterol, ldl", "calculated ldl",
+            "cholesterol ldl direct", "cholesterol, ldl direct", "cholesterol - ldl direct",
+            "cholesterol ldl", "cholesterol, ldl", "cholesterol-ldl",
+            "ldl cholesterol - direct", "ldl cholesterol direct",
+            "ldl - direct", "ldl direct", "ldl-cholesterol - direct",
+            "ldl - cholesterol", "ldl cholesterol", "ldl-cholesterol", "ldl-c", "ldl",
+            "low density lipoprotein", "calculated ldl",
+            "direct ldl cholesterol", "direct ldl",
         ],
         ref_min=0.0,
         ref_max=99.0,
@@ -1011,8 +1018,8 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
                                     r"(\d+(?:\.\d+)?)\s*(?:-|–|—|to)\s*(\d+(?:\.\d+)?)\s*([A-Za-z/%^µμ\s\-.]+)?",
                                     remaining_text,
                                 )
-                                ref_less = re.search(r"<\s*(\d+(?:\.\d+)?)", remaining_text)
-                                ref_greater = re.search(r">\s*(\d+(?:\.\d+)?)", remaining_text)
+                                ref_less = re.search(r"(?:<=\s*|≤\s*|<\s*=\s*|<\s*)(\d+(?:\.\d+)?)", remaining_text)
+                                ref_greater = re.search(r"(?:>=\s*|≥\s*|>\s*=\s*|>\s*)(\d+(?:\.\d+)?)", remaining_text)
                                 p_min, p_max, p_str = None, None, None
                                 p_min_raw, p_max_raw = None, None
                                 if ref_match:
@@ -1021,10 +1028,12 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
                                     p_str = f"{p_min_raw} - {p_max_raw}"
                                 elif ref_less:
                                     p_max_raw = float(ref_less.group(1))
-                                    p_str = f"< {p_max_raw}"
+                                    has_eq = "=" in ref_less.group(0) or "≤" in ref_less.group(0)
+                                    p_str = f"<= {p_max_raw}" if has_eq else f"< {p_max_raw}"
                                 elif ref_greater:
                                     p_min_raw = float(ref_greater.group(1))
-                                    p_str = f"> {p_min_raw}"
+                                    has_eq = "=" in ref_greater.group(0) or "≥" in ref_greater.group(0)
+                                    p_str = f">= {p_min_raw}" if has_eq else f"> {p_min_raw}"
 
                                 if p_min_raw is not None:
                                     p_min = normalize_unit_and_value(t_def.canonical_name, p_min_raw, unit_cand)[0] if unit_cand else p_min_raw
@@ -1096,8 +1105,8 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
             after_val,
             re.IGNORECASE,
         )
-        ref_less_match = re.search(r"<\s*(\d+(?:\.\d+)?)", after_val)
-        ref_greater_match = re.search(r">\s*(\d+(?:\.\d+)?)", after_val)
+        ref_less_match = re.search(r"(?:<=\s*|≤\s*|<\s*=\s*|<\s*)(\d+(?:\.\d+)?)", after_val)
+        ref_greater_match = re.search(r"(?:>=\s*|≥\s*|>\s*=\s*|>\s*)(\d+(?:\.\d+)?)", after_val)
 
         p_min, p_max, p_str = None, None, None
         p_min_raw, p_max_raw = None, None
@@ -1108,10 +1117,12 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
             p_str = f"{p_min_raw} - {p_max_raw}" + (f" {u_part}" if u_part else "")
         elif ref_less_match:
             p_max_raw = float(ref_less_match.group(1))
-            p_str = f"< {p_max_raw}"
+            has_eq = "=" in ref_less_match.group(0) or "≤" in ref_less_match.group(0)
+            p_str = f"<= {p_max_raw}" if has_eq else f"< {p_max_raw}"
         elif ref_greater_match:
             p_min_raw = float(ref_greater_match.group(1))
-            p_str = f"> {p_min_raw}"
+            has_eq = "=" in ref_greater_match.group(0) or "≥" in ref_greater_match.group(0)
+            p_str = f">= {p_min_raw}" if has_eq else f"> {p_min_raw}"
 
         norm_val, norm_unit, conf = normalize_unit_and_value(t_def.canonical_name, raw_val, unit_cand)
 

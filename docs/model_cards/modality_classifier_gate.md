@@ -1,7 +1,7 @@
 # Model Card: Modality Classifier Gate & OOD Rejection
 
 ## Model Details
-- **Architecture:** 5-Class Convolutional Neural Network (ResNet-18, 64x64 input, 3 channels) with pixel standard deviation entropy pre-check.
+- **Architecture:** 5-Class Convolutional Neural Network (ResNet-18, 64x64 input, 3 channels) with dual-stage heuristic pre-check (pixel standard deviation $\text{std} < 0.05$ and Laplacian edge variance $\text{var} < 5.0$).
 - **Classes:** `chest_xray`, `dermoscopy`, `fundus`, `blood_smear`, `other`
 - **Artifact Names & Paths:**
   - Deployed Checkpoint: `models/modality_gate_resnet18_v3.pt`
@@ -25,6 +25,10 @@
   - OrganSMNIST Abdominal CT (Sagittal): 2.80% (95% CI: [1.68%, 4.64%])
   - Synthetic Lab Report Renderings: 100.00% (95% CI: [98.91%, 100.0%])
   - Synthetic Noise & Blanks (Pre-Checked): 0.00% (95% CI: [0.00%, 2.87%])
+- **Adversarial / Synthetic Noise Stress-Test ($n=800$, Wilson 95% CIs):**
+  - Evaluated families: Gaussian noise ($\sigma \in [0.10, 0.30]$), uniform noise, checkerboards, smooth linear/radial gradients, rendered text pages, screenshots.
+  - Overall Rejection Rate: **100.00%** (800 / 800, 95% CI: [99.52%, 100.00%])
+  - False-Accept Rate: **0.00%** (0 / 800, 95% CI: [0.00%, 0.48%])
 - **Target True-Accept Rate (TAR / Recall) on Held-Out Test Sets:**
   - Chest X-ray: 99.75% (399 / 400)
   - Dermoscopy: 99.00% (396 / 400)

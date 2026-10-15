@@ -81,13 +81,13 @@ cd ..
 
 ## 4. Automated Test Suite
 
-Run all 52 unit, integration, estimand, and offline privacy tests:
+Run all 53 unit, integration, estimand, and offline privacy tests:
 
 ```bash
 PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
 ```
 
-All 52 tests execute in under 12 seconds with 100% pass rate.
+All 53 tests execute in under 12 seconds with 100% pass rate.
 
 ---
 
@@ -139,18 +139,19 @@ MPLCONFIGDIR="$PWD/.mplconfig" python3 scripts/generate_architecture_diagram.py
 | **NCHS Linked Mortality Files** | CDC NCHS National Death Index follow-up through 2015 | 47,281 eligible participants (8,828 deaths) | Public Domain (CDC Restricted-Use Data Perturbation Warning Applies) |
 | **MedMNIST v2 Benchmarks** | Zenodo / Yang et al. (Pneumonia, Derma, Retina, Blood, Chest) | 64x64 standardized biomedical images | Creative Commons Attribution 4.0 International (CC-BY 4.0) |
 | **Negative Modality Families** | CIFAR-100, BreastMNIST, OrganCMNIST, OrganSMNIST, Synthetic Blanks | 2,136 negative evaluation images | CC-BY 4.0 / Open Access / Internal Benchmark |
-| **Synthetic Lab Report Benchmark** | Templates A, B, C, D styled after common clinical pathology layouts | 2,100 evaluated analyte entities (seed=999) | Apache 2.0 (Synthetic Research Benchmark) |
+| **Synthetic Lab Report Benchmark** | Templates A-F styled after clinical pathology & urgent care layouts | 2,520 evaluated analyte entities (seeds 999 & 777) | Apache 2.0 (Synthetic Research Benchmark) |
+| **HGNC Gene Nomenclature** | HUGO Gene Nomenclature Committee (EMBL-EBI / Wellcome Trust) | 43,000+ approved human gene symbols & aliases | Public Domain / Open Access (Free Academic & Commercial Use) |
 
 ---
 
 ## 8. Detailed Model Cards
 
 Detailed model cards documenting training procedures, intended use, known limitations, and bias evaluations are available in `docs/model_cards/`:
-- [Single-Cell Lung Disease Classifier](file:///Users/nisarg/Desktop/ml%20project/docs/model_cards/lung_classifier.md)
-- [NHANES Chronic Disease Risk Engine](file:///Users/nisarg/Desktop/ml%20project/docs/model_cards/nhanes_chronic_risk.md)
-- [Future Mortality Risk Engine](file:///Users/nisarg/Desktop/ml%20project/docs/model_cards/future_mortality_risk.md)
-- [Modality Classifier & Gate](file:///Users/nisarg/Desktop/ml%20project/docs/model_cards/modality_classifier_gate.md)
-- [Clinical Laboratory Report Reader](file:///Users/nisarg/Desktop/ml%20project/docs/model_cards/ocr_report_reader.md)
+- [Single-Cell Lung Disease Classifier](docs/model_cards/lung_classifier.md)
+- [NHANES Chronic Disease Risk Engine](docs/model_cards/nhanes_chronic_risk.md)
+- [Future Mortality Risk Engine](docs/model_cards/future_mortality_risk.md)
+- [Modality Classifier & Gate](docs/model_cards/modality_classifier_gate.md)
+- [Clinical Laboratory Report Reader](docs/model_cards/ocr_report_reader.md)
 
 ---
 
@@ -163,3 +164,11 @@ PulmoAI is developed strictly for research, educational, and benchmarking purpos
 - **India (CDSCO):** Under the Medical Device Rules, 2017 (amended 2020), Software as a Medical Device (SaMD) intended for clinical diagnosis requires registration and licensing from the Central Drugs Standard Control Organisation (CDSCO). PulmoAI is **NOT registered** with CDSCO and cannot be used in Indian clinical practice.
 - **United States (US FDA):** Under 21 CFR § 820 and Section 510(k) / De Novo pathways, clinical AI systems require premarket clearance or approval. PulmoAI is **NOT an FDA-cleared** medical device.
 - **European Union (EMA / CE-IVD):** Under EU In Vitro Diagnostic Medical Devices Regulation (IVDR 2017/746) and the EU AI Act (2024), diagnostic AI systems require conformity assessment by an EU Notified Body. PulmoAI does **NOT bear a CE mark**.
+
+---
+
+## 10. License & Distribution
+
+- **Software License:** PulmoAI codebase is released under the [MIT License](LICENSE).
+- **Model Checkpoints:** Weight distribution, reproduction scripts, and cryptographic SHA-256 integrity checksums are documented in [docs/WEIGHTS.md](docs/WEIGHTS.md).
+

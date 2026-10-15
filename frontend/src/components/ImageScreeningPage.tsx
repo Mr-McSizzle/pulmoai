@@ -212,14 +212,17 @@ export function ImageScreeningPage() {
             </button>
           </div>
 
-          {/* Audited OOD Assessment Notice (Slider removed per benchmark findings) */}
-          <div className="p-3 rounded-lg bg-amber-50/70 border border-amber-200">
-            <div className="text-xs font-semibold text-amber-900 mb-1 flex items-center gap-1.5">
-              <AlertTriangle size={14} className="text-amber-700" />
-              OOD Detection Guard Removed (No Reliable Detector Exists)
+          {/* Audited Modality Gate & OOD Assessment Notice (Pass 5 F6) */}
+          <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 space-y-1.5">
+            <div className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+              <AlertTriangle size={15} className="text-amber-700 shrink-0" />
+              Modality Gate & Domain Boundaries Notice
             </div>
-            <div className="text-[11px] text-amber-800 leading-snug">
-              Audited across Maximum Softmax Probability, Energy Score, Mahalanobis Distance, kNN Embeddings, and Outlier Exposure. No evaluated method achieves a False-Accept Rate under 10% (observed FAR on out-of-domain medical images and photographs ranges from 48% to 100%). Automated rejection sliders provide false clinical reassurance and have been removed.
+            <div className="text-[11px] text-amber-900 leading-snug">
+              <strong>Domain boundaries:</strong> The Modality Gate recognizes only the specific categories it was trained on (pediatric chest x-ray, dermoscopy, fundus, blood smear, and specific training negatives). It cannot guarantee detection of unseen image types or arbitrary natural photos.
+            </div>
+            <div className="text-[11px] text-amber-800 leading-snug font-mono bg-amber-100/70 p-2 rounded border border-amber-200">
+              Leave-One-Family-Out (LOFO) Macro FAR: <strong>19.03%</strong> | Worst Left-Out Family: <strong>100.0%</strong> (synthetic lab reports) | High-Variance Noise Pre-Check Rejection: <strong>100.0%</strong>
             </div>
           </div>
 

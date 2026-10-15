@@ -34,6 +34,8 @@ models/covid_vs_healthy_logistic_regression.joblib
 models/lung_disease_classifier.joblib
 models/pilot_best_logistic_regression.joblib
 models/medmnist/*.pt
+models/modality_gate_resnet18.pt
+models/modality_gate_resnet18_v2.pt
 
 # Frontend dependencies and cache (dist is kept so friend does not need Node.js)
 frontend/node_modules/

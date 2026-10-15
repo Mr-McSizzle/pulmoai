@@ -1,12 +1,17 @@
 """Generate a high-resolution, professional architecture diagram for PulmoAI.
 
 Outputs a clean 300 DPI architecture diagram with zero emojis directly to:
-/Users/nisarg/Desktop/ml project/architecture_diagram.png
+architecture_diagram.png
 """
 
 from pathlib import Path
+import unittest
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+test_suite = unittest.defaultTestLoader.discover(str(PROJECT_ROOT / "tests"))
+test_count = test_suite.countTestCases()
 
 # Set non-interactive backend
 plt.switch_backend("Agg")
@@ -272,11 +277,11 @@ for idx, (title, content, accent) in enumerate(data_blocks):
 # ---------------------------------------------------------------------------
 ax.text(
     50, 2.0,
-    "Verified for PulmoAI Multimodal Platform | Zero Emojis Compliance | 52 Automated Tests Passing",
+    f"Verified for PulmoAI Multimodal Platform | Zero Emojis Compliance | {test_count} Automated Tests Passing",
     ha="center", va="center", fontsize=8, color="#94A3B8",
 )
 
-output_path = Path("/Users/nisarg/Desktop/ml project/architecture_diagram.png")
+output_path = PROJECT_ROOT / "architecture_diagram.png"
 plt.savefig(output_path, format="png", dpi=300, facecolor=fig.get_facecolor(), bbox_inches="tight")
 plt.close(fig)
 

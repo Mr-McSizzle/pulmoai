@@ -27,14 +27,14 @@ export function LabReportPage({ onTransferToRisk }: LabReportPageProps) {
   const [dragOver, setDragOver] = useState(false);
   const [patientSex, setPatientSex] = useState<string>("unspecified");
   const [editedValues, setEditedValues] = useState<Record<string, number>>({});
-  const [confirmedByUser, setConfirmedByUser] = useState(false);
+  const [confirmedTests, setConfirmedTests] = useState<Record<string, boolean>>({});
 
   const handleFile = (selected: File) => {
     setFile(selected);
     setError(null);
     setResult(null);
     setEditedValues({});
-    setConfirmedByUser(false);
+    setConfirmedTests({});
   };
 
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
@@ -61,7 +61,7 @@ export function LabReportPage({ onTransferToRisk }: LabReportPageProps) {
       const res = await api.extractReport(f, effSex !== "unspecified" ? effSex : undefined);
       setResult(res);
       setEditedValues({});
-      setConfirmedByUser(false);
+      setConfirmedTests({});
     } catch (err: any) {
       setError(err?.message || "Failed to extract lab report.");
     } finally {
@@ -161,6 +161,14 @@ Sex: Male`;
     : 0;
   const hasLowConfidence = result
     ? result.extracted_tests.some((t) => t.confidence < 0.70)
+    : false;
+  const isScannedOrOcr = result ? result.extraction_method !== "pdf_text_layer" : false;
+  const confirmedCount = result
+    ? result.extracted_tests.filter((t) => confirmedTests[t.canonical_name]).length
+    : 0;
+  const allTestsConfirmed = result
+    ? result.extracted_tests.length > 0 &&
+      result.extracted_tests.every((t) => confirmedTests[t.canonical_name])
     : false;
 
   return (
@@ -295,25 +303,38 @@ Sex: Male`;
                 </div>
               )}
 
-              <div className="mb-3 p-2.5 rounded-lg bg-white/80 border border-teal-200 text-xs">
-                <label className="flex items-start gap-2 text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="mt-0.5 rounded border-slate-300 text-teal-600"
-                    checked={confirmedByUser}
-                    onChange={(e) => setConfirmedByUser(e.target.checked)}
+              <div className="mb-3 p-3 rounded-lg bg-white/90 border border-teal-200 text-xs space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700">
+                  <span>Biomarker Verification:</span>
+                  <span className={allTestsConfirmed ? "text-emerald-700 font-bold" : "text-amber-700 font-bold"}>
+                    {confirmedCount} / {result.extracted_tests.length} confirmed
+                  </span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${allTestsConfirmed ? "bg-emerald-500" : "bg-amber-500"}`}
+                    style={{ width: `${result.extracted_tests.length > 0 ? (confirmedCount / result.extracted_tests.length) * 100 : 0}%` }}
                   />
-                  <span>I have verified and confirm all extracted laboratory values against the source document.</span>
-                </label>
+                </div>
+                {!allTestsConfirmed && (
+                  <div className="text-[10px] text-amber-800 leading-tight">
+                    Individual confirmation is mandatory: check the box next to each biomarker in the table below to verify values against source.
+                  </div>
+                )}
+                {allTestsConfirmed && (
+                  <div className="text-[10px] text-emerald-800 font-medium">
+                    All biomarkers confirmed by user. Ready for transfer.
+                  </div>
+                )}
               </div>
 
               <button
                 className={`button-primary w-full text-xs py-2.5 flex items-center justify-center gap-2 text-white shadow ${
-                  confirmedByUser
+                  allTestsConfirmed
                     ? "bg-teal-600 hover:bg-teal-700 cursor-pointer"
                     : "bg-slate-400 cursor-not-allowed opacity-60"
                 }`}
-                disabled={!confirmedByUser}
+                disabled={!allTestsConfirmed}
                 onClick={() => onTransferToRisk(riskFeatures)}
               >
                 <span>Send to Chronic Risk Engine</span>
@@ -354,6 +375,19 @@ Sex: Male`;
 
           {result && (
             <>
+              {/* Persistent warning for scanned / OCR inputs (Pass 5 F5) */}
+              {isScannedOrOcr && (
+                <div className="p-3.5 rounded-xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-xs font-semibold flex items-center gap-2.5">
+                  <AlertTriangle size={18} className="text-amber-700 shrink-0" />
+                  <div>
+                    <div className="text-sm font-bold">scanned input: values may be wrong</div>
+                    <div className="text-[11px] font-normal text-amber-800 mt-0.5">
+                      Benchmark evaluation: <em>synthetic set; real-world accuracy unknown</em>. Mandatory side-by-side verification required for each biomarker before chronic risk prediction.
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Summary Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-sm">
@@ -404,7 +438,8 @@ Sex: Male`;
                   <table className="w-full text-left text-xs">
                     <thead>
                       <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-600">
-                        <th className="py-2.5 px-4 font-semibold">Biomarker</th>
+                        <th className="py-2.5 px-3 font-semibold text-center w-12">Verify</th>
+                        <th className="py-2.5 px-4 font-semibold">Biomarker / Source Line</th>
                         <th className="py-2.5 px-4 font-semibold">Reported Raw</th>
                         <th className="py-2.5 px-4 font-semibold">Standardized (US)</th>
                         <th className="py-2.5 px-4 font-semibold">Reference Range</th>
@@ -414,9 +449,24 @@ Sex: Male`;
                     <tbody className="divide-y divide-slate-100">
                       {result.extracted_tests.map((test: LabItemSchema, idx: number) => (
                         <tr key={`${test.canonical_name}-${idx}`} className="hover:bg-slate-50/60 transition-colors">
+                          <td className="py-2.5 px-3 text-center">
+                            <input
+                              type="checkbox"
+                              className="rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer h-4 w-4"
+                              checked={!!confirmedTests[test.canonical_name]}
+                              onChange={(e) =>
+                                setConfirmedTests((prev) => ({
+                                  ...prev,
+                                  [test.canonical_name]: e.target.checked,
+                                }))
+                              }
+                            />
+                          </td>
                           <td className="py-2.5 px-4">
                             <div className="font-semibold text-slate-800">{test.display_name}</div>
-                            <div className="text-[10px] text-slate-500 font-mono">{test.raw_name}</div>
+                            <div className="text-[10px] text-slate-600 font-mono bg-slate-100 px-1.5 py-0.5 rounded mt-0.5 inline-block">
+                              Raw: &quot;{test.raw_name}&quot;
+                            </div>
                           </td>
                           <td className="py-2.5 px-4 text-slate-700">
                             {test.raw_value} <span className="text-[10px] text-slate-500">{test.raw_unit}</span>

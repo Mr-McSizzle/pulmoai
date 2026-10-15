@@ -1,0 +1,305 @@
+{
+  "metadata": {
+    "title": "PulmoAI Fresh Holdout OCR Evaluation (Pass 5 F5)",
+    "benchmark_label": "synthetic set; real-world accuracy unknown",
+    "seed": 777,
+    "total_synthetic_documents": 60,
+    "total_entities_per_condition": 420,
+    "timestamp": "2026-10-15T07:19:07Z",
+    "total_runtime_seconds": 156.77
+  },
+  "condition_summaries": {
+    "clean_pdf": {
+      "condition": "clean_pdf",
+      "total_entities": 420,
+      "correct_count": 395,
+      "accuracy": 0.9405,
+      "wrong_value_accepted_count": 0,
+      "silent_error_rate": 0.0,
+      "flag_mismatch_only_count": 25,
+      "flag_mismatch_rate": 0.0595,
+      "not_detected_count": 0,
+      "not_detected_rate": 0.0,
+      "low_confidence_wrong_value_fraction": 1.0,
+      "blocked_from_risk_engine_fraction": 1.0,
+      "runtime_seconds": 0.26
+    },
+    "rotated_raw": {
+      "condition": "rotated_raw",
+      "total_entities": 420,
+      "correct_count": 278,
+      "accuracy": 0.6619,
+      "wrong_value_accepted_count": 65,
+      "silent_error_rate": 0.1548,
+      "flag_mismatch_only_count": 35,
+      "flag_mismatch_rate": 0.0833,
+      "not_detected_count": 42,
+      "not_detected_rate": 0.1,
+      "low_confidence_wrong_value_fraction": 0.0,
+      "blocked_from_risk_engine_fraction": 1.0,
+      "runtime_seconds": 25.77
+    },
+    "rotated_adaptive": {
+      "condition": "rotated_adaptive",
+      "total_entities": 420,
+      "correct_count": 358,
+      "accuracy": 0.8524,
+      "wrong_value_accepted_count": 11,
+      "silent_error_rate": 0.0262,
+      "flag_mismatch_only_count": 29,
+      "flag_mismatch_rate": 0.069,
+      "not_detected_count": 22,
+      "not_detected_rate": 0.0524,
+      "low_confidence_wrong_value_fraction": 0.0,
+      "blocked_from_risk_engine_fraction": 1.0,
+      "runtime_seconds": 41.16
+    },
+    "blur": {
+      "condition": "blur",
+      "total_entities": 420,
+      "correct_count": 229,
+      "accuracy": 0.5452,
+      "wrong_value_accepted_count": 83,
+      "silent_error_rate": 0.1976,
+      "flag_mismatch_only_count": 8,
+      "flag_mismatch_rate": 0.019,
+      "not_detected_count": 100,
+      "not_detected_rate": 0.2381,
+      "low_confidence_wrong_value_fraction": 0.0,
+      "blocked_from_risk_engine_fraction": 1.0,
+      "runtime_seconds": 31.69
+    },
+    "jpeg": {
+      "condition": "jpeg",
+      "total_entities": 420,
+      "correct_count": 361,
+      "accuracy": 0.8595,
+      "wrong_value_accepted_count": 15,
+      "silent_error_rate": 0.0357,
+      "flag_mismatch_only_count": 24,
+      "flag_mismatch_rate": 0.0571,
+      "not_detected_count": 20,
+      "not_detected_rate": 0.0476,
+      "low_confidence_wrong_value_fraction": 0.0,
+      "blocked_from_risk_engine_fraction": 1.0,
+      "runtime_seconds": 28.95
+    },
+    "perspective": {
+      "condition": "perspective",
+      "total_entities": 420,
+      "correct_count": 364,
+      "accuracy": 0.8667,
+      "wrong_value_accepted_count": 18,
+      "silent_error_rate": 0.0429,
+      "flag_mismatch_only_count": 24,
+      "flag_mismatch_rate": 0.0571,
+      "not_detected_count": 14,
+      "not_detected_rate": 0.0333,
+      "low_confidence_wrong_value_fraction": 0.0,
+      "blocked_from_risk_engine_fraction": 1.0,
+      "runtime_seconds": 26.43
+    }
+  },
+  "layout_breakdown": {
+    "template_a": {
+      "layout_name": "Template A (Hospital pathology tabular format)",
+      "total_evaluated_across_all_conditions": 420,
+      "wrong_value_accepted_count": 40,
+      "silent_error_rate": 0.0952
+    },
+    "template_b": {
+      "layout_name": "Template B (Cardio-metabolic panel format)",
+      "total_evaluated_across_all_conditions": 420,
+      "wrong_value_accepted_count": 31,
+      "silent_error_rate": 0.0738
+    },
+    "template_c": {
+      "layout_name": "Template C (High-throughput diagnostic network format)",
+      "total_evaluated_across_all_conditions": 420,
+      "wrong_value_accepted_count": 27,
+      "silent_error_rate": 0.0643
+    },
+    "template_d": {
+      "layout_name": "Template D (Outpatient summary bulleted format)",
+      "total_evaluated_across_all_conditions": 420,
+      "wrong_value_accepted_count": 24,
+      "silent_error_rate": 0.0571
+    },
+    "template_e": {
+      "layout_name": "Template E (Academic Health Science Center multi-column tabular)",
+      "total_evaluated_across_all_conditions": 420,
+      "wrong_value_accepted_count": 55,
+      "silent_error_rate": 0.131
+    },
+    "template_f": {
+      "layout_name": "Template F (Ambulatory Point-of-Care Rapid Panel format)",
+      "total_evaluated_across_all_conditions": 420,
+      "wrong_value_accepted_count": 15,
+      "silent_error_rate": 0.0357
+    }
+  },
+  "total_silent_errors_recorded": 192,
+  "silent_error_examples": [
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 2001,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 87.7,
+      "expected_value": 57.7
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 2002,
+      "canonical_name": "hba1c",
+      "parsed_value": 2.0,
+      "expected_value": 2.6
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 2004,
+      "canonical_name": "hba1c",
+      "parsed_value": 4.0,
+      "expected_value": 4.5
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 2005,
+      "canonical_name": "hba1c",
+      "parsed_value": 7.0,
+      "expected_value": 7.4
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 2006,
+      "canonical_name": "hba1c",
+      "parsed_value": 4.0,
+      "expected_value": 4.7
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 2007,
+      "canonical_name": "hba1c",
+      "parsed_value": 2.0,
+      "expected_value": 2.8
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 2008,
+      "canonical_name": "hba1c",
+      "parsed_value": 8.0,
+      "expected_value": 8.4
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 2008,
+      "canonical_name": "serum_creatinine",
+      "parsed_value": 0.5,
+      "expected_value": 2.1
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_a",
+      "doc_id": 2010,
+      "canonical_name": "hba1c",
+      "parsed_value": 7.0,
+      "expected_value": 7.3
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 2012,
+      "canonical_name": "serum_creatinine",
+      "parsed_value": 2.4,
+      "expected_value": 2.1
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 2014,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 79.0,
+      "expected_value": 79.5
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 2016,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 50.3,
+      "expected_value": 50.8
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 2017,
+      "canonical_name": "serum_creatinine",
+      "parsed_value": 4.0,
+      "expected_value": 0.1
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 2018,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 53.0,
+      "expected_value": 53.2
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 2019,
+      "canonical_name": "serum_creatinine",
+      "parsed_value": 2.4,
+      "expected_value": 2.1
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_b",
+      "doc_id": 2020,
+      "canonical_name": "hdl_cholesterol",
+      "parsed_value": 26.0,
+      "expected_value": 26.2
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_c",
+      "doc_id": 2025,
+      "canonical_name": "fasting_glucose",
+      "parsed_value": 1190.0,
+      "expected_value": 110.0
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_c",
+      "doc_id": 2027,
+      "canonical_name": "hba1c",
+      "parsed_value": 4.8,
+      "expected_value": 4.5
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_c",
+      "doc_id": 2028,
+      "canonical_name": "hba1c",
+      "parsed_value": 7.8,
+      "expected_value": 7.5
+    },
+    {
+      "condition": "rotated_raw",
+      "layout_id": "template_c",
+      "doc_id": 2030,
+      "canonical_name": "fasting_glucose",
+      "parsed_value": 78.9,
+      "expected_value": 75.9
+    }
+  ],
+  "risk_engine_transfer_policy": "No unconfirmed or low-confidence OCR value may be sent to the chronic risk engine. Individual user confirmation checkbox is mandatory per biomarker. Scanned or degraded inputs carry a persistent warning: 'scanned input: values may be wrong'."
+}
