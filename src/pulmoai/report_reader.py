@@ -61,10 +61,11 @@ CANONICAL_TESTS: list[CanonicalTestDef] = [
         category="Glycemic",
         target_unit="%",
         aliases=[
-            "hba1c", "hemoglobin a1c", "glycohemoglobin", "glycated hemoglobin",
+            "hba1c", "hemoglobin a1c", "hemoglobin alc", "hbalc", "alc",
+            "glycohemoglobin", "glycated hemoglobin", "a1c glycohemoglobin",
             "a1c", "hba1c (ngsp)", "glycated hb", "glycosylated hemoglobin",
             "glycosylated hemoglobin (hba1c)", "glycosylated hemoglobin hba1c",
-            "glycohemoglobin hba1c",
+            "glycohemoglobin hba1c", "hemoglobin a1-c",
         ],
         ref_min=4.0,
         ref_max=5.6,
@@ -95,7 +96,7 @@ CANONICAL_TESTS: list[CanonicalTestDef] = [
             "hdl cholesterol - direct", "hdl cholesterol direct",
             "hdl - direct", "hdl direct", "hdl-cholesterol - direct",
             "hdl - cholesterol", "hdl cholesterol", "hdl-cholesterol", "hdl-c", "hdl",
-            "high density lipoprotein",
+            "high density lipoprotein", "hdl good cholesterol", "good cholesterol",
             "direct hdl cholesterol", "direct hdl",
         ],
         ref_min=40.0,
@@ -127,7 +128,7 @@ CANONICAL_TESTS: list[CanonicalTestDef] = [
             "ldl - direct", "ldl direct", "ldl-cholesterol - direct",
             "ldl - cholesterol", "ldl cholesterol", "ldl-cholesterol", "ldl-c", "ldl",
             "low density lipoprotein", "calculated ldl",
-            "direct ldl cholesterol", "direct ldl",
+            "direct ldl cholesterol", "direct ldl", "ldl bad cholesterol", "bad cholesterol",
         ],
         ref_min=0.0,
         ref_max=99.0,
@@ -622,8 +623,26 @@ def determine_flag(
 # Text Extraction: Digital PDF, Tesseract OCR, and Gemini
 # ---------------------------------------------------------------------------
 
+def estimate_image_noise(img_gray: np.ndarray) -> float:
+    """Estimate image noise standard deviation using Immerkaer's Laplacian mask.
+
+    Formula: J. Immerkaer, Fast Noise Variance Estimation, CVIU 1996.
+    """
+    import cv2
+    import numpy as np
+
+    h, w = img_gray.shape[:2]
+    if h < 3 or w < 3:
+        return 0.0
+    M = np.array([[1, -2, 1], [-2, 4, -2], [1, -2, 1]], dtype=np.float64)
+    filtered = cv2.filter2D(img_gray.astype(np.float64), -1, M)
+    sigma = np.sum(np.abs(filtered[1:-1, 1:-1]))
+    sigma = sigma * np.sqrt(0.5 * np.pi) / (6.0 * (w - 2) * (h - 2))
+    return float(round(sigma, 3))
+
+
 def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, str]:
-    """Adaptive per-image preprocessing: selects raw vs enhanced processing based on blur and skew.
+    """Adaptive per-image preprocessing: selects raw vs enhanced processing based on blur, skew, and noise.
 
     Returns:
         (processed_image, decision_rationale)
@@ -633,6 +652,7 @@ def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, st
 
     arr = np.array(pil_img.convert("L"))
     lap_var = float(cv2.Laplacian(arr, cv2.CV_64F).var())
+    noise_sigma = estimate_image_noise(arr)
 
     # 1. Blur detection: if heavily blurred (defocused), Otsu binarization
     # thins characters into broken strokes. Preserve raw image.
@@ -658,22 +678,40 @@ def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, st
         deskewed = cv2.warpAffine(
             arr, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT, borderValue=255
         )
-        up_w, up_h = int(w * (300 / 150)), int(h * (300 / 150))
-        upscaled = cv2.resize(deskewed, (up_w, up_h), interpolation=cv2.INTER_CUBIC)
+        # Normalize to 300 DPI equivalent (~2400px width), do NOT double already high-resolution images
+        if w < 2000:
+            scale = 2400.0 / float(w)
+            up_w, up_h = int(w * scale), int(h * scale)
+            upscaled = cv2.resize(deskewed, (up_w, up_h), interpolation=cv2.INTER_CUBIC)
+        else:
+            upscaled = deskewed
         denoised = cv2.medianBlur(upscaled, 3)
         _, thresh = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         return Image.fromarray(thresh), f"deskewed_and_enhanced (angle={best_angle:+.1f} deg)"
 
-    # If upright and unblurred (e.g. clean OCR or JPEG compression), preserve raw to avoid DCT artifacts
+    # If upright but optical noise detected, denoise to prevent false character generation
+    if noise_sigma >= 0.8:
+        if w < 2000:
+            scale = 2400.0 / float(w)
+            up_w, up_h = int(w * scale), int(h * scale)
+            upscaled = cv2.resize(arr, (up_w, up_h), interpolation=cv2.INTER_CUBIC)
+        else:
+            upscaled = arr
+        denoised = cv2.medianBlur(upscaled, 3)
+        _, thresh = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        return Image.fromarray(thresh), f"denoised_and_binarized (noise_sigma={noise_sigma:.2f})"
+
+    # If upright and unblurred, preserve raw to avoid DCT artifacts
     return pil_img, "upright_unblurred; raw preserved"
 
 
 def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, float]]:
-    """Estimate image blur and skew to determine if quality is sufficient for OCR.
+    """Estimate image blur, skew, and noise to determine if quality is sufficient for OCR.
 
     Thresholds calibrated on development images:
     - Laplacian variance < 30.0 indicates severe defocus blur where stroke edges blend together.
     - Projection profile skew >= 12.0 degrees indicates extreme tilt beyond reliable deskewing.
+    - Noise sigma >= 1.5 indicates excessive sensor/scanner noise causing false character generation.
 
     Returns:
         (is_acceptable, decision_message, quality_metrics)
@@ -684,6 +722,7 @@ def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, floa
 
         arr = np.array(pil_img.convert("L"))
         lap_var = float(cv2.Laplacian(arr, cv2.CV_64F).var())
+        noise_sigma = estimate_image_noise(arr)
 
         h, w = arr.shape
         center = (w // 2, h // 2)
@@ -697,10 +736,16 @@ def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, floa
             if score > best_score:
                 best_score, best_angle = score, float(angle)
 
-        metrics = {"laplacian_variance": round(lap_var, 2), "estimated_skew_degrees": round(best_angle, 2)}
+        metrics = {
+            "laplacian_variance": round(lap_var, 2),
+            "estimated_skew_degrees": round(best_angle, 2),
+            "noise_sigma": round(noise_sigma, 3),
+        }
         if lap_var < 30.0:
             return False, "image quality too low, please re-scan", metrics
         if abs(best_angle) >= 12.0:
+            return False, "image quality too low, please re-scan", metrics
+        if noise_sigma >= 1.5:
             return False, "image quality too low, please re-scan", metrics
 
         return True, "acceptable", metrics
@@ -959,6 +1004,12 @@ def match_test_name(name_candidate: str) -> CanonicalTestDef | None:
 
     # 2. Starts with or contains alias as isolated token (longer aliases first)
     for alias, t_def in sorted_pairs:
+        # Guard: total_cholesterol should never match if candidate mentions HDL or LDL
+        if t_def.canonical_name == "total_cholesterol" and ("hdl" in clean or "ldl" in clean):
+            continue
+        # Guard: hemoglobin (CBC) should never match if candidate mentions HbA1c / glycemic markers
+        if t_def.canonical_name == "hemoglobin" and ("a1c" in clean or "alc" in clean or "glyc" in clean):
+            continue
         if re.search(r"\b" + re.escape(alias) + r"\b", clean) or re.search(
             r"\b" + re.escape(alias) + r"\b", clean_no_hyphen
         ):
@@ -1035,7 +1086,7 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
         if any(skip in line.lower() for skip in ["patient name", "date of birth", "physician", "specimen id", "accession", "page "]):
             continue
 
-        clean_line = re.sub(r"^[•\-\*]\s*", "", line).strip()
+        clean_line = re.sub(r"^[•\-\*–—―⁃·~>:\s]+", "", line).strip()
 
         match = re.search(
             r"^([A-Za-z0-9\s,/()\-+]+?)[\s:=-]+([><]?\s*\d+(?:\.\d+)?)\s*([A-Za-z*%]*)\s*([A-Za-z0-9/%^µμ\s\-.]+)?",

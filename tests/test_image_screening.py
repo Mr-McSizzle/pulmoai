@@ -24,7 +24,13 @@ from pulmoai.image_service import (
     ImageScreeningService,
 )
 
+WEIGHTS_EXIST = (PROJECT_ROOT / "models" / "medmnist" / "pneumoniamnist_resnet18.pt").exists()
 
+
+@unittest.skipUnless(
+    WEIGHTS_EXIST,
+    "PyTorch vision checkpoint weights (.pt) not present in clean repository checkout",
+)
 class ImageScreeningUnitTest(unittest.TestCase):
     """Unit tests for MedMNIST inference and OOD guard."""
 
@@ -109,6 +115,10 @@ class ImageScreeningUnitTest(unittest.TestCase):
         self.assertIn("not recognised", result["message"].lower())
         self.assertIsNone(result["predicted_class"])
 
+
+class MissingWeightValidationTests(unittest.TestCase):
+    """Verify clean failure when weights are not present."""
+
     def test_missing_weight_file_fails_with_clear_message(self) -> None:
         """Verify service fails with a descriptive FileNotFoundError when weight file is missing."""
         import tempfile
@@ -128,6 +138,10 @@ class ImageScreeningAPITest(unittest.TestCase):
     def setUp(self) -> None:
         self.client = TestClient(app)
 
+    @unittest.skipUnless(
+        WEIGHTS_EXIST,
+        "PyTorch vision checkpoint weights (.pt) not present in clean repository checkout",
+    )
     def test_api_predict_chest_xray(self) -> None:
         """Test POST /api/image/predict endpoint with PNG image."""
         arr = np.random.randint(60, 180, size=(64, 64), dtype=np.uint8)

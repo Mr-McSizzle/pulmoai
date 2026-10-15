@@ -17,6 +17,8 @@ from fastapi.testclient import TestClient
 from backend.main import app
 from scripts.verify_checkpoints import verify_checkpoints
 
+WEIGHTS_EXIST = (PROJECT_ROOT / "models" / "medmnist" / "pneumoniamnist_resnet18.pt").exists()
+
 
 class ReproducibilityAndVerificationTests(unittest.TestCase):
     """Test checkpoint verification and integrity endpoints."""
@@ -99,6 +101,10 @@ class OODRejectionBenchmarkTests(unittest.TestCase):
     def setUp(self) -> None:
         self.client = TestClient(app)
 
+    @unittest.skipUnless(
+        WEIGHTS_EXIST,
+        "PyTorch vision checkpoint weights (.pt) not present in clean repository checkout",
+    )
     def test_image_predict_returns_empirical_far_and_methodology(self) -> None:
         """Verify image screening response includes empirical False Accept Rate and methodology statement."""
         import numpy as np
@@ -271,8 +277,8 @@ class FutureRiskEstimandTests(unittest.TestCase):
         self.assertEqual(asian["deaths_observed"], 53)
         self.assertAlmostEqual(asian["c_index"], 0.8618, places=4)
         self.assertAlmostEqual(asian["auroc_5yr"], 0.8834, places=4)
-        self.assertIn("c_index_95ci", asian)
-        self.assertIn("auroc_5yr_95ci", asian)
+        self.assertEqual(asian["c_index_95ci"], [0.8032, 0.914])
+        self.assertEqual(asian["auroc_5yr_95ci"], [0.8146, 0.9465])
 
 
 if __name__ == "__main__":

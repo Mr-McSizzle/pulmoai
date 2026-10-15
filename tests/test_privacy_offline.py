@@ -3,17 +3,22 @@
 from __future__ import annotations
 
 import io
+from pathlib import Path
 import socket
 import unittest
 from unittest.mock import patch
 
 from PIL import Image
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 from pulmoai.future_risk_service import FutureRiskService
 from pulmoai.image_service import ImageScreeningService
 from pulmoai.report_reader import process_lab_report
 from pulmoai.risk_service import HealthRiskService
 from pulmoai.service import PulmoAIService
+
+WEIGHTS_EXIST = (PROJECT_ROOT / "models" / "medmnist" / "pneumoniamnist_resnet18.pt").exists()
 
 
 class OfflineInferencePrivacyTests(unittest.TestCase):
@@ -81,6 +86,10 @@ class OfflineInferencePrivacyTests(unittest.TestCase):
         res = self._assert_no_network_call(service.predict_future_risk, inputs)
         self.assertIn("future_endpoints", res)
 
+    @unittest.skipUnless(
+        WEIGHTS_EXIST,
+        "PyTorch vision checkpoint weights (.pt) not present in clean repository checkout",
+    )
     def test_image_screening_inference_is_offline(self) -> None:
         """Verify medical image screening and modality gate make zero network calls."""
         service = ImageScreeningService.load()
