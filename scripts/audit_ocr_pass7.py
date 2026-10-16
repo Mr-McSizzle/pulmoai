@@ -129,7 +129,7 @@ PASS7_LAYOUT_TEMPLATES = [
         "layout_id": "template_b",
         "layout_name": "Template B (Cardio-metabolic panel format)",
         "default_sex": "female",
-        "header": "METROPOLITAN HEALTHCARE CLINICAL BIOCHEMISTRY LAB\nNAME: Subject_{idx}   AGE/SEX: {age}/{sex_cap}   IP/OP NO: MHC-{idx:06d}\nREFERRAL: OUTPATIENT CARDIOLOGY CLINIC   DATE: 14/11/2024\n------------------------------------------------------------------------------------\nEXAMINATION                      VALUE     UNITS          BIOLOGICAL REFERENCE\n------------------------------------------------------------------------------------\n",
+        "header": "REGIONAL HEALTHCARE CLINICAL BIOCHEMISTRY LAB\nNAME: Subject_{idx}   AGE/SEX: {age}/{sex_cap}   IP/OP NO: RHC-{idx:06d}\nREFERRAL: OUTPATIENT CARDIOLOGY CLINIC   DATE: 14/11/2024\n------------------------------------------------------------------------------------\nEXAMINATION                      VALUE     UNITS          BIOLOGICAL REFERENCE\n------------------------------------------------------------------------------------\n",
         "footer": "\n------------------------------------------------------------------------------------\nVerified by Automated Clinical Interface. End of Investigation Report.",
         "fmt": "{test_name:<30}   {val:<7.1f}   {unit:<12}   {ref}",
     },

@@ -66,34 +66,34 @@ TEST_SPECS = [
 
 LAYOUT_TEMPLATES = [
     {
-        "layout_id": "dr_lal_pathlabs",
-        "layout_name": "Dr Lal PathLabs Style (Indian Corporate Chain)",
+        "layout_id": "corporate_reference_lab",
+        "layout_name": "Corporate Reference Laboratory Style",
         "default_sex": "male",
-        "header": "Dr. Lal PathLabs Ltd. - National Reference Laboratory, New Delhi\nPatient Name: Patient_{idx}   Age / Sex: {age} Y / {sex_cap}   Ref: Self\nRegistration No: DL-88{idx:04d}   Collection Date: 12-Oct-2024\n--------------------------------------------------------------------------------\nTest Name                     Result   Units   Bio Ref Interval\n--------------------------------------------------------------------------------\n",
-        "footer": "\n--------------------------------------------------------------------------------\nEnd of report. Verified by Dr. S. K. Sharma, MD (Biochemistry)",
+        "header": "Corporate Reference Laboratories Ltd. - National Reference Center\nPatient Name: Patient_{idx}   Age / Sex: {age} Y / {sex_cap}   Ref: Self\nRegistration No: CRL-88{idx:04d}   Collection Date: 12-Oct-2024\n--------------------------------------------------------------------------------\nTest Name                     Result   Units   Bio Ref Interval\n--------------------------------------------------------------------------------\n",
+        "footer": "\n--------------------------------------------------------------------------------\nEnd of report. Verified by Dr. S. K. Specialist, MD (Biochemistry)",
         "fmt": "{test_name:<28}  {val:<7.1f}  {unit:<6}  {ref}",
     },
     {
-        "layout_id": "srl_agilus_diagnostics",
-        "layout_name": "Agilus Diagnostics / SRL Style (Indian Pathology)",
+        "layout_id": "regional_pathology_lab",
+        "layout_name": "Regional Pathology Laboratory Style",
         "default_sex": "female",
-        "header": "Agilus Diagnostics Ltd. - Center of Excellence in Pathology\nPatient: Patient_{idx}   Age: {age} Years   Gender: {sex_cap}   Lab No: AG-{idx:04d}\nReferring Physician: Dr. K. Patel   Sample Drawn: 11-Oct-2024\n================================================================================\nInvestigation                 Observed Value   Units   Biological Ref Interval\n================================================================================\n",
+        "header": "Regional Pathology Laboratories Ltd. - Center of Excellence\nPatient: Patient_{idx}   Age: {age} Years   Gender: {sex_cap}   Lab No: RPL-{idx:04d}\nReferring Physician: Dr. K. Patel   Sample Drawn: 11-Oct-2024\n================================================================================\nInvestigation                 Observed Value   Units   Biological Ref Interval\n================================================================================\n",
         "footer": "\n================================================================================\nMethodology: Fully automated dry/wet chemistry analyzer.",
         "fmt": "{test_name:<28}  {val:<14.1f}  {unit:<6}  {ref}",
     },
     {
-        "layout_id": "metropolis_healthcare",
-        "layout_name": "Metropolis Healthcare Style (Specialty Laboratory)",
+        "layout_id": "specialty_diagnostic_lab",
+        "layout_name": "Specialty Diagnostic Laboratory Style",
         "default_sex": "male",
-        "header": "METROPOLIS HEALTHCARE LIMITED - GLOBAL ACCREDITED LABORATORY\nNAME: Patient_{idx}   AGE/GENDER: {age} YRS / {sex_cap}   MRN: MH-{idx:05d}\nCOLLECTED: 10/10/2024   LOCATION: MUMBAI MAIN LAB\n********************************************************************************\nDEPARTMENT OF CLINICAL BIOCHEMISTRY\nTEST DESCRIPTION               FINDING   STANDARD UNIT   REFERENCE RANGE\n********************************************************************************\n",
-        "footer": "\n********************************************************************************\n*** FINAL VERIFIED REPORT *** SIGNED: DR. R. CHOKSHI, MD",
+        "header": "SPECIALTY DIAGNOSTIC LABS LIMITED - ACCREDITED CLINICAL LAB\nNAME: Patient_{idx}   AGE/GENDER: {age} YRS / {sex_cap}   MRN: SDL-{idx:05d}\nCOLLECTED: 10/10/2024   LOCATION: REGIONAL MAIN LAB\n********************************************************************************\nDEPARTMENT OF CLINICAL BIOCHEMISTRY\nTEST DESCRIPTION               FINDING   STANDARD UNIT   REFERENCE RANGE\n********************************************************************************\n",
+        "footer": "\n********************************************************************************\n*** FINAL VERIFIED REPORT *** SIGNED: DR. R. CLINICIAN, MD",
         "fmt": "{test_name:<29}  {val:<7.1f}  {unit:<13}  {ref}",
     },
     {
         "layout_id": "hospital_emr",
         "layout_name": "Standard Hospital EMR Style (Discharge & Vitals)",
         "default_sex": "female",
-        "header": "APOLLO HOSPITALS ENTERPRISE - INPATIENT CLINICAL SUMMARY\nPatient: Patient_{idx}   DOB/Age: {age}   Sex: {sex_cap}   MRN: AHE-{idx:06d}\nEncounter: Inpatient Medical   Admit: 08-Oct-2024   Discharge: 12-Oct-2024\n--------------------------------------------------------------------------------\nLABORATORY AND DIAGNOSTIC DATA:\n--------------------------------------------------------------------------------\n",
+        "header": "REGIONAL GENERAL HOSPITAL - INPATIENT CLINICAL SUMMARY\nPatient: Patient_{idx}   DOB/Age: {age}   Sex: {sex_cap}   MRN: RGH-{idx:06d}\nEncounter: Inpatient Medical   Admit: 08-Oct-2024   Discharge: 12-Oct-2024\n--------------------------------------------------------------------------------\nLABORATORY AND DIAGNOSTIC DATA:\n--------------------------------------------------------------------------------\n",
         "footer": "\n--------------------------------------------------------------------------------\nElectronically authenticated by Dr. N. Sengupta, MD (Medicine)",
         "fmt": "- {test_name}: {val:.1f} {unit} (Ref: {ref})",
     },
@@ -109,7 +109,7 @@ LAYOUT_TEMPLATES = [
 
 # Target display names for each layout
 TEST_NAME_VARIANTS = {
-    "dr_lal_pathlabs": {
+    "corporate_reference_lab": {
         "fasting_glucose": "Fasting Blood Sugar",
         "hba1c": "HbA1c (Glycated Hemoglobin)",
         "total_cholesterol": "Total Cholesterol",
@@ -118,7 +118,7 @@ TEST_NAME_VARIANTS = {
         "serum_creatinine": "Serum Creatinine",
         "hemoglobin": "Hemoglobin",
     },
-    "srl_agilus_diagnostics": {
+    "regional_pathology_lab": {
         "fasting_glucose": "Glucose, Fasting",
         "hba1c": "Glycohemoglobin HbA1c",
         "total_cholesterol": "Cholesterol, Total",
@@ -127,7 +127,7 @@ TEST_NAME_VARIANTS = {
         "serum_creatinine": "Creatinine, Serum",
         "hemoglobin": "Hemoglobin (Hb)",
     },
-    "metropolis_healthcare": {
+    "specialty_diagnostic_lab": {
         "fasting_glucose": "GLUCOSE - FASTING",
         "hba1c": "GLYCOSYLATED HEMOGLOBIN (HBA1C)",
         "total_cholesterol": "CHOLESTEROL, TOTAL",

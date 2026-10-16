@@ -19,6 +19,7 @@ data/
 reports/*
 !reports/evaluation_registry.json
 !reports/ood_benchmark.json
+!reports/diagnose_300dpi_undetected.json
 !reports/audit_*.json
 !reports/test_run.txt
 final_report.md
@@ -43,3 +44,6 @@ models/*.pt
 # Frontend dependencies and cache (dist is kept so friend does not need Node.js)
 frontend/node_modules/
 frontend/.vite/
+
+# Release bundle (untracked weights and release notes)
+release/

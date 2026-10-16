@@ -1,0 +1,673 @@
+{
+  "metadata": {
+    "title": "Pass 9b Fresh Holdout OCR Evaluation with Realistic Degradations and Multi-Factor Gate",
+    "benchmark_label": "synthetic set; real-world accuracy unknown",
+    "seed": 92026,
+    "total_synthetic_documents": 66,
+    "total_entities_per_condition": 462,
+    "templates_evaluated": [
+      "template_a",
+      "template_b",
+      "template_c",
+      "template_d",
+      "template_e",
+      "template_f",
+      "template_g",
+      "template_h",
+      "template_i",
+      "template_j",
+      "template_k"
+    ],
+    "new_template_families": [
+      "template_i_bordered_table (Tabular Bordered Grid)",
+      "template_j_two_column (Two-Column Pathology Summary)",
+      "template_k_compact_ledger (Compact Outpatient EHR Ledger)"
+    ],
+    "timestamp": "2026-10-16",
+    "mild_conditions_evaluated": [
+      "clean_raster_150dpi",
+      "clean_raster_200dpi",
+      "clean_raster_300dpi",
+      "mild_jpeg_q50",
+      "mild_paper_grain",
+      "mild_scanner_sensor",
+      "mild_phone_lighting",
+      "mild_faded_contrast",
+      "mild_perspective_tilt"
+    ],
+    "mild_pages_total": 594,
+    "mild_pages_refused": 66,
+    "false_refusal_rate_mild_pages": 0.1111,
+    "false_refusal_rate_mild_pages_95ci": [
+      0.0883,
+      0.1389
+    ]
+  },
+  "condition_summaries": {
+    "clean_pdf": {
+      "condition": "clean_pdf",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 456,
+      "accuracy_on_accepted": 0.987,
+      "accuracy_95ci": [
+        0.972,
+        0.994
+      ],
+      "wrong_value_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 6,
+      "not_detected_rate_on_accepted": 0.013,
+      "runtime_seconds": 1.99,
+      "silent_error_examples": []
+    },
+    "clean_raster_150dpi": {
+      "condition": "clean_raster_150dpi",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 388,
+      "accuracy_on_accepted": 0.8398,
+      "accuracy_95ci": [
+        0.8036,
+        0.8704
+      ],
+      "wrong_value_count": 23,
+      "silent_error_rate_on_accepted": 0.0498,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 51,
+      "not_detected_rate_on_accepted": 0.1104,
+      "runtime_seconds": 148.07,
+      "silent_error_examples": [
+        {
+          "doc_id": 9011,
+          "template": "National Reference Tabular Flow Sheet",
+          "analyte": "hdl_cholesterol",
+          "expected_value": 77.1,
+          "extracted_value": 50.0,
+          "relative_error": 0.3515,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "NORMAL"
+        },
+        {
+          "doc_id": 9036,
+          "template": "Regional Health Network Laboratory Panel",
+          "analyte": "triglycerides",
+          "expected_value": 74.6,
+          "extracted_value": 14.6,
+          "relative_error": 0.8043,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "LOW"
+        },
+        {
+          "doc_id": 9061,
+          "template": "Ambulatory Health Services - Compact EHR Laboratory Ledger",
+          "analyte": "fasting_glucose",
+          "expected_value": 110.7,
+          "extracted_value": 7.0,
+          "relative_error": 0.9368,
+          "expected_flag": "HIGH",
+          "extracted_flag": "HIGH"
+        },
+        {
+          "doc_id": 9061,
+          "template": "Ambulatory Health Services - Compact EHR Laboratory Ledger",
+          "analyte": "hba1c",
+          "expected_value": 2.7,
+          "extracted_value": 7.0,
+          "relative_error": 1.5926,
+          "expected_flag": "LOW",
+          "extracted_flag": "LOW"
+        },
+        {
+          "doc_id": 9061,
+          "template": "Ambulatory Health Services - Compact EHR Laboratory Ledger",
+          "analyte": "hdl_cholesterol",
+          "expected_value": 36.6,
+          "extracted_value": 6.0,
+          "relative_error": 0.8361,
+          "expected_flag": "LOW",
+          "extracted_flag": "LOW"
+        }
+      ]
+    },
+    "clean_raster_200dpi": {
+      "condition": "clean_raster_200dpi",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 405,
+      "accuracy_on_accepted": 0.8766,
+      "accuracy_95ci": [
+        0.8435,
+        0.9035
+      ],
+      "wrong_value_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 57,
+      "not_detected_rate_on_accepted": 0.1234,
+      "runtime_seconds": 192.78,
+      "silent_error_examples": []
+    },
+    "clean_raster_300dpi": {
+      "condition": "clean_raster_300dpi",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 438,
+      "accuracy_on_accepted": 0.9481,
+      "accuracy_95ci": [
+        0.9239,
+        0.9648
+      ],
+      "wrong_value_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 24,
+      "not_detected_rate_on_accepted": 0.0519,
+      "runtime_seconds": 116.59,
+      "silent_error_examples": []
+    },
+    "mild_jpeg_q50": {
+      "condition": "mild_jpeg_q50",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 331,
+      "accuracy_on_accepted": 0.7165,
+      "accuracy_95ci": [
+        0.6737,
+        0.7556
+      ],
+      "wrong_value_count": 46,
+      "silent_error_rate_on_accepted": 0.0996,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 85,
+      "not_detected_rate_on_accepted": 0.184,
+      "runtime_seconds": 79.4,
+      "silent_error_examples": [
+        {
+          "doc_id": 9001,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "hba1c",
+          "expected_value": 8.1,
+          "extracted_value": 8.0,
+          "relative_error": 0.0123,
+          "expected_flag": "HIGH",
+          "extracted_flag": "HIGH"
+        },
+        {
+          "doc_id": 9001,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "serum_creatinine",
+          "expected_value": 2.2,
+          "extracted_value": 2.0,
+          "relative_error": 0.0909,
+          "expected_flag": "HIGH",
+          "extracted_flag": "HIGH"
+        },
+        {
+          "doc_id": 9003,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "hba1c",
+          "expected_value": 4.3,
+          "extracted_value": 6.09,
+          "relative_error": 0.4163,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "HIGH"
+        },
+        {
+          "doc_id": 9003,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "serum_creatinine",
+          "expected_value": 1.3,
+          "extracted_value": 13.0,
+          "relative_error": 9.0,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "HIGH"
+        },
+        {
+          "doc_id": 9003,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "hemoglobin",
+          "expected_value": 22.6,
+          "extracted_value": 22.0,
+          "relative_error": 0.0265,
+          "expected_flag": "HIGH",
+          "extracted_flag": "HIGH"
+        }
+      ]
+    },
+    "mild_paper_grain": {
+      "condition": "mild_paper_grain",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 416,
+      "accuracy_on_accepted": 0.9004,
+      "accuracy_95ci": [
+        0.8697,
+        0.9245
+      ],
+      "wrong_value_count": 2,
+      "silent_error_rate_on_accepted": 0.0043,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 44,
+      "not_detected_rate_on_accepted": 0.0952,
+      "runtime_seconds": 103.61,
+      "silent_error_examples": [
+        {
+          "doc_id": 9064,
+          "template": "Ambulatory Health Services - Compact EHR Laboratory Ledger",
+          "analyte": "hba1c",
+          "expected_value": 4.3,
+          "extracted_value": 7.0,
+          "relative_error": 0.6279,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "HIGH"
+        },
+        {
+          "doc_id": 9065,
+          "template": "Ambulatory Health Services - Compact EHR Laboratory Ledger",
+          "analyte": "hba1c",
+          "expected_value": 2.0,
+          "extracted_value": 7.0,
+          "relative_error": 2.5,
+          "expected_flag": "LOW",
+          "extracted_flag": "LOW"
+        }
+      ]
+    },
+    "mild_scanner_sensor": {
+      "condition": "mild_scanner_sensor",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 406,
+      "accuracy_on_accepted": 0.8788,
+      "accuracy_95ci": [
+        0.8459,
+        0.9055
+      ],
+      "wrong_value_count": 1,
+      "silent_error_rate_on_accepted": 0.0022,
+      "flag_mismatch_count": 1,
+      "flag_mismatch_rate_on_accepted": 0.0022,
+      "not_detected_count": 54,
+      "not_detected_rate_on_accepted": 0.1169,
+      "runtime_seconds": 125.47,
+      "silent_error_examples": [
+        {
+          "doc_id": 9065,
+          "template": "Ambulatory Health Services - Compact EHR Laboratory Ledger",
+          "analyte": "hemoglobin",
+          "expected_value": 15.7,
+          "extracted_value": 2.0,
+          "relative_error": 0.8726,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "LOW"
+        }
+      ]
+    },
+    "mild_phone_lighting": {
+      "condition": "mild_phone_lighting",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 34,
+      "accuracy_on_accepted": 0.0736,
+      "accuracy_95ci": [
+        0.0531,
+        0.1011
+      ],
+      "wrong_value_count": 144,
+      "silent_error_rate_on_accepted": 0.3117,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 284,
+      "not_detected_rate_on_accepted": 0.6147,
+      "runtime_seconds": 802.62,
+      "silent_error_examples": [
+        {
+          "doc_id": 9002,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "fasting_glucose",
+          "expected_value": 84.4,
+          "extracted_value": 8.0,
+          "relative_error": 0.9052,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "LOW"
+        },
+        {
+          "doc_id": 9002,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "triglycerides",
+          "expected_value": 64.2,
+          "extracted_value": 3.0,
+          "relative_error": 0.9533,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "LOW"
+        },
+        {
+          "doc_id": 9002,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "serum_creatinine",
+          "expected_value": 0.1,
+          "extracted_value": 9.0,
+          "relative_error": 89.0,
+          "expected_flag": "LOW",
+          "extracted_flag": "HIGH"
+        },
+        {
+          "doc_id": 9002,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "hemoglobin",
+          "expected_value": 16.6,
+          "extracted_value": 5.0,
+          "relative_error": 0.6988,
+          "expected_flag": "HIGH",
+          "extracted_flag": "LOW"
+        },
+        {
+          "doc_id": 9003,
+          "template": "Commercial Reference Diagnostic Order",
+          "analyte": "fasting_glucose",
+          "expected_value": 86.7,
+          "extracted_value": 1.0,
+          "relative_error": 0.9885,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "LOW"
+        }
+      ]
+    },
+    "mild_faded_contrast": {
+      "condition": "mild_faded_contrast",
+      "total_pages": 66,
+      "pages_refused": 66,
+      "page_refusal_rate": 1.0,
+      "page_refusal_95ci": [
+        0.945,
+        1.0
+      ],
+      "total_entities": 462,
+      "accepted_entities": 0,
+      "correct_count": 0,
+      "accuracy_on_accepted": 0.0,
+      "accuracy_95ci": [
+        0.0,
+        0.0
+      ],
+      "wrong_value_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 0,
+      "not_detected_rate_on_accepted": 0.0,
+      "runtime_seconds": 5.51,
+      "silent_error_examples": []
+    },
+    "mild_perspective_tilt": {
+      "condition": "mild_perspective_tilt",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 359,
+      "accuracy_on_accepted": 0.7771,
+      "accuracy_95ci": [
+        0.7369,
+        0.8126
+      ],
+      "wrong_value_count": 6,
+      "silent_error_rate_on_accepted": 0.013,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 97,
+      "not_detected_rate_on_accepted": 0.21,
+      "runtime_seconds": 54.01,
+      "silent_error_examples": [
+        {
+          "doc_id": 9055,
+          "template": "Metropolitan Academic Medical Center - Two-Column Pathology Summary",
+          "analyte": "hba1c",
+          "expected_value": 4.3,
+          "extracted_value": 4.0,
+          "relative_error": 0.0698,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "NORMAL"
+        },
+        {
+          "doc_id": 9055,
+          "template": "Metropolitan Academic Medical Center - Two-Column Pathology Summary",
+          "analyte": "serum_creatinine",
+          "expected_value": 0.7,
+          "extracted_value": 0.0,
+          "relative_error": 1.0,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "LOW"
+        },
+        {
+          "doc_id": 9062,
+          "template": "Ambulatory Health Services - Compact EHR Laboratory Ledger",
+          "analyte": "hba1c",
+          "expected_value": 7.4,
+          "extracted_value": 7.0,
+          "relative_error": 0.0541,
+          "expected_flag": "HIGH",
+          "extracted_flag": "HIGH"
+        },
+        {
+          "doc_id": 9062,
+          "template": "Ambulatory Health Services - Compact EHR Laboratory Ledger",
+          "analyte": "triglycerides",
+          "expected_value": 51.7,
+          "extracted_value": 51.0,
+          "relative_error": 0.0135,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "NORMAL"
+        },
+        {
+          "doc_id": 9062,
+          "template": "Ambulatory Health Services - Compact EHR Laboratory Ledger",
+          "analyte": "serum_creatinine",
+          "expected_value": 0.6,
+          "extracted_value": 0.0,
+          "relative_error": 1.0,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "LOW"
+        }
+      ]
+    },
+    "catastrophic_severe_blur": {
+      "condition": "catastrophic_severe_blur",
+      "total_pages": 66,
+      "pages_refused": 66,
+      "page_refusal_rate": 1.0,
+      "page_refusal_95ci": [
+        0.945,
+        1.0
+      ],
+      "total_entities": 462,
+      "accepted_entities": 0,
+      "correct_count": 0,
+      "accuracy_on_accepted": 0.0,
+      "accuracy_95ci": [
+        0.0,
+        0.0
+      ],
+      "wrong_value_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 0,
+      "not_detected_rate_on_accepted": 0.0,
+      "runtime_seconds": 7.94,
+      "silent_error_examples": []
+    },
+    "catastrophic_extreme_skew": {
+      "condition": "catastrophic_extreme_skew",
+      "total_pages": 66,
+      "pages_refused": 27,
+      "page_refusal_rate": 0.4091,
+      "page_refusal_95ci": [
+        0.2987,
+        0.5295
+      ],
+      "total_entities": 462,
+      "accepted_entities": 273,
+      "correct_count": 0,
+      "accuracy_on_accepted": 0.0,
+      "accuracy_95ci": [
+        0.0,
+        0.0139
+      ],
+      "wrong_value_count": 29,
+      "silent_error_rate_on_accepted": 0.1062,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 244,
+      "not_detected_rate_on_accepted": 0.8938,
+      "runtime_seconds": 63.85,
+      "silent_error_examples": [
+        {
+          "doc_id": 9007,
+          "template": "National Reference Tabular Flow Sheet",
+          "analyte": "triglycerides",
+          "expected_value": 27.8,
+          "extracted_value": 99.0,
+          "relative_error": 2.5612,
+          "expected_flag": "LOW",
+          "extracted_flag": "NORMAL"
+        },
+        {
+          "doc_id": 9007,
+          "template": "National Reference Tabular Flow Sheet",
+          "analyte": "hemoglobin",
+          "expected_value": 9.5,
+          "extracted_value": 0.0,
+          "relative_error": 1.0,
+          "expected_flag": "LOW",
+          "extracted_flag": "LOW"
+        },
+        {
+          "doc_id": 9008,
+          "template": "National Reference Tabular Flow Sheet",
+          "analyte": "hemoglobin",
+          "expected_value": 16.9,
+          "extracted_value": 3.0,
+          "relative_error": 0.8225,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "LOW"
+        },
+        {
+          "doc_id": 9010,
+          "template": "National Reference Tabular Flow Sheet",
+          "analyte": "triglycerides",
+          "expected_value": 126.6,
+          "extracted_value": 7.0,
+          "relative_error": 0.9447,
+          "expected_flag": "NORMAL",
+          "extracted_flag": "LOW"
+        },
+        {
+          "doc_id": 9011,
+          "template": "National Reference Tabular Flow Sheet",
+          "analyte": "hemoglobin",
+          "expected_value": 5.4,
+          "extracted_value": 2.0,
+          "relative_error": 0.6296,
+          "expected_flag": "LOW",
+          "extracted_flag": "LOW"
+        }
+      ]
+    },
+    "catastrophic_noise_flood": {
+      "condition": "catastrophic_noise_flood",
+      "total_pages": 66,
+      "pages_refused": 0,
+      "page_refusal_rate": 0.0,
+      "page_refusal_95ci": [
+        0.0,
+        0.055
+      ],
+      "total_entities": 462,
+      "accepted_entities": 462,
+      "correct_count": 414,
+      "accuracy_on_accepted": 0.8961,
+      "accuracy_95ci": [
+        0.8649,
+        0.9207
+      ],
+      "wrong_value_count": 0,
+      "silent_error_rate_on_accepted": 0.0,
+      "flag_mismatch_count": 0,
+      "flag_mismatch_rate_on_accepted": 0.0,
+      "not_detected_count": 48,
+      "not_detected_rate_on_accepted": 0.1039,
+      "runtime_seconds": 102.45,
+      "silent_error_examples": []
+    }
+  }
+}

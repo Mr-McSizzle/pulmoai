@@ -1,3 +1,7 @@
+# PulmoAI Model Checkpoint SHA-256 Digest Manifest
+# Date: 2026-10-16
+# Commit: 2e7ad4c
+# Status: Cryptographically verified deployed artifacts
 3c79abb652ac0099a34145c38cbdaf774d673941636a208c8c820be4ac37f03c  models/ensemble_benchmark_best.joblib
 f56ef0883e3d1e00f7c496e4b9f8edd9492b3c71210afcf08b7ba860d0fca043  models/lung_uncalibrated_dual_rule.joblib
 ac86d702fd069919354ca8c20d26168c5a08ce91589ede2eb53f74c8c9a71b7e  models/nhanes_risk_models.joblib

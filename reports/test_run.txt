@@ -1,128 +1,15 @@
-test_api_predict_chest_xray (test_image_screening.ImageScreeningAPITest.test_api_predict_chest_xray)
-Test POST /api/image/predict endpoint with PNG image. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-INFO:httpx2:HTTP Request: POST http://testserver/api/image/predict "HTTP/1.1 200 OK"
+test_tampered_artifact_triggers_http_503_in_api (test_reproducibility_and_estimands.ReproducibilityAndVerificationTests.test_tampered_artifact_triggers_http_503_in_api)
+Verify that if an artifact failed verification, API endpoints return HTTP 503. ... INFO:httpx2:HTTP Request: GET http://testserver/api/dashboard "HTTP/1.1 503 Service Unavailable"
+INFO:httpx2:HTTP Request: POST http://testserver/api/risk/predict "HTTP/1.1 503 Service Unavailable"
+INFO:httpx2:HTTP Request: POST http://testserver/api/risk/future "HTTP/1.1 503 Service Unavailable"
 ok
-test_api_predict_invalid_modality (test_image_screening.ImageScreeningAPITest.test_api_predict_invalid_modality)
-Verify 400 Bad Request for unknown image_type. ... INFO:httpx2:HTTP Request: POST http://testserver/api/image/predict "HTTP/1.1 400 Bad Request"
-ok
-test_api_predict_unsupported_format (test_image_screening.ImageScreeningAPITest.test_api_predict_unsupported_format)
-Verify 415 Unsupported Media Type for non-image files. ... INFO:httpx2:HTTP Request: POST http://testserver/api/image/predict "HTTP/1.1 415 Unsupported Media Type"
-ok
-test_modality_gate_rejects_cross_modality_mismatch (test_image_screening.ImageScreeningUnitTest.test_modality_gate_rejects_cross_modality_mismatch)
-Verify Modality Gate refuses to run when image modality contradicts user selection. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-ok
-test_modality_gate_rejects_non_medical_noise (test_image_screening.ImageScreeningUnitTest.test_modality_gate_rejects_non_medical_noise)
-Verify Modality Gate refuses to run when input is non-target/non-medical content. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-ok
-test_modality_validation (test_image_screening.ImageScreeningUnitTest.test_modality_validation)
-Verify invalid image_type raises ValueError. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-ok
-test_ood_guard_triggers_on_low_confidence (test_image_screening.ImageScreeningUnitTest.test_ood_guard_triggers_on_low_confidence)
-Verify internal confidence threshold guard triggers when gate is bypassed and threshold=1.0. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-ok
-test_pneumonia_prediction_with_genuine_image (test_image_screening.ImageScreeningUnitTest.test_pneumonia_prediction_with_genuine_image)
-Verify chest_xray predicts binary label and returns required metadata with verified gate match. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-ok
-test_missing_weight_file_fails_with_clear_message (test_image_screening.MissingWeightValidationTests.test_missing_weight_file_fails_with_clear_message)
-Verify service fails with a descriptive FileNotFoundError when weight file is missing. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-ok
-test_empty_upload_is_rejected (test_inference_service.InferenceServiceInputTests.test_empty_upload_is_rejected) ... ok
-test_large_upload_is_rejected (test_inference_service.InferenceServiceInputTests.test_large_upload_is_rejected) ... ok
-test_missing_gene_is_rejected_before_prediction (test_inference_service.InferenceServiceInputTests.test_missing_gene_is_rejected_before_prediction) ... ok
-test_prediction_maps_encoded_class_to_saved_label (test_inference_service.InferenceServiceInputTests.test_prediction_maps_encoded_class_to_saved_label) ... ok
-test_prediction_without_predict_proba (test_inference_service.InferenceServiceInputTests.test_prediction_without_predict_proba) ... ok
-test_validation_accepts_one_complete_long_profile (test_inference_service.InferenceServiceInputTests.test_validation_accepts_one_complete_long_profile) ... ok
-test_duplicate_long_format_gene_is_rejected (test_preprocessing.CountPreprocessingTests.test_duplicate_long_format_gene_is_rejected) ... ok
-test_duplicate_model_feature_names_are_rejected (test_preprocessing.CountPreprocessingTests.test_duplicate_model_feature_names_are_rejected) ... ok
-test_extra_gene_is_rejected (test_preprocessing.CountPreprocessingTests.test_extra_gene_is_rejected) ... ok
-test_long_csv_is_supported (test_preprocessing.CountPreprocessingTests.test_long_csv_is_supported) ... ok
-test_missing_gene_is_rejected (test_preprocessing.CountPreprocessingTests.test_missing_gene_is_rejected) ... ok
-test_multiple_profiles_are_rejected (test_preprocessing.CountPreprocessingTests.test_multiple_profiles_are_rejected) ... ok
-test_negative_fractional_and_nonfinite_counts_are_rejected (test_preprocessing.CountPreprocessingTests.test_negative_fractional_and_nonfinite_counts_are_rejected) ... ok
-test_wide_csv_aligns_shuffled_genes_and_normalizes_counts (test_preprocessing.CountPreprocessingTests.test_wide_csv_aligns_shuffled_genes_and_normalizes_counts) ... ok
-test_zero_count_profile_is_rejected (test_preprocessing.CountPreprocessingTests.test_zero_count_profile_is_rejected) ... ok
-test_future_mortality_risk_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_future_mortality_risk_inference_is_offline)
-Verify future mortality risk service makes zero network calls. ... ok
-test_image_screening_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_image_screening_inference_is_offline)
-Verify medical image screening and modality gate make zero network calls. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
-ok
-test_local_report_reader_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_local_report_reader_inference_is_offline)
-Verify local lab report parser (without Gemini key) makes zero network calls. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x151301350>
-ok
-test_nhanes_risk_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_nhanes_risk_inference_is_offline)
-Verify NHANES chronic disease risk engine makes zero network calls. ... INFO:pulmoai.risk_service:Initialized HealthRiskService with targets: diabetes, hypertension, high_cholesterol, heart_disease, stroke, copd
-ok
-test_scrna_seq_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_scrna_seq_inference_is_offline)
-Verify scRNA-seq classification makes zero network calls. ... ok
-test_api_report_extract_txt (test_report_reader.ReportReaderAPITests.test_api_report_extract_txt)
-Test POST /api/report/extract with a text report. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x16f0362f0>
-INFO:httpx2:HTTP Request: POST http://testserver/api/report/extract "HTTP/1.1 200 OK"
-ok
-test_api_report_extract_unsupported_format (test_report_reader.ReportReaderAPITests.test_api_report_extract_unsupported_format)
-Verify 415 on unsupported file extensions. ... INFO:httpx2:HTTP Request: POST http://testserver/api/report/extract "HTTP/1.1 415 Unsupported Media Type"
-ok
-test_api_risk_predict_endpoint (test_report_reader.ReportReaderAPITests.test_api_risk_predict_endpoint)
-Test POST /api/risk/predict endpoint returns calibrated predictions and disclaimer. ... INFO:pulmoai.risk_service:Initialized HealthRiskService with targets: diabetes, hypertension, high_cholesterol, heart_disease, stroke, copd
-INFO:httpx2:HTTP Request: POST http://testserver/api/risk/predict "HTTP/1.1 200 OK"
-ok
-test_adaptive_preprocessing_decision (test_report_reader.ReportReaderRegressionTests.test_adaptive_preprocessing_decision)
-Verify adaptive preprocessing gates blur and skew accurately. ... ok
-test_boundary_semantics_inclusive_reference_limits (test_report_reader.ReportReaderRegressionTests.test_boundary_semantics_inclusive_reference_limits)
-Verify settled boundary semantics: reference intervals are strictly inclusive [min, max]. ... ok
-test_bulleted_and_prefixed_lines (test_report_reader.ReportReaderRegressionTests.test_bulleted_and_prefixed_lines)
-Verify leading bullet points and hyphens are stripped without corrupting test names. ... ok
-test_clean_pdf_five_layouts_accuracy (test_report_reader.ReportReaderRegressionTests.test_clean_pdf_five_layouts_accuracy)
-Verify native PDF text layer extraction achieves >= 98% accuracy across all 5 layouts. ... ok
-test_hba1c_alias_safety_and_explicit_patterns (test_report_reader.ReportReaderRegressionTests.test_hba1c_alias_safety_and_explicit_patterns)
-Verify bare ALC (CBC) and Alcohol do not produce HbA1c, while explicit patterns do. ... ok
-test_hdl_direct_not_overwritten_by_total_cholesterol (test_report_reader.ReportReaderRegressionTests.test_hdl_direct_not_overwritten_by_total_cholesterol)
-Verify HDL direct assay is not captured by total cholesterol alias. ... ok
-test_one_sided_reference_range_flagging (test_report_reader.ReportReaderRegressionTests.test_one_sided_reference_range_flagging)
-Verify one-sided printed ranges fall back to physiological minima for deficit detection. ... ok
-test_pass5_one_sided_ranges_and_composite_hdl (test_report_reader.ReportReaderRegressionTests.test_pass5_one_sided_ranges_and_composite_hdl)
-Verify Pass 5 fixes for one-sided ranges (<=5.7, >=10, <200, >40) and composite HDL names. ... ok
-test_digital_pdf_layer_extraction (test_report_reader.ReportReaderUnitTest.test_digital_pdf_layer_extraction)
-Create a real in-memory PDF with text layer and verify extraction. ... INFO:pulmoai.report_reader:Successfully extracted text layer from PDF (110 chars)
-ok
-test_health_risk_service_predict (test_report_reader.ReportReaderUnitTest.test_health_risk_service_predict)
-Verify HealthRiskService loads Phase 2 models and produces calibrated risks. ... INFO:pulmoai.risk_service:Initialized HealthRiskService with targets: diabetes, hypertension, high_cholesterol, heart_disease, stroke, copd
-ok
-test_image_tesseract_ocr_extraction (test_report_reader.ReportReaderUnitTest.test_image_tesseract_ocr_extraction)
-Create an in-memory image and verify local Tesseract OCR extracts lab text. ... ok
-test_parse_dummy_report_1_us_units (test_report_reader.ReportReaderUnitTest.test_parse_dummy_report_1_us_units)
-Verify standard US unit report extracts all biomarkers with correct flags. ... ok
-test_parse_dummy_report_2_si_units (test_report_reader.ReportReaderUnitTest.test_parse_dummy_report_2_si_units)
-Verify UK/SI units are automatically converted to standard NHANES units. ... ok
-test_parse_dummy_report_3_cbc (test_report_reader.ReportReaderUnitTest.test_parse_dummy_report_3_cbc)
-Verify CBC and normal hematology values are parsed correctly. ... ok
-test_registry_file_structure (test_reproducibility_and_estimands.CanonicalEvaluationRegistryTests.test_registry_file_structure)
-Verify evaluation_registry.json contains all required modules and metrics. ... ok
-test_future_risk_endpoints_and_published_scores (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_future_risk_endpoints_and_published_scores) ... INFO:httpx2:HTTP Request: POST http://testserver/api/risk/future "HTTP/1.1 200 OK"
-ok
-test_glycemic_features_excluded_from_diabetes_model (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_glycemic_features_excluded_from_diabetes_model)
-Verify glycemic features are excluded from diabetes model inputs to prevent diagnostic leakage. ... ok
-test_idrs_unit_test_worked_examples (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_idrs_unit_test_worked_examples)
-Verify IDRS scoring matches Mohan et al. 2005 published worked examples. ... ok
-test_non_hispanic_asian_subgroup_reproducibility (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_non_hispanic_asian_subgroup_reproducibility)
-Verify Non-Hispanic Asian subgroup mortality metrics in audit report match evaluated holdout. ... ok
-test_pce_unit_test_worked_examples (test_reproducibility_and_estimands.FutureRiskEstimandTests.test_pce_unit_test_worked_examples)
-Verify PCE calculation matches 2013 ACC/AHA published worked examples. ... ok
-test_image_predict_returns_empirical_far_and_methodology (test_reproducibility_and_estimands.OODRejectionBenchmarkTests.test_image_predict_returns_empirical_far_and_methodology)
-Verify image screening response includes empirical False Accept Rate and methodology statement. ... INFO:httpx2:HTTP Request: POST http://testserver/api/image/predict "HTTP/1.1 200 OK"
-ok
-test_api_health_includes_integrity_flag (test_reproducibility_and_estimands.ReproducibilityAndVerificationTests.test_api_health_includes_integrity_flag)
-Verify GET /api/health includes integrity_verified flag. ... INFO:httpx2:HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
-ok
-test_api_integrity_endpoint (test_reproducibility_and_estimands.ReproducibilityAndVerificationTests.test_api_integrity_endpoint)
-Verify GET /api/integrity returns verified status and individual checkpoint records. ... INFO:httpx2:HTTP Request: GET http://testserver/api/integrity "HTTP/1.1 200 OK"
-ok
-test_checkpoint_manifest_and_sha256_verification (test_reproducibility_and_estimands.ReproducibilityAndVerificationTests.test_checkpoint_manifest_and_sha256_verification)
-Verify that all critical model files on disk match their SHA-256 integrity hashes. ... ok
+test_verify_artifacts_script_passes_on_current_repo (test_reproducibility_and_estimands.ReproducibilityAndVerificationTests.test_verify_artifacts_script_passes_on_current_repo)
+Verify scripts/verify_artifacts.py succeeds on deployed repository models. ... ok
 test_estimands_in_risk_prediction (test_reproducibility_and_estimands.RiskEstimandValidationTests.test_estimands_in_risk_prediction)
 Verify that condition predictions define estimand_type, label, and time_horizon. ... INFO:httpx2:HTTP Request: POST http://testserver/api/risk/predict "HTTP/1.1 200 OK"
 ok
 
 ----------------------------------------------------------------------
-Ran 57 tests in 7.031s
+Ran 60 tests in 33.567s
 
 OK

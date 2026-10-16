@@ -38,8 +38,29 @@
   - Blood Smear: 100.00% (400 / 400)
   - Overall Target TAR: **99.50%** (1,592 / 1,600, 95% CI: [99.02%, 99.75%])
 
+## External Out-of-Distribution (OOD) Benchmark (Pass 9b)
+[Tested - reports/ood_benchmark.json:datasets]
+To verify open-world generalization beyond the training negative sets, the modality gate ResNet-18 was evaluated against four external unseen image datasets at 64x64 resolution:
+| Dataset | Modality / Domain | N Evaluated | False Accepts | False Accept Rate (FAR) | 95% Wilson Score CI | Predictions Breakdown |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **SVHN** | Natural scene digits (Street View House Numbers) | 1,000 | 35 | **3.50%** | [2.53%, 4.83%] | other: 965, blood_smear: 16, chest_xray: 9, dermoscopy: 9, fundus: 1 |
+| **Flowers102** | Natural photography (Oxford Flowers) | 500 | 63 | **12.60%** | [9.97%, 15.80%] | other: 437, blood_smear: 29, fundus: 18, dermoscopy: 14, chest_xray: 2 |
+| **OCTMNIST** | Retinal Optical Coherence Tomography (non-fundus) | 1,000 | 0 | **0.00%** | [0.00%, 0.38%] | other: 1,000, chest_xray: 0, dermoscopy: 0, fundus: 0, blood_smear: 0 |
+| **TissueMNIST** | Human kidney cortex histopathology (non-blood) | 1,000 | 0 | **0.00%** | [0.00%, 0.38%] | other: 1,000, chest_xray: 0, dermoscopy: 0, fundus: 0, blood_smear: 0 |
+
+## Adult-to-Pediatric Radiograph Domain Shift Audit (Pass 9b)
+[Tested - reports/ood_benchmark.json:adult_to_pediatric_domain_shift]
+To quantify the hazard of anatomical domain shift between age groups:
+- **Source Cohort:** ChestMNIST test set (Adult NIH ChestX-ray14 cohort), filtered to adult "no finding" normal chest radiographs ($n = 11,928$).
+- **Target Classifier:** PneumoniaMNIST ResNet-18 (`models/medmnist/pneumoniamnist_resnet18.pt`), trained strictly on pediatric patients aged 1-5 years from Guangzhou Women and Children's Medical Center.
+- **Evaluation Findings:**
+  - Adult normal radiographs classified as Normal: 85 (0.71%)
+  - Adult normal radiographs falsely predicted as Pediatric Pneumonia: **11,843** (**99.29%**, 95% Wilson Score CI: [99.12%, 99.42%])
+- **Clinical Rationale:** Pediatric lungs and mediastinum have fundamentally distinct anatomical proportions, ribcage calcification, cardiac silhouette ratios, and thymic shadows compared to adult thoracic anatomy. Adult normal markings are overwhelmingly misconstrued by the pediatric classifier as consolidation or infiltration.
+- **Safety Directive:** The pediatric pneumonia screening model must NEVER be executed on adult patient radiographs.
+
 ## Known Limitations and Clinical Caveats
-1. **Unseen Document Modalities Fail Gating:** When document thumbnails / lab report scans are omitted from negative training, the network experiences 100% false-accept rates (predominantly accepted as dermoscopy due to high-contrast edges and beige backgrounds).
-2. **Pediatric vs. Adult X-rays:** The gate cannot differentiate between pediatric and adult chest radiographs (training data from PneumoniaMNIST consists of pediatric patients aged 1-5 years from Guangzhou Women and Children's Medical Center).
-3. **Unseen Modalities Not Guaranteed Rejection:** Modalities completely absent from negative training (e.g., MRI, PET scans, dental panoramic radiographs) cannot be reliably detected or rejected.
-4. **Safety Policy:** Because the LOFO macro FAR is 19.03% (exceeding the strict 10% clinical threshold), a permanent warning banner is displayed across all image screening outputs.
+1. **No Generic OOD Detection Guarantee:** The modality gate does NOT provide universal out-of-distribution detection. While medical cross-domain images (OCT, kidney histology) achieved 0.00% FAR, natural photography (Flowers102) produced 12.60% FAR and synthetic lab reports in LOFO testing produced 100.00% FAR. Modalities not represented in the training set cannot be guaranteed rejection.
+2. **Pediatric Restriction & Anatomical Gate Blindness:** The modality gate identifies images only as `chest_xray` and cannot differentiate pediatric from adult anatomy. Adult radiographs will pass the gate and trigger an catastrophic 99.29% false alarm rate on the pediatric model.
+3. **Mandatory UI Warning Banner:** Because LOFO macro FAR is 19.03% and natural image FAR reaches 12.60%, an unambiguous clinical safety disclaimer is permanently enforced across the user interface.
+4. **Clinical Decision Support Only:** All image screening outputs are exploratory research decision support tools and do not substitute for certified radiological or pathological evaluation.

@@ -359,7 +359,7 @@ class ReportReaderRegressionTests(unittest.TestCase):
     def test_hdl_direct_not_overwritten_by_total_cholesterol(self) -> None:
         """Verify HDL direct assay is not captured by total cholesterol alias."""
         text = (
-            "METROPOLIS HEALTHCARE LIMITED\n"
+            "REGIONAL CLINICAL PATHOLOGY LABORATORY\n"
             "TEST DESCRIPTION               FINDING   STANDARD UNIT   REFERENCE RANGE\n"
             "CHOLESTEROL, TOTAL              215.0     mg/dL           < 200.0\n"
             "HDL CHOLESTEROL - DIRECT        48.0      mg/dL           >= 40.0\n"

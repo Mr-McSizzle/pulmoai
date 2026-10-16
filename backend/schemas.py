@@ -11,6 +11,7 @@ class HealthResponse(BaseModel):
     model_name: str | None = None
     artifact_id: str | None = None
     integrity_verified: bool = True
+    artifact_status: dict[str, Any] | None = None
     message: str
 
 

@@ -2,9 +2,9 @@
 """Synthetic Benchmark and Honest Evaluation for PulmoAI Lab Report Reader.
 
 Evaluates entity-level exact-match accuracy across 5 distinct report layouts:
-1. Dr Lal PathLabs (Indian corporate diagnostic chain style)
-2. Agilus / SRL Diagnostics (Indian pathology format)
-3. Metropolis Healthcare (Indian specialty clinical laboratory)
+1. Corporate Reference Laboratory Style
+2. Regional Pathology Laboratory Style
+3. Specialty Diagnostic Laboratory Style
 4. Standard Hospital EMR (Electronic health record discharge summary)
 5. Compact Clinic Summary (Outpatient narrative and vitals format)
 
@@ -17,7 +17,7 @@ Across 6 degradation tiers:
 - perspective: Phone-style keystoned quad perspective transform
 
 Label: "synthetic test set; real-world accuracy unknown"
-Removes unsupported claims (LabCorp/Quest, 99.5% on scanned documents).
+Removes unsupported claims (99.5% on scanned documents).
 """
 
 from __future__ import annotations
@@ -45,13 +45,13 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 SYNTHETIC_LAYOUTS: list[dict[str, Any]] = [
     {
-        "layout_id": "dr_lal_pathlabs",
-        "layout_name": "Dr Lal PathLabs Style (Indian Corporate Chain)",
+        "layout_id": "corporate_reference_lab",
+        "layout_name": "Corporate Reference Laboratory Style",
         "patient_sex": "male",
         "header_lines": [
-            "Dr. Lal PathLabs Ltd. - National Reference Laboratory, New Delhi",
+            "Corporate Reference Laboratories Ltd. - National Reference Center",
             "Patient Name: Rajesh Gupta    Age / Sex: 48 Y / Male    Ref: Self",
-            "Registration No: DL-884920    Collection Date: 12-Oct-2024",
+            "Registration No: CRL-884920    Collection Date: 12-Oct-2024",
             "--------------------------------------------------------------------------------",
             "Test Name                     Result   Units   Bio Ref Interval",
             "--------------------------------------------------------------------------------",
@@ -67,16 +67,16 @@ SYNTHETIC_LAYOUTS: list[dict[str, Any]] = [
         ],
         "footer_lines": [
             "--------------------------------------------------------------------------------",
-            "End of report. Verified by Dr. S. K. Sharma, MD (Biochemistry)",
+            "End of report. Verified by Dr. S. K. Specialist, MD (Biochemistry)",
         ],
     },
     {
-        "layout_id": "srl_agilus_diagnostics",
-        "layout_name": "Agilus Diagnostics / SRL Style (Indian Pathology)",
+        "layout_id": "regional_pathology_lab",
+        "layout_name": "Regional Pathology Laboratory Style",
         "patient_sex": "female",
         "header_lines": [
-            "Agilus Diagnostics Ltd. - Center of Excellence in Pathology",
-            "Patient: Sunita Verma   Age: 42 Years   Gender: Female   Lab No: AG-40192",
+            "Regional Pathology Laboratories Ltd. - Center of Excellence",
+            "Patient: Sunita Verma   Age: 42 Years   Gender: Female   Lab No: RPL-40192",
             "Referring Physician: Dr. K. Patel   Sample Drawn: 11-Oct-2024",
             "================================================================================",
             "Investigation                 Observed Value   Units   Biological Ref Interval",
@@ -93,16 +93,16 @@ SYNTHETIC_LAYOUTS: list[dict[str, Any]] = [
         ],
         "footer_lines": [
             "================================================================================",
-            "Methodology: Fully automated dry/wet chemistry analyzer. Tests reported by Agilus.",
+            "Methodology: Fully automated dry/wet chemistry analyzer. Tests reported by Pathology Unit.",
         ],
     },
     {
-        "layout_id": "metropolis_healthcare",
-        "layout_name": "Metropolis Healthcare Style (Indian Specialty Care)",
+        "layout_id": "specialty_diagnostic_lab",
+        "layout_name": "Specialty Diagnostic Laboratory Style",
         "patient_sex": "male",
         "header_lines": [
-            "Metropolis Healthcare Ltd. - Comprehensive Diagnostic Care",
-            "Patient Name: Vikram Mehta   Age / Sex: 52 Y / Male   PID: MH-991204",
+            "Specialty Diagnostic Laboratories Ltd. - Comprehensive Diagnostic Care",
+            "Patient Name: Vikram Mehta   Age / Sex: 52 Y / Male   PID: SDL-991204",
             "Doctor: Dr. A. Joshi   Specimen: Venous Blood / Fluoride Plasma",
             "--------------------------------------------------------------------------------",
             "Test Description              Result   Units    Reference Range",
@@ -119,7 +119,7 @@ SYNTHETIC_LAYOUTS: list[dict[str, Any]] = [
         ],
         "footer_lines": [
             "--------------------------------------------------------------------------------",
-            "NABL Accredited Laboratory. Electronic digital signature applied.",
+            "Accredited Laboratory. Electronic digital signature applied.",
         ],
     },
     {
@@ -433,12 +433,12 @@ def run_benchmark() -> dict[str, Any]:
         "evaluation_note": "synthetic test set; real-world accuracy unknown",
         "description": (
             "Honest entity-level evaluation of PulmoAI laboratory report reader across 5 "
-            "synthetic clinical report layouts (including Indian diagnostic chains: Dr Lal, SRL/Agilus, Metropolis) "
+            "synthetic clinical report layouts (corporate reference, regional pathology, specialty diagnostic, hospital EMR, clinic summary) "
             "and 6 physical degradation tiers (native digital PDF, clean OCR scan, rotation, blur, "
             "JPEG compression, and phone-style perspective distortion)."
         ),
         "unsupported_claims_removed": [
-            "LabCorp / Quest validation claims removed (not evaluated on proprietary commercial formats).",
+            "Commercial brand validation claims removed (not evaluated on proprietary commercial formats).",
             ">99.5% entity identification claim removed (true only for clean digital PDFs with embedded text layers; severely drops on scanned images).",
         ],
         "sex_specific_reference_ranges": {

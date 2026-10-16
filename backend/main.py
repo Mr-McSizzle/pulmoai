@@ -39,46 +39,74 @@ logger = logging.getLogger("pulmoai.api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Automated Startup Checkpoint Verification
+    # Automated Startup Artifact Verification
     try:
         sys.path.insert(0, str(PROJECT_ROOT))
-        from scripts.verify_checkpoints import verify_checkpoints
-        verification = verify_checkpoints()
-        app.state.checkpoint_verification = verification
-        if verification.get("all_critical_passed", False):
-            logger.info("Model checkpoint startup verification: PASSED (all critical hashes match)")
+        from scripts.verify_artifacts import verify_artifacts
+        artifact_verif = verify_artifacts()
+        app.state.artifact_verification = artifact_verif
+        app.state.checkpoint_verification = {
+            "all_critical_passed": artifact_verif.get("module_status", {}).get("pulmo_service", True)
+            and artifact_verif.get("module_status", {}).get("risk_service", True),
+            "all_checkpoints_passed": artifact_verif.get("all_passed", False),
+            "checkpoints": artifact_verif.get("artifacts", {}),
+        }
+        if artifact_verif.get("all_passed", False):
+            logger.info("Model artifact verification: PASSED (all deployed artifacts cryptographically match)")
         else:
-            logger.warning("Model checkpoint startup verification: CRITICAL WARNING (hash mismatch or missing)")
+            logger.warning(
+                "Model artifact verification: CRITICAL WARNING (%d failed artifacts)",
+                artifact_verif.get("failed_count", 0),
+            )
     except Exception as e:
-        logger.warning("Startup checkpoint verification skipped: %s", e)
+        logger.warning("Startup artifact verification skipped: %s", e)
+        app.state.artifact_verification = {"all_passed": True, "artifacts": {}, "module_status": {}}
         app.state.checkpoint_verification = {"all_critical_passed": True, "checkpoints": {}}
 
-    try:
-        app.state.pulmo_service = PulmoAIService.load()
-        app.state.model_error = None
-        logger.info("Loaded PulmoAI model artifact %s", app.state.pulmo_service.artifact_id)
-    except Exception:
+    mod_status = app.state.artifact_verification.get("module_status", {})
+
+    if not mod_status.get("pulmo_service", True):
         app.state.pulmo_service = None
-        app.state.model_error = "Model artifact could not be loaded; check the local server logs."
-        logger.exception("PulmoAI model startup failed")
+        app.state.model_error = "Model artifact failed cryptographic integrity verification against models/checksums.sha256."
+    else:
+        try:
+            app.state.pulmo_service = PulmoAIService.load()
+            app.state.model_error = None
+            logger.info("Loaded PulmoAI model artifact %s", app.state.pulmo_service.artifact_id)
+        except Exception:
+            app.state.pulmo_service = None
+            app.state.model_error = "Model artifact could not be loaded; check the local server logs."
+            logger.exception("PulmoAI model startup failed")
 
-    try:
-        app.state.risk_service = HealthRiskService.load()
-        app.state.risk_model_error = None
-        logger.info("Loaded NHANES HealthRiskService with targets: %s", app.state.risk_service.available_targets)
-    except Exception:
+    if not mod_status.get("risk_service", True):
         app.state.risk_service = None
-        app.state.risk_model_error = "NHANES risk model artifact could not be loaded; check server logs."
-        logger.exception("NHANES risk model startup failed")
+        app.state.risk_model_error = "NHANES risk model artifact failed cryptographic integrity verification against models/checksums.sha256."
+    else:
+        try:
+            app.state.risk_service = HealthRiskService.load()
+            app.state.risk_model_error = None
+            logger.info("Loaded NHANES HealthRiskService with targets: %s", app.state.risk_service.available_targets)
+        except Exception:
+            app.state.risk_service = None
+            app.state.risk_model_error = "NHANES risk model artifact could not be loaded; check server logs."
+            logger.exception("NHANES risk model startup failed")
 
-    try:
-        app.state.future_risk_service = FutureRiskService.load()
-        app.state.future_risk_model_error = None
-        logger.info("Loaded FutureRiskService successfully")
-    except Exception:
+    if not mod_status.get("future_risk_service", True):
         app.state.future_risk_service = None
-        app.state.future_risk_model_error = "Future risk models artifact could not be loaded; check server logs."
-        logger.exception("Future risk model startup failed")
+        app.state.future_risk_model_error = "Future risk model artifact failed cryptographic integrity verification against models/checksums.sha256."
+    else:
+        try:
+            app.state.future_risk_service = FutureRiskService.load()
+            app.state.future_risk_model_error = None
+            logger.info("Loaded FutureRiskService successfully")
+        except Exception:
+            app.state.future_risk_service = None
+            app.state.future_risk_model_error = "Future risk models artifact could not be loaded; check server logs."
+            logger.exception("Future risk model startup failed")
+
+    if not mod_status.get("image_service", True):
+        app.state.image_service = None
+        app.state.image_model_error = "MedMNIST screening image model artifact failed cryptographic integrity verification against models/checksums.sha256."
     yield
 
 
@@ -98,16 +126,43 @@ app.add_middleware(
 )
 
 
+def get_artifact_verification(app: FastAPI) -> dict[str, Any]:
+    verif = getattr(app.state, "artifact_verification", None)
+    if verif is None:
+        from scripts.verify_artifacts import verify_artifacts
+        verif = verify_artifacts()
+        app.state.artifact_verification = verif
+    return verif
+
+
 def require_service(request: Request) -> PulmoAIService:
+    artifact_verif = get_artifact_verification(request.app)
+    mod_status = artifact_verif.get("module_status", {})
+    if not mod_status.get("pulmo_service", True):
+        raise HTTPException(
+            status_code=503,
+            detail="Single-cell lung atlas model artifact failed cryptographic integrity verification against models/checksums.sha256.",
+        )
     service = getattr(request.app.state, "pulmo_service", None)
     if service is None:
-        raise HTTPException(status_code=503, detail=getattr(
-            request.app.state, "model_error", "Model service is unavailable."
-        ))
+        try:
+            service = PulmoAIService.load()
+            request.app.state.pulmo_service = service
+        except Exception:
+            raise HTTPException(status_code=503, detail=getattr(
+                request.app.state, "model_error", "Model service is unavailable."
+            ))
     return service
 
 
 def require_risk_service(request: Request) -> HealthRiskService:
+    artifact_verif = get_artifact_verification(request.app)
+    mod_status = artifact_verif.get("module_status", {})
+    if not mod_status.get("risk_service", True):
+        raise HTTPException(
+            status_code=503,
+            detail="NHANES chronic disease risk model artifact failed cryptographic integrity verification against models/checksums.sha256.",
+        )
     service = getattr(request.app.state, "risk_service", None)
     if service is None:
         try:
@@ -121,6 +176,13 @@ def require_risk_service(request: Request) -> HealthRiskService:
 
 
 def require_future_risk_service(request: Request) -> FutureRiskService:
+    artifact_verif = get_artifact_verification(request.app)
+    mod_status = artifact_verif.get("module_status", {})
+    if not mod_status.get("future_risk_service", True):
+        raise HTTPException(
+            status_code=503,
+            detail="Future mortality risk model artifact failed cryptographic integrity verification against models/checksums.sha256.",
+        )
     service = getattr(request.app.state, "future_risk_service", None)
     if service is None:
         try:
@@ -134,6 +196,13 @@ def require_future_risk_service(request: Request) -> FutureRiskService:
 
 
 def require_image_service(request: Request) -> ImageScreeningService:
+    artifact_verif = get_artifact_verification(request.app)
+    mod_status = artifact_verif.get("module_status", {})
+    if not mod_status.get("image_service", True):
+        raise HTTPException(
+            status_code=503,
+            detail="MedMNIST screening image model artifact failed cryptographic integrity verification against models/checksums.sha256.",
+        )
     service = getattr(request.app.state, "image_service", None)
     if service is None:
         try:
@@ -158,14 +227,22 @@ async def read_csv_upload(upload: UploadFile) -> bytes:
 
 @app.get("/api/health", response_model=HealthResponse)
 def health(request: Request) -> HealthResponse:
+    verif = get_artifact_verification(request.app)
+    integrity_ok = verif.get("all_passed", True)
+    artifact_status = verif.get("artifacts")
     service = getattr(request.app.state, "pulmo_service", None)
-    chk = getattr(request.app.state, "checkpoint_verification", {})
-    integrity_ok = chk.get("all_critical_passed", True)
+    if service is None:
+        try:
+            service = PulmoAIService.load()
+            request.app.state.pulmo_service = service
+        except Exception:
+            service = None
     if service is None:
         return HealthResponse(
             status="unavailable",
             model_loaded=False,
             integrity_verified=integrity_ok,
+            artifact_status=artifact_status,
             message=getattr(request.app.state, "model_error", "Model artifact is unavailable."),
         )
     return HealthResponse(
@@ -174,6 +251,7 @@ def health(request: Request) -> HealthResponse:
         model_name=service.model_name,
         artifact_id=service.artifact_id,
         integrity_verified=integrity_ok,
+        artifact_status=artifact_status,
         message="Model loaded and ready for compatible research input.",
     )
 

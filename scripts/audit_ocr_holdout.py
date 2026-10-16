@@ -3,10 +3,10 @@
 
 Evaluates the frozen lab parser on a completely new test set:
 - 3+ brand-new clinical layout templates NOT used during tuning:
-  1. Max Healthcare Style (Max Super Speciality Hospital)
-  2. Fortis Escorts Heart Institute Style
-  3. Thyrocare Technologies Wellness Style
-  4. Narayana Health Multi-Speciality Style
+  1. General Hospital Style (General Super Speciality Hospital)
+  2. Heart Institute Style (Specialized Heart & Metabolic Institute)
+  3. Central Diagnostic Laboratory Style
+  4. Ambulatory Clinic Style (Multi-Speciality Ambulatory Clinic)
 - Distinct random seed (seed=999, vs seed=42 on tuning dev set)
 - At least 350 analyte entities per condition (50 reports x 7 tests = 350 entities)
 - Strictly frozen parser (zero layout-specific or value-specific tweaks)
@@ -84,44 +84,44 @@ TEST_SPECS = [
     },
 ]
 
-# 4 Completely Unseen Layout Templates for Holdout Evaluation
+# 4 Completely Unseen Generic Layout Templates for Holdout Evaluation
 HOLDOUT_LAYOUT_TEMPLATES = [
     {
-        "layout_id": "max_healthcare",
-        "layout_name": "Max Healthcare Super Speciality Hospital",
+        "layout_id": "general_hospital",
+        "layout_name": "General Super Speciality Hospital",
         "default_sex": "male",
-        "header": "MAX SUPER SPECIALITY HOSPITAL - DEPARTMENT OF PATHOLOGY\nPATIENT NAME: Subject_{idx}   AGE: {age} YRS   GENDER: {sex_cap}   UHID: MAX-{idx:05d}\nREG DATE: 15-Nov-2024   LOCATION: SAKET NEW DELHI   STATUS: FINAL\n====================================================================================\nTEST INVESTIGATION               OBSERVED RESULT   UNIT       REFERENCE INTERVAL\n====================================================================================\n",
-        "footer": "\n====================================================================================\nValidated by: Dr. S. Mukherjee, MD, Senior Consultant Pathologist",
+        "header": "GENERAL SUPER SPECIALITY HOSPITAL - DEPARTMENT OF PATHOLOGY\nPATIENT NAME: Subject_{idx}   AGE: {age} YRS   GENDER: {sex_cap}   UHID: HOSP-{idx:05d}\nREG DATE: 15-Nov-2024   LOCATION: REGIONAL DIVISION   STATUS: FINAL\n====================================================================================\nTEST INVESTIGATION               OBSERVED RESULT   UNIT       REFERENCE INTERVAL\n====================================================================================\n",
+        "footer": "\n====================================================================================\nValidated by: Dr. S. Pathologist, MD, Senior Consultant Pathologist",
         "fmt": "{test_name:<30}   {val:<15.1f}   {unit:<8}   {ref}",
     },
     {
-        "layout_id": "fortis_escorts",
-        "layout_name": "Fortis Escorts Heart Institute (Cardio-Metabolic Panel)",
+        "layout_id": "heart_institute",
+        "layout_name": "Specialized Heart & Metabolic Institute",
         "default_sex": "female",
-        "header": "FORTIS HEALTHCARE LIMITED - CLINICAL BIOCHEMISTRY LAB\nNAME: Subject_{idx}   AGE/SEX: {age}/{sex_cap}   IP/OP NO: FEHI-{idx:06d}\nDOCTOR: DR. A. BANSAL, DM CARDIOLOGY   DATE: 14/11/2024\n------------------------------------------------------------------------------------\nEXAMINATION                      VALUE     UNITS          BIOLOGICAL REFERENCE\n------------------------------------------------------------------------------------\n",
+        "header": "REGIONAL SPECIALIZED HEALTHCARE - CLINICAL BIOCHEMISTRY LAB\nNAME: Subject_{idx}   AGE/SEX: {age}/{sex_cap}   IP/OP NO: SHI-{idx:06d}\nDOCTOR: DR. A. CARDIOLOGIST, MD   DATE: 14/11/2024\n------------------------------------------------------------------------------------\nEXAMINATION                      VALUE     UNITS          BIOLOGICAL REFERENCE\n------------------------------------------------------------------------------------\n",
         "footer": "\n------------------------------------------------------------------------------------\nVerified by Automated Interface. End of Laboratory Investigation Report.",
         "fmt": "{test_name:<30}   {val:<7.1f}   {unit:<12}   {ref}",
     },
     {
-        "layout_id": "thyrocare_technologies",
-        "layout_name": "Thyrocare Technologies Limited (Central Processing Unit)",
+        "layout_id": "central_automated_lab",
+        "layout_name": "Central Automated Diagnostic Laboratory",
         "default_sex": "male",
-        "header": "THYROCARE TECHNOLOGIES LTD - WORLD CLASS CENTRAL PROCESSING UNIT\nPATIENT: Subject_{idx}   AGE: {age}   SEX: {sex_cap}   BARCODE: TC-{idx:07d}\nSAMPLE COLLECTED AT: BENGALURU   REPORT GENERATED: 16-NOV-2024\n************************************************************************************\nANALYTE NAME                     VALUE     UNIT           REFERENCE RANGE\n************************************************************************************\n",
+        "header": "CENTRAL AUTOMATED DIAGNOSTICS LTD - PROCESSING FACILITY\nPATIENT: Subject_{idx}   AGE: {age}   SEX: {sex_cap}   BARCODE: CD-{idx:07d}\nSAMPLE COLLECTED AT: REGIONAL AREA   REPORT GENERATED: 16-NOV-2024\n************************************************************************************\nANALYTE NAME                     VALUE     UNIT           REFERENCE RANGE\n************************************************************************************\n",
         "footer": "\n************************************************************************************\nAccreditation: NABL / CAP / ISO 15189. Automated Barcode Processing.",
         "fmt": "{test_name:<30}   {val:<7.1f}   {unit:<12}   {ref}",
     },
     {
-        "layout_id": "narayana_health",
-        "layout_name": "Narayana Health Multi-Speciality Clinic",
+        "layout_id": "ambulatory_clinic",
+        "layout_name": "Multi-Speciality Ambulatory Clinic",
         "default_sex": "female",
-        "header": "NARAYANA HEALTH CARE - OUTPATIENT LABORATORY SERVICE\nPatient Name: Subject_{idx} ({sex_cap}, {age} Years)   File No: NH-{idx:04d}\nRef By: Dr. R. Narayanan, MBBS, DNB   Reporting Date: 17-Nov-2024\n------------------------------------------------------------------------------------\nLABORATORY REPORT SUMMARY:\n",
+        "header": "INTEGRATED HEALTH CARE - OUTPATIENT LABORATORY SERVICE\nPatient Name: Subject_{idx} ({sex_cap}, {age} Years)   File No: AC-{idx:04d}\nRef By: Dr. R. Physician, MD   Reporting Date: 17-Nov-2024\n------------------------------------------------------------------------------------\nLABORATORY REPORT SUMMARY:\n",
         "footer": "\n------------------------------------------------------------------------------------\nKindly correlate clinically. Report reviewed and released electronically.",
         "fmt": "* {test_name}: {val:.1f} {unit} [Reference: {ref}]",
     },
 ]
 
 HOLDOUT_TEST_VARIANTS = {
-    "max_healthcare": {
+    "general_hospital": {
         "fasting_glucose": "GLUCOSE, FASTING (HEXOKINASE)",
         "hba1c": "GLYCOSYLATED HEMOGLOBIN (HBA1C HPLC)",
         "total_cholesterol": "CHOLESTEROL TOTAL",
@@ -130,7 +130,7 @@ HOLDOUT_TEST_VARIANTS = {
         "serum_creatinine": "CREATININE JAFFE KINETIC",
         "hemoglobin": "HEMOGLOBIN CYANMETHEMOGLOBIN",
     },
-    "fortis_escorts": {
+    "heart_institute": {
         "fasting_glucose": "Plasma Glucose Fasting",
         "hba1c": "Glycated Hemoglobin (HbA1c)",
         "total_cholesterol": "Total Serum Cholesterol",
@@ -139,7 +139,7 @@ HOLDOUT_TEST_VARIANTS = {
         "serum_creatinine": "Creatinine, Serum",
         "hemoglobin": "Blood Hemoglobin",
     },
-    "thyrocare_technologies": {
+    "central_automated_lab": {
         "fasting_glucose": "FASTING BLOOD GLUCOSE",
         "hba1c": "HBA1C - TOTAL GLYCOHEMOGLOBIN",
         "total_cholesterol": "TOTAL CHOLESTEROL",
@@ -148,7 +148,7 @@ HOLDOUT_TEST_VARIANTS = {
         "serum_creatinine": "SERUM CREATININE",
         "hemoglobin": "HEMOGLOBIN ESTIMATION",
     },
-    "narayana_health": {
+    "ambulatory_clinic": {
         "fasting_glucose": "Fasting Blood Sugar (FBS)",
         "hba1c": "HbA1c",
         "total_cholesterol": "Cholesterol Total",

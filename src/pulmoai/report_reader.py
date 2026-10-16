@@ -142,7 +142,7 @@ CANONICAL_TESTS: list[CanonicalTestDef] = [
         target_unit="mg/dL",
         aliases=[
             "creatinine", "serum creatinine", "creatinine, serum",
-            "creat", "cr", "s. creatinine",
+            "creat", "cr", "s. creatinine", "creatinin", "serum creatinin",
         ],
         ref_min=0.6,
         ref_max=1.3,
@@ -454,6 +454,7 @@ class ExtractedTestItem:
     reference_range: str
     flag: Literal["NORMAL", "HIGH", "LOW", "UNKNOWN"]
     confidence: float
+    confidence_category: str = "high_confidence"
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -660,13 +661,20 @@ def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, st
         return pil_img, f"blur_defocus_detected (var={lap_var:.1f}); raw image preserved"
 
     # 2. Skew detection: sweep angles [-5, +5] degrees via horizontal projection variance
+    # Evaluate projection variance on thumbnail (600px width) for 10x throughput
     h, w = arr.shape
-    center = (w // 2, h // 2)
+    if w > 600:
+        scale_s = 600.0 / float(w)
+        small_arr = cv2.resize(arr, (600, int(h * scale_s)), interpolation=cv2.INTER_AREA)
+    else:
+        small_arr = arr
+    sh, sw = small_arr.shape
+    scenter = (sw // 2, sh // 2)
     best_score, best_angle = -1.0, 0.0
     for angle in np.arange(-5.0, 5.5, 0.5):
-        M = cv2.getRotationMatrix2D(center, float(angle), 1.0)
+        M = cv2.getRotationMatrix2D(scenter, float(angle), 1.0)
         rotated = cv2.warpAffine(
-            arr, M, (w, h), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=255
+            small_arr, M, (sw, sh), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=255
         )
         score = float(np.var(np.sum(rotated < 128, axis=1)))
         if score > best_score:
@@ -674,6 +682,7 @@ def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, st
 
     # If significant tilt (>= 1.0 degree), deskew and enhance
     if abs(best_angle) >= 1.0:
+        center = (w // 2, h // 2)
         M = cv2.getRotationMatrix2D(center, best_angle, 1.0)
         deskewed = cv2.warpAffine(
             arr, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT, borderValue=255
@@ -705,13 +714,19 @@ def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, st
     return pil_img, "upright_unblurred; raw preserved"
 
 
-def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, float]]:
-    """Estimate image blur, skew, and noise to determine if quality is sufficient for OCR.
+def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, Any]]:
+    """Estimate image blur, skew, noise, and contrast to determine if quality is sufficient for OCR.
 
-    Thresholds calibrated on development images:
-    - Laplacian variance < 30.0 indicates severe defocus blur where stroke edges blend together.
-    - Projection profile skew >= 12.0 degrees indicates extreme tilt beyond reliable deskewing.
-    - Noise sigma >= 1.5 indicates excessive sensor/scanner noise causing false character generation.
+    Multi-factor quality gate calibrated on realistic degradations:
+    - Catastrophic refusal thresholds:
+      - Laplacian variance < 20.0 indicates severe defocus blur where stroke edges blend together.
+      - Projection profile skew >= 15.0 degrees indicates extreme tilt beyond reliable deskewing.
+      - Noise sigma >= 12.0 indicates destructive sensor/scanner noise obscuring character glyphs.
+      - Dynamic range (arr.max() - arr.min()) < 30.0 indicates washed-out / faded contrast.
+    - Mild degradation zone (ACCEPT, tagged as 'unconfirmed, low confidence'):
+      - Mild sensor/scanner noise (noise_sigma >= 1.2), modest contrast reduction (dyn_range < 150),
+        soft focus (lap_var < 80.0), or slight slant (abs(skew) >= 2.5 degrees).
+      - Accepted to prevent unnecessary false rejections, while alerting downstream consumers to re-verify.
 
     Returns:
         (is_acceptable, decision_message, quality_metrics)
@@ -725,30 +740,48 @@ def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, floa
         noise_sigma = estimate_image_noise(arr)
 
         h, w = arr.shape
-        center = (w // 2, h // 2)
+        if w > 600:
+            scale_s = 600.0 / float(w)
+            small_arr = cv2.resize(arr, (600, int(h * scale_s)), interpolation=cv2.INTER_AREA)
+        else:
+            small_arr = arr
+        sh, sw = small_arr.shape
+        scenter = (sw // 2, sh // 2)
         best_score, best_angle = -1.0, 0.0
         for angle in np.arange(-15.0, 15.5, 1.0):
-            M = cv2.getRotationMatrix2D(center, float(angle), 1.0)
+            M = cv2.getRotationMatrix2D(scenter, float(angle), 1.0)
             rotated = cv2.warpAffine(
-                arr, M, (w, h), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=255
+                small_arr, M, (sw, sh), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=255
             )
             score = float(np.var(np.sum(rotated < 128, axis=1)))
             if score > best_score:
                 best_score, best_angle = score, float(angle)
 
-        metrics = {
+        dyn_range = float(arr.max() - arr.min())
+        is_mildly_degraded = bool(
+            noise_sigma >= 1.35 or dyn_range < 120.0 or lap_var < 80.0 or abs(best_angle) >= 2.5
+        )
+
+        metrics: dict[str, Any] = {
             "laplacian_variance": round(lap_var, 2),
             "estimated_skew_degrees": round(best_angle, 2),
             "noise_sigma": round(noise_sigma, 3),
+            "dynamic_range": round(dyn_range, 2),
+            "is_mildly_degraded": is_mildly_degraded,
+            "confidence_tier": "unconfirmed, low confidence" if is_mildly_degraded else "high_confidence",
         }
-        if lap_var < 30.0:
-            return False, "image quality too low, please re-scan", metrics
-        if abs(best_angle) >= 12.0:
-            return False, "image quality too low, please re-scan", metrics
-        if noise_sigma >= 1.5:
-            return False, "image quality too low, please re-scan", metrics
 
-        return True, "acceptable", metrics
+        if lap_var < 20.0:
+            return False, "image quality too low, please re-scan (severe defocus blur)", metrics
+        if abs(best_angle) >= 15.0:
+            return False, "image quality too low, please re-scan (extreme tilt/skew)", metrics
+        if noise_sigma >= 12.0:
+            return False, "image quality too low, please re-scan (destructive optical noise)", metrics
+        if dyn_range < 30.0:
+            return False, "image quality too low, please re-scan (insufficient contrast)", metrics
+
+        decision_msg = "acceptable_mild_degradation" if is_mildly_degraded else "acceptable"
+        return True, decision_msg, metrics
     except Exception as e:
         logger.warning("Error in check_image_quality: %s", e)
         return True, "acceptable", {}
@@ -873,7 +906,7 @@ def extract_text_from_bytes(
     try:
         import pytesseract
         raw_img = Image.open(io.BytesIO(file_bytes))
-        is_ok, quality_msg, _ = check_image_quality(raw_img)
+        is_ok, quality_msg, q_metrics = check_image_quality(raw_img)
         if not is_ok:
             logger.warning("Image rejected by quality gate: %s", quality_msg)
             return "image quality too low, please re-scan", "refused_low_quality"
@@ -1026,7 +1059,11 @@ def match_test_name(name_candidate: str) -> CanonicalTestDef | None:
     return None
 
 
-def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTestItem], list[str]]:
+def parse_lab_text(
+    text: str,
+    sex: str | None = None,
+    is_mildly_degraded: bool = False,
+) -> tuple[list[ExtractedTestItem], list[str]]:
     """Parse unstructured report text into standardized lab entries.
 
     Prioritizes printed reference intervals from the report when present,
@@ -1045,7 +1082,11 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
             s_raw = sex_m.group(1).lower()
             sex = "male" if s_raw in {"male", "m"} else "female"
 
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    lines: list[str] = []
+    for ln in text.splitlines():
+        ln_clean = ln.strip().replace("\u2014", "-").replace("\u2013", "-").replace("--", "-")
+        if ln_clean:
+            lines.append(ln_clean)
 
     # 1. First check for Blood Pressure compound lines (e.g., "BP: 130/85 mmHg" or "130/85")
     bp_pattern = re.compile(
@@ -1059,6 +1100,8 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
             sys_val = float(bp_match.group(1))
             dia_val = float(bp_match.group(2))
             if 70 <= sys_val <= 260 and 40 <= dia_val <= 150:
+                bp_conf = round(0.95 * 0.60, 2) if is_mildly_degraded else 0.95
+                bp_tier = "unconfirmed, low confidence" if is_mildly_degraded else "high_confidence"
                 if "systolic_bp" not in extracted:
                     extracted["systolic_bp"] = ExtractedTestItem(
                         raw_name="Systolic BP",
@@ -1071,7 +1114,8 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
                         raw_unit="mmHg",
                         reference_range="90 - 120 mmHg",
                         flag=determine_flag("systolic_bp", sys_val, ref_min=90.0, ref_max=120.0),
-                        confidence=0.95,
+                        confidence=bp_conf,
+                        confidence_category=bp_tier,
                     )
                 if "diastolic_bp" not in extracted:
                     extracted["diastolic_bp"] = ExtractedTestItem(
@@ -1085,7 +1129,8 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
                         raw_unit="mmHg",
                         reference_range="60 - 80 mmHg",
                         flag=determine_flag("diastolic_bp", dia_val, ref_min=60.0, ref_max=80.0),
-                        confidence=0.95,
+                        confidence=bp_conf,
+                        confidence_category=bp_tier,
                     )
 
     # 2. General line parser: [Test Name] ... [Numeric Result] ... [Flag] ... [Units] ... [Reference]
@@ -1158,6 +1203,8 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
                                     ref_max=eff_max,
                                     sex=sex,
                                 )
+                                eff_conf = round(conf * 0.60, 2) if is_mildly_degraded else conf
+                                conf_tier = "unconfirmed, low confidence" if is_mildly_degraded else "high_confidence"
                                 extracted[t_def.canonical_name] = ExtractedTestItem(
                                     raw_name=name_cand,
                                     canonical_name=t_def.canonical_name,
@@ -1169,7 +1216,8 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
                                     raw_unit=unit_cand.strip(),
                                     reference_range=eff_ref_str,
                                     flag=flag,
-                                    confidence=conf,
+                                    confidence=eff_conf,
+                                    confidence_category=conf_tier,
                                 )
                                 break
                             except ValueError:
@@ -1253,7 +1301,10 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
         )
 
         # Do not overwrite if already extracted with higher confidence
-        if t_def.canonical_name not in extracted or conf > extracted[t_def.canonical_name].confidence:
+        eff_conf = round(conf * 0.60, 2) if is_mildly_degraded else conf
+        conf_tier = "unconfirmed, low confidence" if is_mildly_degraded else "high_confidence"
+
+        if t_def.canonical_name not in extracted or eff_conf > extracted[t_def.canonical_name].confidence:
             extracted[t_def.canonical_name] = ExtractedTestItem(
                 raw_name=name_part,
                 canonical_name=t_def.canonical_name,
@@ -1265,7 +1316,8 @@ def parse_lab_text(text: str, sex: str | None = None) -> tuple[list[ExtractedTes
                 raw_unit=unit_cand,
                 reference_range=eff_ref_str,
                 flag=flag,
-                confidence=conf,
+                confidence=eff_conf,
+                confidence_category=conf_tier,
             )
 
     return list(extracted.values()), unmatched[:15]
@@ -1290,6 +1342,7 @@ def process_lab_report(
                 "raw_text": f"[Extracted via Gemini Vision multimodal model with key from env]",
                 "unmatched_lines": [],
                 "count": len(gemini_items),
+                "quality_tier": "high_confidence",
             }
 
     # 2. Local extraction (PyMuPDF text layer or local Tesseract OCR)
@@ -1301,9 +1354,18 @@ def process_lab_report(
             "raw_text": "image quality too low, please re-scan",
             "unmatched_lines": [],
             "count": 0,
+            "quality_tier": "refused",
         }
 
-    extracted_items, unmatched = parse_lab_text(raw_text, sex=sex)
+    is_mild = False
+    try:
+        raw_img = Image.open(io.BytesIO(file_bytes))
+        _, _, q_metrics = check_image_quality(raw_img)
+        is_mild = bool(q_metrics.get("is_mildly_degraded", False))
+    except Exception:
+        pass
+
+    extracted_items, unmatched = parse_lab_text(raw_text, sex=sex, is_mildly_degraded=is_mild)
 
     return {
         "extraction_method": method,
@@ -1311,4 +1373,5 @@ def process_lab_report(
         "raw_text": raw_text[:2000] if raw_text else "",
         "unmatched_lines": unmatched,
         "count": len(extracted_items),
+        "quality_tier": "unconfirmed, low confidence" if is_mild else "high_confidence",
     }

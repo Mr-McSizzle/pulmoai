@@ -216,7 +216,7 @@ def run_unit_tests() -> dict:
     logger.info("Running unit tests for published clinical risk scores...")
     results = {}
 
-    # PCE Unit Tests (Goff et al. 2013 Table B / Cerner worked examples)
+    # PCE Unit Tests (Goff et al. 2013 Table B / EHR worked examples)
     # Profile: 55yo, TC 210, HDL 50, SBP 140 treated, non-smoker, non-diabetic
     pce_w_f = compute_pce_10yr(False, False, False, True, False, 55, 140, 210, 50)
     pce_b_f = compute_pce_10yr(False, True, False, True, False, 55, 140, 210, 50)

@@ -212,14 +212,14 @@ export function ImageScreeningPage() {
             </button>
           </div>
 
-          {/* Audited Modality Gate & OOD Assessment Notice (Pass 5 F6) */}
+          {/* Audited Modality Gate & OOD Assessment Notice (Pass 9b L4) */}
           <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 space-y-1.5">
             <div className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
               <AlertTriangle size={15} className="text-amber-700 shrink-0" />
               Modality Gate & Domain Boundaries Notice
             </div>
             <div className="text-[11px] text-amber-900 leading-snug">
-              <strong>Domain boundaries:</strong> The Modality Gate recognizes only the specific categories it was trained on (pediatric chest x-ray, dermoscopy, fundus, blood smear, and specific training negatives). It cannot guarantee detection of unseen image types or arbitrary natural photos.
+              <strong>Domain boundaries &amp; pediatric restriction:</strong> The Modality Gate recognizes only the specific categories it was trained on (pediatric chest x-ray, dermoscopy, fundus, blood smear, and specific training negatives). It cannot guarantee detection of unseen image types or arbitrary natural photos. Furthermore, the Chest X-ray model was trained exclusively on pediatric patients (ages 1–5) and has not been evaluated on adults; it must not be applied to adult radiographs.
             </div>
             <div className="text-[11px] text-amber-800 leading-snug font-mono bg-amber-100/70 p-2 rounded border border-amber-200">
               Leave-One-Family-Out (LOFO) Macro FAR: <strong>19.03%</strong> | Worst Left-Out Family: <strong>100.0%</strong> (synthetic lab reports) | High-Variance Noise Pre-Check Rejection: <strong>100.0%</strong>

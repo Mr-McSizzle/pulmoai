@@ -104,7 +104,7 @@ class OfflineInferencePrivacyTests(unittest.TestCase):
     def test_local_report_reader_inference_is_offline(self) -> None:
         """Verify local lab report parser (without Gemini key) makes zero network calls."""
         sample_report = b"""
-        METROPOLITAN CLINICAL LABORATORY
+        COMMUNITY MEDICAL DIAGNOSTICS LAB
         Patient Name: Test Subject   Age: 50   Sex: Male
         ----------------------------------------------------
         Fasting Blood Glucose: 95.0 mg/dL [70 - 99]

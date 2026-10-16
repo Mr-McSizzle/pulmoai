@@ -39,6 +39,8 @@ Every model checkpoint can be deterministically reproduced from raw data using i
 ## 3. Cryptographic SHA-256 Checksums
 
 The following hashes represent the exact binary integrity of the deployed and audited checkpoints:
+Date: 2026-10-16
+Commit: 2e7ad4c
 
 ```text
 3c79abb652ac0099a34145c38cbdaf774d673941636a208c8c820be4ac37f03c  models/ensemble_benchmark_best.joblib

@@ -16,6 +16,7 @@ if str(PROJECT_ROOT / "src") not in sys.path:
 from fastapi.testclient import TestClient
 from backend.main import app
 from scripts.verify_checkpoints import verify_checkpoints
+from scripts.verify_artifacts import verify_artifacts
 
 WEIGHTS_EXIST = (PROJECT_ROOT / "models" / "medmnist" / "pneumoniamnist_resnet18.pt").exists()
 
@@ -35,6 +36,73 @@ class ReproducibilityAndVerificationTests(unittest.TestCase):
         self.assertTrue(res["checkpoints"]["single_cell_lung_atlas"]["passed"])
         self.assertTrue(res["checkpoints"]["nhanes_chronic_risk"]["passed"])
 
+    def test_verify_artifacts_script_passes_on_current_repo(self) -> None:
+        """Verify scripts/verify_artifacts.py succeeds on deployed repository models."""
+        res = verify_artifacts()
+        self.assertTrue(res["all_passed"], f"Deployed artifacts failed verification: {res}")
+        self.assertEqual(res["failed_count"], 0)
+        self.assertGreaterEqual(res["verified_count"], 5)
+        self.assertTrue(res["module_status"]["pulmo_service"])
+        self.assertTrue(res["module_status"]["risk_service"])
+        self.assertTrue(res["module_status"]["future_risk_service"])
+
+    def test_tampered_artifact_causes_verification_failure(self) -> None:
+        """Verify that a tampered file is detected as hash_mismatch and fails module verification."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmppath = Path(tmpdir)
+            model_sub = tmppath / "models"
+            model_sub.mkdir()
+            tampered_model = model_sub / "ensemble_benchmark_best.joblib"
+            tampered_model.write_bytes(b"tampered model corrupted bytes for test")
+            checksums_file = model_sub / "checksums.sha256"
+            checksums_file.write_text(
+                "3c79abb652ac0099a34145c38cbdaf774d673941636a208c8c820be4ac37f03c  models/ensemble_benchmark_best.joblib\n",
+                encoding="utf-8",
+            )
+            res = verify_artifacts(checksums_path=checksums_file, base_dir=tmppath)
+            self.assertFalse(res["all_passed"])
+            self.assertEqual(res["failed_count"], 1)
+            self.assertEqual(res["artifacts"]["models/ensemble_benchmark_best.joblib"]["status"], "hash_mismatch")
+            self.assertFalse(res["module_status"]["pulmo_service"])
+
+    def test_tampered_artifact_triggers_http_503_in_api(self) -> None:
+        """Verify that if an artifact failed verification, API endpoints return HTTP 503."""
+        orig_verif = getattr(app.state, "artifact_verification", None)
+        try:
+            # Simulate pulmo_service failure
+            app.state.artifact_verification = {
+                "all_passed": False,
+                "module_status": {
+                    "pulmo_service": False,
+                    "risk_service": True,
+                    "future_risk_service": True,
+                    "image_service": True,
+                },
+                "artifacts": {},
+            }
+            resp = self.client.get("/api/dashboard")
+            self.assertEqual(resp.status_code, 503)
+            self.assertIn("failed cryptographic integrity verification", resp.json()["detail"])
+
+            # Simulate risk_service failure
+            app.state.artifact_verification["module_status"]["risk_service"] = False
+            resp_risk = self.client.post("/api/risk/predict", json={"inputs": {"age": 50}})
+            self.assertEqual(resp_risk.status_code, 503)
+            self.assertIn("failed cryptographic integrity verification", resp_risk.json()["detail"])
+
+            # Simulate future_risk_service failure
+            app.state.artifact_verification["module_status"]["future_risk_service"] = False
+            resp_future = self.client.post("/api/risk/future", json={"inputs": {"age": 50}})
+            self.assertEqual(resp_future.status_code, 503)
+            self.assertIn("failed cryptographic integrity verification", resp_future.json()["detail"])
+        finally:
+            if orig_verif is not None:
+                app.state.artifact_verification = orig_verif
+            else:
+                from scripts.verify_artifacts import verify_artifacts
+                app.state.artifact_verification = verify_artifacts()
+
     def test_api_integrity_endpoint(self) -> None:
         """Verify GET /api/integrity returns verified status and individual checkpoint records."""
         resp = self.client.get("/api/integrity")
@@ -44,13 +112,17 @@ class ReproducibilityAndVerificationTests(unittest.TestCase):
         self.assertIn("checkpoints", data)
         self.assertIn("single_cell_lung_atlas", data["checkpoints"])
 
-    def test_api_health_includes_integrity_flag(self) -> None:
-        """Verify GET /api/health includes integrity_verified flag."""
+    def test_api_health_includes_integrity_flag_and_artifact_status(self) -> None:
+        """Verify GET /api/health includes integrity_verified flag and per-artifact status."""
         resp = self.client.get("/api/health")
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
         self.assertIn("integrity_verified", data)
         self.assertTrue(data["integrity_verified"])
+        self.assertIn("artifact_status", data)
+        self.assertIsNotNone(data["artifact_status"])
+        self.assertIn("models/ensemble_benchmark_best.joblib", data["artifact_status"])
+        self.assertTrue(data["artifact_status"]["models/ensemble_benchmark_best.joblib"]["passed"])
 
 
 class RiskEstimandValidationTests(unittest.TestCase):
