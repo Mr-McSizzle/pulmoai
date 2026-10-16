@@ -478,6 +478,29 @@ class ReportReaderRegressionTests(unittest.TestCase):
         self.assertEqual(res_map["total_cholesterol"].value, 210.0)
         self.assertEqual(res_map["total_cholesterol"].flag, "HIGH")
 
+    def test_hba1c_alias_safety_and_explicit_patterns(self) -> None:
+        """Verify bare ALC (CBC) and Alcohol do not produce HbA1c, while explicit patterns do."""
+        # CBC line with ALC must not produce HbA1c
+        extracted_alc, unmatched_alc = parse_lab_text("ALC  2.1  x10^3/uL")
+        self.assertEqual(len(extracted_alc), 0)
+        self.assertIn("ALC  2.1  x10^3/uL", unmatched_alc)
+
+        # Alcohol must not match anything
+        extracted_alc2, unmatched_alc2 = parse_lab_text("Alcohol  0.0  g/dL")
+        self.assertEqual(len(extracted_alc2), 0)
+        self.assertIn("Alcohol  0.0  g/dL", unmatched_alc2)
+
+        # HbAlc 6.1 % and Hb A1c 6.1 % must produce HbA1c 6.1
+        extracted_hbalc, _ = parse_lab_text("HbAlc 6.1 %")
+        self.assertEqual(len(extracted_hbalc), 1)
+        self.assertEqual(extracted_hbalc[0].canonical_name, "hba1c")
+        self.assertEqual(extracted_hbalc[0].value, 6.1)
+
+        extracted_hb_a1c, _ = parse_lab_text("Hb A1c 6.1 %")
+        self.assertEqual(len(extracted_hb_a1c), 1)
+        self.assertEqual(extracted_hb_a1c[0].canonical_name, "hba1c")
+        self.assertEqual(extracted_hb_a1c[0].value, 6.1)
+
 
 if __name__ == "__main__":
     unittest.main()

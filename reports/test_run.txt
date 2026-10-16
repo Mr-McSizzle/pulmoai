@@ -47,7 +47,7 @@ test_image_screening_inference_is_offline (test_privacy_offline.OfflineInference
 Verify medical image screening and modality gate make zero network calls. ... INFO:pulmoai.image_service:ImageScreeningService initialized with device: mps
 ok
 test_local_report_reader_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_local_report_reader_inference_is_offline)
-Verify local lab report parser (without Gemini key) makes zero network calls. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x177d2eb10>
+Verify local lab report parser (without Gemini key) makes zero network calls. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x151301350>
 ok
 test_nhanes_risk_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_nhanes_risk_inference_is_offline)
 Verify NHANES chronic disease risk engine makes zero network calls. ... INFO:pulmoai.risk_service:Initialized HealthRiskService with targets: diabetes, hypertension, high_cholesterol, heart_disease, stroke, copd
@@ -55,7 +55,7 @@ ok
 test_scrna_seq_inference_is_offline (test_privacy_offline.OfflineInferencePrivacyTests.test_scrna_seq_inference_is_offline)
 Verify scRNA-seq classification makes zero network calls. ... ok
 test_api_report_extract_txt (test_report_reader.ReportReaderAPITests.test_api_report_extract_txt)
-Test POST /api/report/extract with a text report. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x177807e70>
+Test POST /api/report/extract with a text report. ... WARNING:pulmoai.report_reader:Local Tesseract OCR error: cannot identify image file <_io.BytesIO object at 0x16f0362f0>
 INFO:httpx2:HTTP Request: POST http://testserver/api/report/extract "HTTP/1.1 200 OK"
 ok
 test_api_report_extract_unsupported_format (test_report_reader.ReportReaderAPITests.test_api_report_extract_unsupported_format)
@@ -73,6 +73,8 @@ test_bulleted_and_prefixed_lines (test_report_reader.ReportReaderRegressionTests
 Verify leading bullet points and hyphens are stripped without corrupting test names. ... ok
 test_clean_pdf_five_layouts_accuracy (test_report_reader.ReportReaderRegressionTests.test_clean_pdf_five_layouts_accuracy)
 Verify native PDF text layer extraction achieves >= 98% accuracy across all 5 layouts. ... ok
+test_hba1c_alias_safety_and_explicit_patterns (test_report_reader.ReportReaderRegressionTests.test_hba1c_alias_safety_and_explicit_patterns)
+Verify bare ALC (CBC) and Alcohol do not produce HbA1c, while explicit patterns do. ... ok
 test_hdl_direct_not_overwritten_by_total_cholesterol (test_report_reader.ReportReaderRegressionTests.test_hdl_direct_not_overwritten_by_total_cholesterol)
 Verify HDL direct assay is not captured by total cholesterol alias. ... ok
 test_one_sided_reference_range_flagging (test_report_reader.ReportReaderRegressionTests.test_one_sided_reference_range_flagging)
@@ -121,6 +123,6 @@ Verify that condition predictions define estimand_type, label, and time_horizon.
 ok
 
 ----------------------------------------------------------------------
-Ran 56 tests in 6.976s
+Ran 57 tests in 7.031s
 
 OK

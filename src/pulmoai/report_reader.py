@@ -61,7 +61,7 @@ CANONICAL_TESTS: list[CanonicalTestDef] = [
         category="Glycemic",
         target_unit="%",
         aliases=[
-            "hba1c", "hemoglobin a1c", "hemoglobin alc", "hbalc", "alc",
+            "hba1c", "hemoglobin a1c", "hemoglobin alc",
             "glycohemoglobin", "glycated hemoglobin", "a1c glycohemoglobin",
             "a1c", "hba1c (ngsp)", "glycated hb", "glycosylated hemoglobin",
             "glycosylated hemoglobin (hba1c)", "glycosylated hemoglobin hba1c",
@@ -996,6 +996,14 @@ def match_test_name(name_candidate: str) -> CanonicalTestDef | None:
         for alias in t_def.aliases:
             sorted_pairs.append((alias.lower().strip(), t_def))
     sorted_pairs.sort(key=lambda x: len(x[0]), reverse=True)
+
+    # Explicit HbA1c compound patterns allowing 1/l/I OCR confusion
+    # Must be attached to explicit roots (hb, hemoglobin, glyco-) - never on a bare token (e.g. CBC ALC)
+    if re.search(r"\b(?:hb\s*a[1li]c|hemoglobin\s+a[1li]c|glyc(?:ated|osylated)\s+hemoglobin(?:\s+a[1li]c)?|glycohemoglobin(?:\s+a[1li]c)?)\b", clean) or \
+       re.search(r"\b(?:hb\s*a[1li]c|hemoglobin\s+a[1li]c|glyc(?:ated|osylated)\s+hemoglobin(?:\s+a[1li]c)?|glycohemoglobin(?:\s+a[1li]c)?)\b", clean_no_hyphen):
+        for t_def in CANONICAL_TESTS:
+            if t_def.canonical_name == "hba1c":
+                return t_def
 
     # 1. Exact alias match
     for alias, t_def in sorted_pairs:
