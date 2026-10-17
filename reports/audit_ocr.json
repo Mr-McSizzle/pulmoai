@@ -1,8 +1,8 @@
 {
   "evaluation_note": "synthetic test set; real-world accuracy unknown",
-  "description": "Honest entity-level evaluation of PulmoAI laboratory report reader across 5 synthetic clinical report layouts (including Indian diagnostic chains: Dr Lal, SRL/Agilus, Metropolis) and 6 physical degradation tiers (native digital PDF, clean OCR scan, rotation, blur, JPEG compression, and phone-style perspective distortion).",
+  "description": "Honest entity-level evaluation of PulmoAI laboratory report reader across 5 synthetic clinical report layouts and 6 physical degradation tiers (native digital PDF, clean OCR scan, rotation, blur, JPEG compression, and phone-style perspective distortion).",
   "unsupported_claims_removed": [
-    "LabCorp / Quest validation claims removed (not evaluated on proprietary commercial formats).",
+    "Commercial third-party laboratory format validation claims removed (not evaluated on proprietary commercial formats).",
     ">99.5% entity identification claim removed (true only for clean digital PDFs with embedded text layers; severely drops on scanned images)."
   ],
   "sex_specific_reference_ranges": {
@@ -91,21 +91,21 @@
   },
   "layout_breakdown": {
     "dr_lal_pathlabs": {
-      "layout_name": "Dr Lal PathLabs Style (Indian Corporate Chain)",
+      "layout_name": "National Diagnostic Chain Style (Multi-Panel Laboratory)",
       "pdf_exact_accuracy": 1.0,
       "clean_ocr_accuracy": 0.8571,
       "perspective_accuracy": 1.0,
       "overall_exact_accuracy": 0.7619
     },
     "srl_agilus_diagnostics": {
-      "layout_name": "Agilus Diagnostics / SRL Style (Indian Pathology)",
+      "layout_name": "Regional Pathology Network Style (Biochemistry Tabular)",
       "pdf_exact_accuracy": 0.8571,
       "clean_ocr_accuracy": 0.8571,
       "perspective_accuracy": 0.8571,
       "overall_exact_accuracy": 0.8571
     },
     "metropolis_healthcare": {
-      "layout_name": "Metropolis Healthcare Style (Indian Specialty Care)",
+      "layout_name": "Specialty Reference Laboratory Style (Metabolic Profile)",
       "pdf_exact_accuracy": 1.0,
       "clean_ocr_accuracy": 1.0,
       "perspective_accuracy": 0.0,
@@ -128,7 +128,7 @@
   },
   "detailed_results_by_layout": {
     "dr_lal_pathlabs": {
-      "layout_name": "Dr Lal PathLabs Style (Indian Corporate Chain)",
+      "layout_name": "National Diagnostic Chain Style (Multi-Panel Laboratory)",
       "patient_sex": "male",
       "tier_results": {
         "clean_pdf": {
@@ -268,7 +268,7 @@
       }
     },
     "srl_agilus_diagnostics": {
-      "layout_name": "Agilus Diagnostics / SRL Style (Indian Pathology)",
+      "layout_name": "Regional Pathology Network Style (Biochemistry Tabular)",
       "patient_sex": "female",
       "tier_results": {
         "clean_pdf": {
@@ -394,7 +394,7 @@
       }
     },
     "metropolis_healthcare": {
-      "layout_name": "Metropolis Healthcare Style (Indian Specialty Care)",
+      "layout_name": "Specialty Reference Laboratory Style (Metabolic Profile)",
       "patient_sex": "male",
       "tier_results": {
         "clean_pdf": {

@@ -125,7 +125,14 @@ class ImagePredictionResponse(BaseModel):
     image_type: str
     modality_name: str
     recognized: bool
-    status: Literal["success", "low_confidence", "rejected_modality_mismatch", "rejected_non_medical_input", "error"]
+    status: Literal[
+        "success",
+        "low_confidence",
+        "rejected_modality_mismatch",
+        "rejected_non_medical_input",
+        "rejected_pediatric_confirmation_required",
+        "error",
+    ]
     message: str | None = None
     predicted_class: str | None = None
     confidence: float | None = None

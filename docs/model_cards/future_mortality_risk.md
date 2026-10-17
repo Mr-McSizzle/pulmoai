@@ -39,11 +39,16 @@
   - Calibration-in-the-Large Intercept: 0.0356
 
 ## Subgroup Discrimination (Bootstrap 95% CIs)
-- **Non-Hispanic Asian Subgroup ($n=1,529$, 53 deaths):**
-  - C-index: 0.8618 (95% CI: [0.8032, 0.9140])
-  - 5-Year AUROC: 0.8834 (95% CI: [0.8146, 0.9465])
-- **Males ($n=5,802$, 596 deaths):** C-index: 0.8527 [0.8347, 0.8683], 5-Yr AUROC: 0.8651 [0.8461, 0.8850]
-- **Females ($n=6,147$, 499 deaths):** C-index: 0.8670 [0.8507, 0.8809], 5-Yr AUROC: 0.8775 [0.8571, 0.8949]
+- **Non-Hispanic Asian Subgroup ($n=1,529$):**
+  - **All-Cause Mortality** ($n_{\text{events}}=53$, $n_{\text{5yr}}=34$): C-index 0.8618 (95% CI: [0.8032, 0.9140]), 5-Year AUROC 0.8834 (95% CI: [0.8146, 0.9465])
+  - **Cardiovascular Mortality** ($n_{\text{events}}=16$, $n_{\text{5yr}}=11$): C-index 0.8585 (95% CI: [0.7678, 0.9370]), 5-Year AUROC 0.8747 (95% CI: [0.7427, 0.9608])
+- **Males ($n=5,802$):**
+  - All-Cause ($n_{\text{events}}=596$, $n_{\text{5yr}}=406$): C-index 0.8527 [0.8347, 0.8683], 5-Yr AUROC: 0.8651 [0.8461, 0.8850]
+  - Cardiovascular ($n_{\text{events}}=185$, $n_{\text{5yr}}=129$): C-index 0.8979 [0.8760, 0.9178], 5-Yr AUROC: 0.9161 [0.8900, 0.9358]
+- **Females ($n=6,147$):**
+  - All-Cause ($n_{\text{events}}=499$, $n_{\text{5yr}}=339$): C-index 0.8670 [0.8507, 0.8809], 5-Yr AUROC: 0.8775 [0.8571, 0.8949]
+  - Cardiovascular ($n_{\text{events}}=162$, $n_{\text{5yr}}=115$): C-index 0.8870 [0.8611, 0.9099], 5-Yr AUROC: 0.8928 [0.8631, 0.9216]
+- **Synthetic Zero-Event Control Cohort:** Metric returned as `null` with `null_reason: "zero_subjects_in_subgroup"`.
 
 ## Primary Prevention Comparison (Age 40-79 without Prior CVD)
 - **Guideline-Concordant Complete-Case Subset ($n=5,187$, no imputed PCE inputs):**

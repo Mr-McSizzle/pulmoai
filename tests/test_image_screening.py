@@ -60,7 +60,12 @@ class ImageScreeningUnitTest(unittest.TestCase):
         buf = io.BytesIO()
         img.save(buf, format="PNG")
 
-        result = self.service.predict(buf.getvalue(), "chest_xray", ood_threshold=0.30)
+        result = self.service.predict(
+            buf.getvalue(),
+            "chest_xray",
+            ood_threshold=0.30,
+            patient_is_pediatric=True,
+        )
         self.assertEqual(result["image_type"], "chest_xray")
         self.assertIn("modality_name", result)
         self.assertIn("class_probabilities", result)
@@ -68,6 +73,24 @@ class ImageScreeningUnitTest(unittest.TestCase):
         self.assertIn("model_metrics", result)
         self.assertIn("modality_gate", result)
         self.assertEqual(result["modality_gate"]["status"], "VERIFIED_MATCH")
+
+    def test_chest_xray_refuses_when_pediatric_confirmation_missing_service(self) -> None:
+        """Verify service refuses chest_xray when patient_is_pediatric=False."""
+        arr = np.random.randint(50, 200, size=(64, 64), dtype=np.uint8)
+        img = Image.fromarray(arr, mode="L")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+
+        result = self.service.predict(
+            buf.getvalue(),
+            "chest_xray",
+            ood_threshold=0.30,
+            patient_is_pediatric=False,
+        )
+        self.assertFalse(result["recognized"])
+        self.assertEqual(result["status"], "rejected_pediatric_confirmation_required")
+        self.assertIn("Refusal", result["message"])
+        self.assertIn("pediatric patients aged 1-5", result["message"])
 
     def test_modality_gate_rejects_cross_modality_mismatch(self) -> None:
         """Verify Modality Gate refuses to run when image modality contradicts user selection."""
@@ -79,8 +102,13 @@ class ImageScreeningUnitTest(unittest.TestCase):
             buf = io.BytesIO()
             img.save(buf, format="PNG")
 
-            # Upload dermoscopy image under chest_xray selection
-            result = self.service.predict(buf.getvalue(), "chest_xray", ood_threshold=0.30)
+            # Upload dermoscopy image under chest_xray selection with pediatric confirmation
+            result = self.service.predict(
+                buf.getvalue(),
+                "chest_xray",
+                ood_threshold=0.30,
+                patient_is_pediatric=True,
+            )
             self.assertFalse(result["recognized"])
             self.assertEqual(result["status"], "rejected_modality_mismatch")
             self.assertEqual(result["modality_gate"]["status"], "REJECTED_MODALITY_MISMATCH")
@@ -94,7 +122,12 @@ class ImageScreeningUnitTest(unittest.TestCase):
         buf = io.BytesIO()
         img.save(buf, format="PNG")
 
-        result = self.service.predict(buf.getvalue(), "chest_xray", ood_threshold=0.30)
+        result = self.service.predict(
+            buf.getvalue(),
+            "chest_xray",
+            ood_threshold=0.30,
+            patient_is_pediatric=True,
+        )
         self.assertFalse(result["recognized"])
         self.assertEqual(result["status"], "rejected_non_medical_input")
         self.assertEqual(result["modality_gate"]["status"], "REJECTED_NON_MEDICAL")
@@ -109,7 +142,13 @@ class ImageScreeningUnitTest(unittest.TestCase):
         img.save(buf, format="PNG")
 
         # Bypass modality gate to test confidence threshold guard in isolation
-        result = self.service.predict(buf.getvalue(), "chest_xray", ood_threshold=1.0, enforce_modality_gate=False)
+        result = self.service.predict(
+            buf.getvalue(),
+            "chest_xray",
+            ood_threshold=1.0,
+            enforce_modality_gate=False,
+            patient_is_pediatric=True,
+        )
         self.assertFalse(result["recognized"])
         self.assertEqual(result["status"], "low_confidence")
         self.assertIn("not recognised", result["message"].lower())
@@ -128,7 +167,12 @@ class MissingWeightValidationTests(unittest.TestCase):
             buf = io.BytesIO()
             dummy_img.save(buf, format="PNG")
             with self.assertRaises(FileNotFoundError) as ctx:
-                service.predict(buf.getvalue(), "chest_xray", enforce_modality_gate=False)
+                service.predict(
+                    buf.getvalue(),
+                    "chest_xray",
+                    enforce_modality_gate=False,
+                    patient_is_pediatric=True,
+                )
             self.assertIn("Model checkpoint for 'chest_xray' not found", str(ctx.exception))
 
 
@@ -142,8 +186,8 @@ class ImageScreeningAPITest(unittest.TestCase):
         WEIGHTS_EXIST,
         "PyTorch vision checkpoint weights (.pt) not present in clean repository checkout",
     )
-    def test_api_predict_chest_xray(self) -> None:
-        """Test POST /api/image/predict endpoint with PNG image."""
+    def test_api_predict_chest_xray_with_pediatric_confirmation(self) -> None:
+        """Test POST /api/image/predict endpoint with explicit pediatric confirmation."""
         arr = np.random.randint(60, 180, size=(64, 64), dtype=np.uint8)
         img = Image.fromarray(arr, mode="L")
         buf = io.BytesIO()
@@ -151,7 +195,11 @@ class ImageScreeningAPITest(unittest.TestCase):
         buf.seek(0)
 
         files = {"file": ("chest.png", buf.getvalue(), "image/png")}
-        data = {"image_type": "chest_xray", "ood_threshold": "0.30"}
+        data = {
+            "image_type": "chest_xray",
+            "ood_threshold": "0.30",
+            "patient_is_pediatric": "true",
+        }
 
         resp = self.client.post("/api/image/predict", files=files, data=data)
         self.assertEqual(resp.status_code, 200)
@@ -159,6 +207,27 @@ class ImageScreeningAPITest(unittest.TestCase):
         self.assertEqual(payload["image_type"], "chest_xray")
         self.assertIn("disclaimer", payload)
         self.assertIn("status", payload)
+
+    def test_api_predict_chest_xray_refusal_when_confirmation_missing(self) -> None:
+        """Verify 422 Unprocessable Entity when chest_xray is requested without pediatric confirmation."""
+        arr = np.random.randint(60, 180, size=(64, 64), dtype=np.uint8)
+        img = Image.fromarray(arr, mode="L")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+
+        files = {"file": ("chest.png", buf.getvalue(), "image/png")}
+        data = {
+            "image_type": "chest_xray",
+            "ood_threshold": "0.30",
+            "patient_is_pediatric": "false",
+        }
+
+        resp = self.client.post("/api/image/predict", files=files, data=data)
+        self.assertEqual(resp.status_code, 422)
+        detail = resp.json().get("detail", "")
+        self.assertIn("Refusal", detail)
+        self.assertIn("pediatric patients aged 1-5", detail)
 
     def test_api_predict_unsupported_format(self) -> None:
         """Verify 415 Unsupported Media Type for non-image files."""

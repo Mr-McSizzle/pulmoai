@@ -50,7 +50,7 @@ Verified by Laboratory Director
 """
 
 # Document 3: Severe blur (to trigger quality gate refusal)
-doc3_text = """METROPOLITAN HEALTH LAB
+doc3_text = """URBAN HEALTH LAB
 ROUTINE LAB RESULTS
 Patient: Alex Ray    Age: 38    Sex: Male
 

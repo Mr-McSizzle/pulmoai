@@ -48,16 +48,26 @@ To verify open-world generalization beyond the training negative sets, the modal
 | **OCTMNIST** | Retinal Optical Coherence Tomography (non-fundus) | 1,000 | 0 | **0.00%** | [0.00%, 0.38%] | other: 1,000, chest_xray: 0, dermoscopy: 0, fundus: 0, blood_smear: 0 |
 | **TissueMNIST** | Human kidney cortex histopathology (non-blood) | 1,000 | 0 | **0.00%** | [0.00%, 0.38%] | other: 1,000, chest_xray: 0, dermoscopy: 0, fundus: 0, blood_smear: 0 |
 
-## Adult-to-Pediatric Radiograph Domain Shift Audit (Pass 9b)
-[Tested - reports/ood_benchmark.json:adult_to_pediatric_domain_shift]
-To quantify the hazard of anatomical domain shift between age groups:
+## Adult-to-Pediatric Radiograph Domain Shift Audit (Pass 9b & 9c)
+[Tested - reports/cxr_image_stats_experiment.json:perturbation_experiment]
+To quantify the hazard of domain shift and investigate image statistics vs anatomical hypotheses:
+- **Module Classification:** **Pediatric Benchmark Demonstration Only** (Not for clinical use or adult evaluation).
 - **Source Cohort:** ChestMNIST test set (Adult NIH ChestX-ray14 cohort), filtered to adult "no finding" normal chest radiographs ($n = 11,928$).
 - **Target Classifier:** PneumoniaMNIST ResNet-18 (`models/medmnist/pneumoniamnist_resnet18.pt`), trained strictly on pediatric patients aged 1-5 years from Guangzhou Women and Children's Medical Center.
 - **Evaluation Findings:**
   - Adult normal radiographs classified as Normal: 85 (0.71%)
-  - Adult normal radiographs falsely predicted as Pediatric Pneumonia: **11,843** (**99.29%**, 95% Wilson Score CI: [99.12%, 99.42%])
-- **Clinical Rationale:** Pediatric lungs and mediastinum have fundamentally distinct anatomical proportions, ribcage calcification, cardiac silhouette ratios, and thymic shadows compared to adult thoracic anatomy. Adult normal markings are overwhelmingly misconstrued by the pediatric classifier as consolidation or infiltration.
-- **Safety Directive:** The pediatric pneumonia screening model must NEVER be executed on adult patient radiographs.
+  - Adult normal radiographs predicted as Pediatric Pneumonia: **11,843** (**99.29%**, 95% Wilson Score CI: [99.12%, 99.42%])
+- **Image Statistics Experiment (`reports/cxr_image_stats_experiment.json`):**
+  - Pediatric Normal Mean Brightness: 141.50 (std: 50.40)
+  - Pediatric Pneumonia Mean Brightness: 145.11 (std: 40.88)
+  - Adult Normal Mean Brightness: 127.46 (std: 60.67)
+  - Brightness Inversion ($255 - x$): 99.36% Pneumonia (0.64% Normal)
+  - Brightness/Contrast Normalized to Pediatric Mean & Std: 99.51% Pneumonia (0.49% Normal)
+- **Anatomical Attribution:**
+  - [Hypothesis] Prior claims that adult vs pediatric domain shifts stem specifically from rib ossification, thoracic skeletal maturity, or thymic shadow geometry remain an unverified hypothesis. They have not been corroborated by clinical radiologist annotation or Grad-CAM saliency maps, whereas global pixel intensity inversion and normalization similarly preserve >99% pneumonia predictions.
+- **Safety Directive & Mandatory Confirmation Gate:**
+  - The module is strictly designated **pediatric benchmark demonstration only**.
+  - In both the API (`/api/image/predict`) and UI, an explicit confirmation that the patient is a child aged 1-5 (`patient_is_pediatric=True`) is mandatory. If not confirmed, the system immediately refuses execution with HTTP 422 and a clear clinical explanation.
 
 ## Known Limitations and Clinical Caveats
 1. **No Generic OOD Detection Guarantee:** The modality gate does NOT provide universal out-of-distribution detection. While medical cross-domain images (OCT, kidney histology) achieved 0.00% FAR, natural photography (Flowers102) produced 12.60% FAR and synthetic lab reports in LOFO testing produced 100.00% FAR. Modalities not represented in the training set cannot be guaranteed rejection.

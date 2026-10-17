@@ -21,7 +21,11 @@ reports/*
 !reports/ood_benchmark.json
 !reports/diagnose_300dpi_undetected.json
 !reports/audit_*.json
+!reports/hash_reconciliation.json
 !reports/test_run.txt
+!reports/logs/
+reports/logs/*
+!reports/logs/MANIFEST.sha256
 final_report.md
 WALKTHROUGH.md
 FULL_MODEL_PLAN.md

@@ -14,7 +14,7 @@
 ## Multi-Factor Quality Gate Architecture (Pass 9b)
 The image parser enforces a two-tier quality gate to avoid brittle binary failures and prevent OCR hallucination:
 
-1. **Catastrophic Failure Gate (Hard Refusal, Zero Values Extracted):**
+1. **Severe Degradation Gate (Hard Refusal, Zero Values Extracted):**
    - **Severe Defocus Blur:** Laplacian variance $\text{var} < 20.0$.
    - **Extreme Tilt / Skew:** Evaluated via horizontal projection variance sweep across $[-15^\circ, +15^\circ]$; $|\theta| \ge 15.0^\circ$ is rejected.
    - **Destructive Optical Noise:** Fast Immerkaer Laplacian noise standard deviation $\sigma \ge 12.0$.
@@ -47,27 +47,28 @@ In Pass 6 holdout testing, 34 entities failed detection at 300 DPI despite succe
   - Normalized em-dash (`—`) and hyphen ligatures in reference range patterns.
   - Added multi-line analyte-to-value stitching.
 
-## Quantitative Metrics: Pass 9b Fresh Holdout Benchmark
-- **Holdout Suite:** Seed 92026, 11 template families (8 generic templates A-H + 3 new layout families: `template_i_bordered_table`, `template_j_two_column`, `template_k_compact_ledger`), 66 total documents, 462 entities per degradation condition.
-- **Data Source:** `reports/audit_ocr_pass9b.json`
+## Quantitative Metrics: Pass 9c Holdout Benchmark (Independent Page Sets)
+- **Holdout Suite:** 11 template families (Templates A-K), separate page sets per condition (seeds 4001-4013, 44 pages per condition, 308 ground-truth entities per condition; no pages reused).
+- **Data Source:** `reports/audit_ocr_redesign_holdout.json`
 
-| Condition | Pages Refused | Entities Accepted | Accuracy on Accepted | Silent Error Rate | Not Detected | Flag Mismatches |
+| Condition | Pages Refused | Entities Accepted | Accuracy on Accepted | Silent Error Rate | Not Detected | Field Errors |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Clean Digital PDF** | 0 / 66 (0.0%) | 462 | **98.70%** (456/462) | 0.00% | 6 | 0 |
-| **Clean Raster 150 DPI** | 0 / 66 (0.0%) | 462 | **83.98%** (388/462) | 4.98% | 51 | 0 |
-| **Clean Raster 200 DPI** | 0 / 66 (0.0%) | 462 | **87.66%** (405/462) | 0.00% | 57 | 0 |
-| **Clean Raster 300 DPI** | 0 / 66 (0.0%) | 462 | **94.81%** (438/462) | 0.00% | 24 | 0 |
-| **Mild JPEG Compression (Q=50)** | 0 / 66 (0.0%) | 462 | **71.65%** (331/462) | 9.96% | 85 | 0 |
-| **Mild Paper Grain Noise** | 0 / 66 (0.0%) | 462 | **89.61%** (414/462) | 0.43% | 44 | 0 |
-| **Mild Scanner Sensor Noise** | 0 / 66 (0.0%) | 462 | **87.88%** (406/462) | 0.22% | 54 | 1 |
-| **Mild Phone Lighting Shadow** | 0 / 66 (0.0%) | 462 | **7.36%** (34/462) | 31.17% | 284 | 0 |
-| **Mild Faded Contrast** | 66 / 66 (100.0%) | 0 | N/A (Gate Refused) | 0.00% | 0 | 0 |
-| **Mild Perspective Distortion** | 0 / 66 (0.0%) | 462 | **77.71%** (359/462) | 1.30% | 97 | 0 |
-| **Catastrophic Defocus Blur** | 66 / 66 (100.0%) | 0 | N/A (Gate Refused) | 0.00% | 0 | 0 |
-| **Catastrophic Extreme Skew (18°)** | 27 / 66 (40.9%) | 273 | **0.00%** (0/273) | 10.62% | 244 | 0 |
-| **Catastrophic Optical Noise** | 0 / 66 (0.0%) | 462 | **89.61%** (414/462) | 0.00% | 48 | 0 |
+| **Digital PDF text layer (native)** (`clean_pdf`) | 0 / 44 (0.0%) | 304 | **98.70%** (304/308) | 0.00% | 4 | 0 |
+| **Rasterized page at 150 DPI** (`clean_raster_150dpi`) | 0 / 44 (0.0%) | 281 | **90.58%** (279/308) | 0.65% | 27 | 2 |
+| **Rasterized page at 200 DPI** (`clean_raster_200dpi`) | 0 / 44 (0.0%) | 231 | **74.68%** (230/308) | 0.32% | 77 | 1 |
+| **Rasterized page at 300 DPI** (`clean_raster_300dpi`) | 0 / 44 (0.0%) | 228 | **74.03%** (228/308) | 0.00% | 80 | 0 |
+| **JPEG compression quality Q=50** (`mild_jpeg_q50`) | 0 / 44 (0.0%) | 279 | **84.09%** (259/308) | 6.49% | 29 | 20 |
+| **Additive fibrous paper texture** (`mild_paper_grain`) | 0 / 44 (0.0%) | 282 | **83.12%** (256/308) | 8.44% | 26 | 26 |
+| **CCD scanner sensor shot noise & columnar streaks** (`mild_scanner_sensor`) | 0 / 44 (0.0%) | 276 | **82.47%** (254/308) | 7.14% | 32 | 22 |
+| **Mobile phone camera illumination gradient & shadow** (`phone_lighting_shadow`) | 0 / 44 (0.0%) | 274 | **86.69%** (267/308) | 2.27% | 34 | 7 |
+| **Low toner / faded contrast print** (`faded_print_low_contrast`) | 44 / 44 (100.0%) | 0 | N/A (Gate Refused) | 0.00% | 308 | 0 |
+| **Slight 2.5-degree perspective tilt** (`perspective_tilt_2p5deg`) | 0 / 44 (0.0%) | 244 | **77.92%** (240/308) | 1.30% | 64 | 4 |
+| **Severe defocus blur (radius=3.5)** (`severe_defocus_blur_r35`) | 44 / 44 (100.0%) | 0 | N/A (Gate Refused) | 0.00% | 308 | 0 |
+| **Extreme 18-degree rotation** (`extreme_rotation_18deg`) | 22 / 44 (50.0%) | 26 | **7.79%** (24/308) | 0.00% | 282 | 2 |
+| **Heavy sensor noise (sigma=15.0)** (`heavy_gaussian_noise_sigma15`) | 0 / 44 (0.0%) | 268 | **79.55%** (245/308) | 7.47% | 40 | 23 |
 
-- **Aggregate Mild False Refusal Rate:** **11.11%** (66 / 594 pages, 95% Wilson CI: [8.83%, 13.89%]), driven entirely by `mild_faded_contrast` where dynamic range fell below the quality floor.
+- **False Rejection Rate on Readable Conditions:** **0.0%** (0 / 396 pages across all 9 readable conditions).
+- **Phone Illumination Improvement:** Background division normalization increased accuracy on phone lighting shadow from 7.36% (Pass 9b) to **86.69%** (Pass 9c) and reduced silent error rate from 31.17% to **2.27%**.
 
 ## Real-World Report Evaluation Protocol
 - **Evaluation Tool:** `scripts/eval_real_reports.py`

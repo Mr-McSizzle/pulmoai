@@ -643,7 +643,7 @@ def estimate_image_noise(img_gray: np.ndarray) -> float:
 
 
 def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, str]:
-    """Adaptive per-image preprocessing: selects raw vs enhanced processing based on blur, skew, and noise.
+    """Adaptive per-image preprocessing: illumination normalization, deskewing, and optimal resolution scaling.
 
     Returns:
         (processed_image, decision_rationale)
@@ -652,26 +652,30 @@ def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, st
     import numpy as np
 
     arr = np.array(pil_img.convert("L"))
+    h, w = arr.shape
     lap_var = float(cv2.Laplacian(arr, cv2.CV_64F).var())
     noise_sigma = estimate_image_noise(arr)
 
-    # 1. Blur detection: if heavily blurred (defocused), Otsu binarization
-    # thins characters into broken strokes. Preserve raw image.
-    if lap_var < 50.0:
-        return pil_img, f"blur_defocus_detected (var={lap_var:.1f}); raw image preserved"
-
-    # 2. Skew detection: sweep angles [-5, +5] degrees via horizontal projection variance
-    # Evaluate projection variance on thumbnail (600px width) for 10x throughput
-    h, w = arr.shape
-    if w > 600:
-        scale_s = 600.0 / float(w)
-        small_arr = cv2.resize(arr, (600, int(h * scale_s)), interpolation=cv2.INTER_AREA)
+    # 1. Illumination Normalization via Background Division (Pass 9c M5)
+    # Detects non-uniform illumination / mobile phone shadows (background gradient std > 12.0)
+    bg = cv2.GaussianBlur(arr, (51, 51), 0)
+    if float(bg.std()) > 12.0:
+        arr = (arr.astype(float) / np.maximum(bg.astype(float), 1.0) * 255.0).clip(0, 255).astype(np.uint8)
+        illum_note = "illumination_normalized_bg_division"
     else:
-        small_arr = arr
+        illum_note = "illumination_uniform"
+
+    # 2. Defocus blur check: if heavily blurred, avoid aggressive binarization
+    if lap_var < 20.0:
+        return Image.fromarray(arr), f"severe_defocus_blur (var={lap_var:.1f}); blur_defocus_detected; {illum_note}"
+
+    # 3. Skew detection: sweep angles [-15, +15] degrees via horizontal projection variance
+    scale_s = 600.0 / float(w) if w > 600 else 1.0
+    small_arr = cv2.resize(arr, (int(w * scale_s), int(h * scale_s)), interpolation=cv2.INTER_AREA)
     sh, sw = small_arr.shape
     scenter = (sw // 2, sh // 2)
     best_score, best_angle = -1.0, 0.0
-    for angle in np.arange(-5.0, 5.5, 0.5):
+    for angle in np.arange(-15.0, 15.5, 0.5):
         M = cv2.getRotationMatrix2D(scenter, float(angle), 1.0)
         rotated = cv2.warpAffine(
             small_arr, M, (sw, sh), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=255
@@ -680,53 +684,45 @@ def preprocess_lab_image_adaptive(pil_img: Image.Image) -> tuple[Image.Image, st
         if score > best_score:
             best_score, best_angle = score, float(angle)
 
-    # If significant tilt (>= 1.0 degree), deskew and enhance
-    if abs(best_angle) >= 1.0:
+    # Deskew if significant tilt (1.0 <= abs(angle) < 15.0 degrees)
+    if 1.0 <= abs(best_angle) < 15.0:
         center = (w // 2, h // 2)
         M = cv2.getRotationMatrix2D(center, best_angle, 1.0)
-        deskewed = cv2.warpAffine(
+        arr = cv2.warpAffine(
             arr, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT, borderValue=255
         )
-        # Normalize to 300 DPI equivalent (~2400px width), do NOT double already high-resolution images
-        if w < 2000:
-            scale = 2400.0 / float(w)
-            up_w, up_h = int(w * scale), int(h * scale)
-            upscaled = cv2.resize(deskewed, (up_w, up_h), interpolation=cv2.INTER_CUBIC)
-        else:
-            upscaled = deskewed
-        denoised = cv2.medianBlur(upscaled, 3)
-        _, thresh = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        return Image.fromarray(thresh), f"deskewed_and_enhanced (angle={best_angle:+.1f} deg)"
+        deskew_note = f"deskewed_and_enhanced (angle={best_angle:+.1f}deg)"
+    else:
+        deskew_note = "no_deskew_needed"
 
-    # If upright but optical noise detected, denoise to prevent false character generation
-    if noise_sigma >= 0.8:
-        if w < 2000:
-            scale = 2400.0 / float(w)
-            up_w, up_h = int(w * scale), int(h * scale)
-            upscaled = cv2.resize(arr, (up_w, up_h), interpolation=cv2.INTER_CUBIC)
-        else:
-            upscaled = arr
-        denoised = cv2.medianBlur(upscaled, 3)
-        _, thresh = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        return Image.fromarray(thresh), f"denoised_and_binarized (noise_sigma={noise_sigma:.2f})"
+    # 4. Optimal Resolution Scaling (Pass 9c M5)
+    # At >2000px width (e.g. 300 DPI = 2550px), thin courier glyph strokes (stroke/height ~0.095)
+    # cause Tesseract word dropping. Downsample to 1600px width (stroke/height ~0.16) for optimal recognition.
+    if w > 2000:
+        scale_res = 1600.0 / float(w)
+        arr = cv2.resize(arr, (1600, int(h * scale_res)), interpolation=cv2.INTER_AREA)
+        res_note = "rescaled_300dpi_to_optimal_1600px"
+    elif w < 1000:
+        scale_res = 1600.0 / float(w)
+        arr = cv2.resize(arr, (1600, int(h * scale_res)), interpolation=cv2.INTER_CUBIC)
+        res_note = "upscaled_lowres_to_1600px"
+    else:
+        res_note = "resolution_native"
 
-    # If upright and unblurred, preserve raw to avoid DCT artifacts
-    return pil_img, "upright_unblurred; raw preserved"
+    return Image.fromarray(arr), f"{illum_note}; {deskew_note}; {res_note}"
 
 
 def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, Any]]:
-    """Estimate image blur, skew, noise, and contrast to determine if quality is sufficient for OCR.
+    """Estimate image quality and pre-read OCR reliability.
 
-    Multi-factor quality gate calibrated on realistic degradations:
-    - Catastrophic refusal thresholds:
-      - Laplacian variance < 20.0 indicates severe defocus blur where stroke edges blend together.
-      - Projection profile skew >= 15.0 degrees indicates extreme tilt beyond reliable deskewing.
-      - Noise sigma >= 12.0 indicates destructive sensor/scanner noise obscuring character glyphs.
-      - Dynamic range (arr.max() - arr.min()) < 30.0 indicates washed-out / faded contrast.
-    - Mild degradation zone (ACCEPT, tagged as 'unconfirmed, low confidence'):
-      - Mild sensor/scanner noise (noise_sigma >= 1.2), modest contrast reduction (dyn_range < 150),
-        soft focus (lap_var < 80.0), or slight slant (abs(skew) >= 2.5 degrees).
-      - Accepted to prevent unnecessary false rejections, while alerting downstream consumers to re-verify.
+    Multi-factor quality gate:
+    1. Catastrophic refusal:
+       - Dynamic range < 25.0: washed out / faded / blank image.
+       - Laplacian variance < 15.0: severe defocus blur where character glyphs are completely merged.
+       - Skew angle >= 15.0 degrees: extreme rotation beyond reliable projection profile.
+    2. Pre-read reliability check:
+       - Checks Tesseract word confidence and presence of clinical lab header anchor words.
+       - Rejects unreadable gibberish (mean_conf < 35.0% AND anchor_ratio < 0.20).
 
     Returns:
         (is_acceptable, decision_message, quality_metrics)
@@ -738,17 +734,15 @@ def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, Any]
         arr = np.array(pil_img.convert("L"))
         lap_var = float(cv2.Laplacian(arr, cv2.CV_64F).var())
         noise_sigma = estimate_image_noise(arr)
+        dyn_range = float(arr.max() - arr.min())
 
         h, w = arr.shape
-        if w > 600:
-            scale_s = 600.0 / float(w)
-            small_arr = cv2.resize(arr, (600, int(h * scale_s)), interpolation=cv2.INTER_AREA)
-        else:
-            small_arr = arr
+        scale_s = 600.0 / float(w) if w > 600 else 1.0
+        small_arr = cv2.resize(arr, (int(w * scale_s), int(h * scale_s)), interpolation=cv2.INTER_AREA)
         sh, sw = small_arr.shape
         scenter = (sw // 2, sh // 2)
         best_score, best_angle = -1.0, 0.0
-        for angle in np.arange(-15.0, 15.5, 1.0):
+        for angle in np.arange(-15.0, 15.5, 0.5):
             M = cv2.getRotationMatrix2D(scenter, float(angle), 1.0)
             rotated = cv2.warpAffine(
                 small_arr, M, (sw, sh), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=255
@@ -757,31 +751,26 @@ def check_image_quality(pil_img: Image.Image) -> tuple[bool, str, dict[str, Any]
             if score > best_score:
                 best_score, best_angle = score, float(angle)
 
-        dyn_range = float(arr.max() - arr.min())
-        is_mildly_degraded = bool(
-            noise_sigma >= 1.35 or dyn_range < 120.0 or lap_var < 80.0 or abs(best_angle) >= 2.5
-        )
-
         metrics: dict[str, Any] = {
             "laplacian_variance": round(lap_var, 2),
             "estimated_skew_degrees": round(best_angle, 2),
             "noise_sigma": round(noise_sigma, 3),
             "dynamic_range": round(dyn_range, 2),
-            "is_mildly_degraded": is_mildly_degraded,
-            "confidence_tier": "unconfirmed, low confidence" if is_mildly_degraded else "high_confidence",
+            "confidence_tier": "high_confidence",
         }
 
-        if lap_var < 20.0:
+        # 1. Catastrophic physical defects
+        if dyn_range < 25.0:
+            metrics["confidence_tier"] = "refused"
+            return False, "image quality too low, please re-scan (insufficient contrast / washed out)", metrics
+        if lap_var < 15.0:
+            metrics["confidence_tier"] = "refused"
             return False, "image quality too low, please re-scan (severe defocus blur)", metrics
         if abs(best_angle) >= 15.0:
+            metrics["confidence_tier"] = "refused"
             return False, "image quality too low, please re-scan (extreme tilt/skew)", metrics
-        if noise_sigma >= 12.0:
-            return False, "image quality too low, please re-scan (destructive optical noise)", metrics
-        if dyn_range < 30.0:
-            return False, "image quality too low, please re-scan (insufficient contrast)", metrics
 
-        decision_msg = "acceptable_mild_degradation" if is_mildly_degraded else "acceptable"
-        return True, decision_msg, metrics
+        return True, "acceptable", metrics
     except Exception as e:
         logger.warning("Error in check_image_quality: %s", e)
         return True, "acceptable", {}
@@ -905,13 +894,30 @@ def extract_text_from_bytes(
     # Step 2: Image or fallback OCR with robust adaptive preprocessing
     try:
         import pytesseract
+        import numpy as np
+
         raw_img = Image.open(io.BytesIO(file_bytes))
         is_ok, quality_msg, q_metrics = check_image_quality(raw_img)
         if not is_ok:
             logger.warning("Image rejected by quality gate: %s", quality_msg)
             return "image quality too low, please re-scan", "refused_low_quality"
+
         preprocessed_img, _ = preprocess_lab_image_adaptive(raw_img)
         ocr_text = pytesseract.image_to_string(preprocessed_img)
+
+        # Pre-read reliability check (Pass 9c M5)
+        data = pytesseract.image_to_data(preprocessed_img, output_type=pytesseract.Output.DICT)
+        words = [w.lower() for w in data.get("text", []) if w.strip()]
+        confs = [int(c) for c in data.get("conf", []) if int(c) >= 0]
+        mean_conf = float(np.mean(confs)) if confs else 0.0
+
+        anchors = {"patient", "name", "date", "test", "result", "units", "ref", "reference", "flag", "report", "lab", "age", "sex", "dob", "mrn"}
+        found_anchors = sum(1 for w in words if any(a in w for a in anchors))
+
+        if (mean_conf < 35.0 and found_anchors < 2) or (len(words) < 5 and found_anchors == 0):
+            logger.warning("Pre-read reliability gate rejected scan: mean_conf=%.1f%%, anchors=%d", mean_conf, found_anchors)
+            return "image quality too low, please re-scan (unreliable scan)", "refused_low_quality"
+
         if ocr_text.strip():
             return ocr_text.strip(), "tesseract_ocr"
     except Exception as e:

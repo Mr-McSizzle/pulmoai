@@ -127,7 +127,7 @@ SYNTHETIC_LAYOUTS: list[dict[str, Any]] = [
         "layout_name": "Standard Hospital EMR Style (Electronic Export)",
         "patient_sex": "female",
         "header_lines": [
-            "Apollo Hospitals - Clinical Laboratory Electronic Health Record",
+            "Regional Clinical Laboratory - Electronic Health Record",
             "Patient: Anita Desai   DOB: 14-Aug-1976   Sex: Female   MRN: 7029148",
             "Encounter: Inpatient Ward 4B   Attending: Dr. R. Iyer, MD",
             "--------------------------------------------------------------------------------",

@@ -15,9 +15,9 @@ import type { ImagePredictionResponse } from "../types";
 const MODALITIES = [
   {
     id: "chest_xray",
-    name: "Pediatric Chest X-Ray",
-    caption: "Pediatric Pneumonia (Ages 1-5)",
-    classes: "Normal vs Pneumonia (Ages 1-5)",
+    name: "Pediatric Chest X-Ray (Ages 1-5)",
+    caption: "Pediatric benchmark demonstration only",
+    classes: "Pediatric Pneumonia (Ages 1-5) - Benchmark Demonstration Only",
     testAuc: "97.57%",
   },
   {
@@ -52,6 +52,7 @@ const MODALITIES = [
 
 export function ImageScreeningPage() {
   const [selectedModality, setSelectedModality] = useState("chest_xray");
+  const [pediatricConfirmed, setPediatricConfirmed] = useState(false);
   const oodThreshold = 0.50;
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -86,10 +87,16 @@ export function ImageScreeningPage() {
   const runPrediction = async (customFile?: File) => {
     const f = customFile || imageFile;
     if (!f) return;
+    if (selectedModality === "chest_xray" && !pediatricConfirmed) {
+      setError(
+        "Refusal: Explicit confirmation that the patient is a child aged 1-5 is required before running the chest X-ray screening module (pediatric benchmark demonstration only)."
+      );
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const res = await api.predictImage(f, selectedModality, oodThreshold);
+      const res = await api.predictImage(f, selectedModality, oodThreshold, pediatricConfirmed);
       setResult(res);
     } catch (err: any) {
       setError(err?.message || "Medical image screening failed.");
@@ -203,14 +210,38 @@ export function ImageScreeningPage() {
               <ImageIcon size={16} className="text-teal-600" /> Image Input & OOD Guard
             </h2>
             <button
-              className="button-primary text-xs py-1.5 px-3 flex items-center gap-1"
-              disabled={loading || !imageFile}
+              className="button-primary text-xs py-1.5 px-3 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading || !imageFile || (selectedModality === "chest_xray" && !pediatricConfirmed)}
               onClick={() => runPrediction()}
             >
               {loading ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
               Screen Image
             </button>
           </div>
+
+          {/* Pediatric Safety Confirmation Gate (Pass 9c M6) */}
+          {selectedModality === "chest_xray" && (
+            <div className="p-3.5 rounded-xl bg-blue-50/90 border border-blue-200 space-y-2">
+              <div className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                <ShieldAlert size={15} className="text-blue-700 shrink-0" />
+                Pediatric Safety Confirmation (Benchmark Demonstration Only)
+              </div>
+              <div className="text-[11px] text-blue-900 leading-snug">
+                This model is a <strong>pediatric benchmark demonstration only</strong> trained on PneumoniaMNIST (children aged 1–5). It cannot evaluate adult radiographs.
+              </div>
+              <label className="flex items-start gap-2 pt-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 rounded border-blue-300 text-teal-600 focus:ring-teal-500"
+                  checked={pediatricConfirmed}
+                  onChange={(e) => setPediatricConfirmed(e.target.checked)}
+                />
+                <span className="text-[11px] font-semibold text-blue-950">
+                  I confirm this radiograph is from a pediatric patient aged 1–5.
+                </span>
+              </label>
+            </div>
+          )}
 
           {/* Audited Modality Gate & OOD Assessment Notice (Pass 9b L4) */}
           <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 space-y-1.5">

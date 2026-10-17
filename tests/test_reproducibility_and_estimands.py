@@ -189,7 +189,11 @@ class OODRejectionBenchmarkTests(unittest.TestCase):
         img.save(buf, format="PNG")
 
         files = {"file": ("test.png", buf.getvalue(), "image/png")}
-        data = {"image_type": "chest_xray", "ood_threshold": "0.50"}
+        data = {
+            "image_type": "chest_xray",
+            "ood_threshold": "0.50",
+            "patient_is_pediatric": "true",
+        }
 
         resp = self.client.post("/api/image/predict", files=files, data=data)
         self.assertEqual(resp.status_code, 200)
@@ -339,18 +343,45 @@ class FutureRiskEstimandTests(unittest.TestCase):
             self.assertNotIn(marker, diabetes_feats, f"Glycemic marker {marker} found in diabetes features!")
 
     def test_non_hispanic_asian_subgroup_reproducibility(self) -> None:
-        """Verify Non-Hispanic Asian subgroup mortality metrics in audit report match evaluated holdout."""
-        rep_path = PROJECT_ROOT / "reports" / "audit_future_risk_v3.json"
-        self.assertTrue(rep_path.exists())
+        """Verify Non-Hispanic Asian subgroup mortality metrics match audit_future_risk_subgroups.json."""
+        rep_path = PROJECT_ROOT / "reports" / "audit_future_risk_subgroups.json"
+        self.assertTrue(rep_path.exists(), "audit_future_risk_subgroups.json not found")
         with open(rep_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        asian = data["subgroup_metrics_with_bootstrap_95ci_e4"]["non_hispanic_asian"]
-        self.assertEqual(asian["n_subjects"], 1529)
-        self.assertEqual(asian["deaths_observed"], 53)
-        self.assertAlmostEqual(asian["c_index"], 0.8618, places=4)
-        self.assertAlmostEqual(asian["auroc_5yr"], 0.8834, places=4)
-        self.assertEqual(asian["c_index_95ci"], [0.8032, 0.914])
-        self.assertEqual(asian["auroc_5yr_95ci"], [0.8146, 0.9465])
+
+        asian = data["subgroups"]["non_hispanic_asian"]
+        
+        # All-cause mortality outcome
+        ac = asian["all_cause_mortality"]
+        self.assertEqual(ac["n_subjects"], 1529)
+        self.assertEqual(ac["n_events"], 53)
+        self.assertEqual(ac["n_5yr_events"], 34)
+        self.assertAlmostEqual(ac["c_index"], 0.8618, places=4)
+        self.assertAlmostEqual(ac["auroc_5yr"], 0.8834, places=4)
+        self.assertEqual(ac["c_index_95ci"], [0.8032, 0.9140])
+        self.assertEqual(ac["auroc_5yr_95ci"], [0.8146, 0.9465])
+        self.assertEqual(ac["bootstrap_seed"], 42)
+        self.assertEqual(ac["n_boot"], 500)
+
+        # Cardiovascular mortality outcome
+        cvd = asian["cardiovascular_mortality"]
+        self.assertEqual(cvd["n_subjects"], 1529)
+        self.assertEqual(cvd["n_events"], 16)
+        self.assertEqual(cvd["n_5yr_events"], 11)
+        self.assertAlmostEqual(cvd["c_index"], 0.8585, places=4)
+        self.assertAlmostEqual(cvd["auroc_5yr"], 0.8747, places=4)
+        self.assertEqual(cvd["c_index_95ci"], [0.7678, 0.9370])
+        self.assertEqual(cvd["auroc_5yr_95ci"], [0.7427, 0.9608])
+        self.assertEqual(cvd["bootstrap_seed"], 42)
+        self.assertEqual(cvd["n_boot"], 500)
+
+        # Zero-event safety check
+        zero_ctl = data["subgroups"]["synthetic_zero_event_control"]["all_cause_mortality"]
+        self.assertIsNone(zero_ctl["c_index"])
+        self.assertIsNone(zero_ctl["auroc_5yr"])
+        self.assertIsNotNone(zero_ctl["null_reason"])
+        self.assertNotEqual(zero_ctl["c_index"], 1.0)
+        self.assertNotEqual(zero_ctl["auroc_5yr"], 1.0)
 
 
 if __name__ == "__main__":

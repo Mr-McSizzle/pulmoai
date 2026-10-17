@@ -32,8 +32,8 @@ DEFAULT_MODEL_DIR = PROJECT_ROOT / "models" / "medmnist"
 MODALITY_MAP = {
     "chest_xray": {
         "model_file": "pneumoniamnist_resnet18.pt",
-        "display_name": "Pediatric Chest X-Ray (Ages 1-5)",
-        "cohort_note": "Source dataset: Pediatric pneumonia cohort (children aged 1-5)",
+        "display_name": "Pediatric Chest X-Ray (Ages 1-5, Benchmark Demonstration Only)",
+        "cohort_note": "Source dataset: Pediatric pneumonia cohort (children aged 1-5); pediatric benchmark demonstration only",
         "channels": 1,
         "task": "binary-class",
     },
@@ -185,6 +185,7 @@ class ImageScreeningService:
         image_type: str,
         ood_threshold: float = 0.50,
         enforce_modality_gate: bool = True,
+        patient_is_pediatric: bool = False,
     ) -> dict[str, Any]:
         """Classify a medical image with Modality Gate and Out-of-Distribution (OOD) confidence guard."""
         bundle = self._get_model_bundle(image_type)
@@ -192,6 +193,26 @@ class ImageScreeningService:
         labels = bundle["labels"]
         n_ch = bundle["n_channels"]
         task = bundle["task"]
+
+        # Safety confirmation gate for pediatric chest X-ray
+        if image_type == "chest_xray" and not patient_is_pediatric:
+            return {
+                "image_type": image_type,
+                "modality_name": bundle["display_name"],
+                "recognized": False,
+                "status": "rejected_pediatric_confirmation_required",
+                "message": (
+                    "Refusal: The chest X-ray screening module was trained strictly on pediatric patients aged 1-5 "
+                    "(PneumoniaMNIST) and cannot be applied to adult radiographs. Explicit confirmation that the patient "
+                    "is a child aged 1-5 (patient_is_pediatric=True) is required."
+                ),
+                "predicted_class": None,
+                "confidence": None,
+                "threshold_applied": ood_threshold,
+                "warning_banner": "Refusal: Pediatric patient confirmation (aged 1-5) required for chest X-ray screening.",
+                "clinical_notice": "Pediatric benchmark demonstration only. Not for clinical use or adult evaluation.",
+                "disclaimer": IMAGE_DISCLAIMER,
+            }
 
         # Modality Gate Check: verify input modality matches requested image_type
         gate_info = None

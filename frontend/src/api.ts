@@ -70,11 +70,17 @@ export const api = {
   },
 
   // Phase 4: Medical Image Screening
-  predictImage: (file: File, imageType: string = "chest_xray", oodThreshold: number = 0.50): Promise<ImagePredictionResponse> => {
+  predictImage: (
+    file: File,
+    imageType: string = "chest_xray",
+    oodThreshold: number = 0.50,
+    patientIsPediatric: boolean = false,
+  ): Promise<ImagePredictionResponse> => {
     const form = new FormData();
     form.append("file", file);
     form.append("image_type", imageType);
     form.append("ood_threshold", oodThreshold.toString());
+    form.append("patient_is_pediatric", patientIsPediatric ? "true" : "false");
     return request<ImagePredictionResponse>("/api/image/predict", { method: "POST", body: form });
   },
 };

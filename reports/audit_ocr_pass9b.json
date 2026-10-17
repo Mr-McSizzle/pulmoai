@@ -490,7 +490,7 @@
       "silent_error_examples": [
         {
           "doc_id": 9055,
-          "template": "Metropolitan Academic Medical Center - Two-Column Pathology Summary",
+          "template": "Urban Academic Medical Center - Two-Column Pathology Summary",
           "analyte": "hba1c",
           "expected_value": 4.3,
           "extracted_value": 4.0,
@@ -500,7 +500,7 @@
         },
         {
           "doc_id": 9055,
-          "template": "Metropolitan Academic Medical Center - Two-Column Pathology Summary",
+          "template": "Urban Academic Medical Center - Two-Column Pathology Summary",
           "analyte": "serum_creatinine",
           "expected_value": 0.7,
           "extracted_value": 0.0,

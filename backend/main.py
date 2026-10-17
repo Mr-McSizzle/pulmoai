@@ -390,8 +390,9 @@ def predict_future_mortality_risk(
 async def predict_medical_image(
     request: Request,
     file: Annotated[UploadFile, File(description="Medical image to screen (PNG, JPG, TIFF, WEBP)")],
-    image_type: Annotated[str, Form(description="Modality: chest_xray, skin_lesion, retina, blood_smear, chest_multilabel")] = "chest_xray",
+    image_type: Annotated[str, Form(description="Modality: chest_xray (pediatric benchmark demonstration only), skin_lesion, retina, blood_smear, chest_multilabel")] = "chest_xray",
     ood_threshold: Annotated[float, Form(description="Out-of-distribution minimum confidence threshold")] = 0.50,
+    patient_is_pediatric: Annotated[bool, Form(description="Explicit confirmation that patient is a child aged 1-5 (required for chest_xray)")] = False,
 ) -> ImagePredictionResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
@@ -403,6 +404,15 @@ async def predict_medical_image(
             detail=f"Unsupported image format '{suffix}'. Supported formats: {', '.join(sorted(valid_suffixes))}",
         )
 
+    if image_type == "chest_xray" and not patient_is_pediatric:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "Refusal: The chest X-ray screening module was trained strictly on pediatric patients aged 1-5 (PneumoniaMNIST) "
+                "and cannot be evaluated on adult radiographs. Explicit confirmation that the patient is a child aged 1-5 is required."
+            ),
+        )
+
     contents = await file.read(MAX_REPORT_BYTES + 1)
     await file.close()
     if len(contents) > MAX_REPORT_BYTES:
@@ -410,7 +420,12 @@ async def predict_medical_image(
 
     image_service = require_image_service(request)
     try:
-        result = image_service.predict(contents, image_type, ood_threshold)
+        result = image_service.predict(
+            contents,
+            image_type=image_type,
+            ood_threshold=ood_threshold,
+            patient_is_pediatric=patient_is_pediatric,
+        )
         return ImagePredictionResponse(**result)
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Cryptographic artifact verification for deployed PulmoAI models.
 
+Notice: This script verifies cryptographic integrity since pinning (Date: 2026-10-17, Commit: bd408f7),
+not provenance of evaluated models.
+
 Reads models/checksums.sha256, verifies every deployed artifact,
 and returns a structured status dictionary.
 """
@@ -129,6 +132,7 @@ def verify_artifacts(
 def main() -> None:
     results = verify_artifacts()
     print("\n=== PulmoAI Cryptographic Artifact Verification ===")
+    print("Notice: Verifies integrity since pinning (Date: 2026-10-17, Commit: bd408f7), not provenance of evaluated models.")
     print(f"Total Artifacts Evaluated: {results.get('total_artifacts', 0)}")
     print(f"Verified Checkpoints:     {results.get('verified_count', 0)}")
     print(f"Failed Checkpoints:       {results.get('failed_count', 0)}\n")

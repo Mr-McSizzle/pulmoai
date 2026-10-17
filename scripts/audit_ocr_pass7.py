@@ -153,7 +153,7 @@ PASS7_LAYOUT_TEMPLATES = [
         "layout_id": "template_e",
         "layout_name": "Template E (Academic Health Science Center multi-column tabular)",
         "default_sex": "male",
-        "header": "ACADEMIC HEALTH SCIENCE CENTER - CENTRAL CORE DIAGNOSTICS\nPATIENT: Subject_{idx}   MRN: AHSC-{idx:06d}   DOB: 12/04/{birth_yr}   SEX: {sex_cap}\nORDERING PHYSICIAN: DR. H. VANDERBILT, MD   DATE: 17-NOV-2024\n====================================================================================\nTEST PROCEDURE                   RESULT    UNITS        FLAG    REFERENCE RANGE\n====================================================================================\n",
+        "header": "ACADEMIC HEALTH SCIENCE CENTER - CENTRAL CORE DIAGNOSTICS\nPATIENT: Subject_{idx}   MRN: AHSC-{idx:06d}   DOB: 12/04/{birth_yr}   SEX: {sex_cap}\nORDERING PHYSICIAN: DR. H. VALENTINE, MD   DATE: 17-NOV-2024\n====================================================================================\nTEST PROCEDURE                   RESULT    UNITS        FLAG    REFERENCE RANGE\n====================================================================================\n",
         "footer": "\n====================================================================================\nCLIA/CAP Certified Laboratory. Medical Director Review Completed.",
         "fmt": "{test_name:<30}   {val:<7.1f}   {unit:<10}   {flag:<6}  {ref}",
     },

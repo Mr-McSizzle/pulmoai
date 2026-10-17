@@ -129,11 +129,11 @@ NEW_LAYOUT_TEMPLATES: list[dict[str, Any]] = [
     # Family 2: Two-Column Clinical Summary
     {
         "layout_id": "template_j",
-        "layout_name": "Metropolitan Academic Medical Center - Two-Column Pathology Summary",
+        "layout_name": "Urban Academic Medical Center - Two-Column Pathology Summary",
         "default_sex": "female",
         "header": (
             "================================================================================\n"
-            "                    METROPOLITAN ACADEMIC MEDICAL CENTER\n"
+            "                       URBAN ACADEMIC MEDICAL CENTER\n"
             "                       DIVISION OF CLINICAL PATHOLOGY\n"
             "================================================================================\n"
             "PATIENT IDENTIFIER: MED-{idx}          AGE: {age}      GENDER: {sex_cap}\n"
