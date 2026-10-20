@@ -52,11 +52,18 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
   // Sync initialFeatures if passed from Lab Report transfer
   useEffect(() => {
     if (initialFeatures && Object.keys(initialFeatures).length > 0) {
-      setInputs((prev) => ({
-        ...prev,
-        ...initialFeatures,
-      }));
-      runPrediction({ ...inputs, ...initialFeatures });
+      const merged: Record<string, any> = { ...inputs, ...initialFeatures };
+      if (initialFeatures.serum_creatinine !== undefined && initialFeatures.creatinine === undefined) {
+        merged.creatinine = initialFeatures.serum_creatinine;
+      }
+      if (initialFeatures.pulse_bpm !== undefined && initialFeatures.pulse === undefined) {
+        merged.pulse = initialFeatures.pulse_bpm;
+      }
+      if (initialFeatures.sex_male !== undefined && initialFeatures.gender === undefined) {
+        merged.gender = initialFeatures.sex_male === 1.0 ? 1 : 2;
+      }
+      setInputs(merged);
+      runPrediction(merged);
     } else {
       runPrediction(inputs);
     }

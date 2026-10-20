@@ -137,7 +137,10 @@ Sex: Male`;
       else if (it.canonical_name === "systolic_bp") map.systolic_bp = val;
       else if (it.canonical_name === "diastolic_bp") map.diastolic_bp = val;
       else if (it.canonical_name === "bmi") map.bmi = val;
-      else if (it.canonical_name === "serum_creatinine" || it.canonical_name === "creatinine") map.serum_creatinine = val;
+      else if (it.canonical_name === "serum_creatinine" || it.canonical_name === "creatinine") {
+        map.serum_creatinine = val;
+        map.creatinine = val;
+      }
       else if (it.canonical_name === "bun") map.bun = val;
       else if (it.canonical_name === "uric_acid") map.uric_acid = val;
       else if (it.canonical_name === "albumin") map.albumin = val;
@@ -153,11 +156,19 @@ Sex: Male`;
       else if (it.canonical_name === "hemoglobin") map.hemoglobin = val;
       else if (it.canonical_name === "hematocrit") map.hematocrit = val;
       else if (it.canonical_name === "platelets") map.platelets = val;
-      else if (it.canonical_name === "pulse") map.pulse_bpm = val;
+      else if (it.canonical_name === "pulse") {
+        map.pulse_bpm = val;
+        map.pulse = val;
+      }
       else if (it.canonical_name === "age") map.age = val;
     }
-    if (patientSex === "male") map.sex_male = 1.0;
-    else if (patientSex === "female") map.sex_male = 0.0;
+    if (patientSex === "male") {
+      map.sex_male = 1.0;
+      map.gender = 1;
+    } else if (patientSex === "female") {
+      map.sex_male = 0.0;
+      map.gender = 2;
+    }
     return map;
   };
 
