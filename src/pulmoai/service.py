@@ -167,7 +167,7 @@ class PulmoAIService:
         }
 
     def gene_insights(self, limit: int = 30) -> dict[str, Any]:
-        pipeline = getattr(self.pipeline, "estimator", self.pipeline)
+        pipeline = getattr(self.pipeline, "base_pipeline", getattr(self.pipeline, "estimator", self.pipeline))
         named_steps = getattr(pipeline, "named_steps", None)
         if named_steps is None:
             return {"available": False, "message": "This model has no compatible feature-selection metadata."}

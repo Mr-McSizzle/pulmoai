@@ -10,6 +10,7 @@ import {
   Eye,
   RefreshCw,
   AlertTriangle,
+  CheckCircle2,
 } from "lucide-react";
 import { api } from "../api";
 import type { ReportExtractResponse, LabItemSchema } from "../types";
@@ -328,30 +329,39 @@ Sex: Male`;
                 )}
               </div>
 
-              {isScannedOrOcr ? (
+              {isScannedOrOcr && !allTestsConfirmed && (
                 <div className="p-3.5 rounded-xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-xs space-y-1.5 shadow-sm">
                   <div className="flex items-center gap-2 font-bold text-amber-900 text-xs">
                     <AlertTriangle size={16} className="text-amber-700 shrink-0" />
-                    <span>One-Click Transfer Disabled for Scanned Inputs</span>
+                    <span>One-Click Transfer Disabled Until Verified</span>
                   </div>
                   <p className="text-[11px] text-amber-800 leading-relaxed font-normal">
-                    Due to potential optical character misread risk on scanned reports (silent error risk &gt; 5%), automated one-click transfer to risk calculators is disabled. Please verify each unconfirmed suggestion side-by-side with your original report and transcribe verified values into the Chronic Risk Engine manually.
+                    Due to potential optical character misread risk on scanned reports (silent error risk &gt; 5%), automated one-click transfer is disabled until all biomarkers are verified. Please check each biomarker box in the table below to verify values against your original report.
                   </p>
                 </div>
-              ) : (
-                <button
-                  className={`button-primary w-full text-xs py-2.5 flex items-center justify-center gap-2 text-white shadow ${
-                    allTestsConfirmed
-                      ? "bg-teal-600 hover:bg-teal-700 cursor-pointer"
-                      : "bg-slate-400 cursor-not-allowed opacity-60"
-                  }`}
-                  disabled={!allTestsConfirmed}
-                  onClick={() => onTransferToRisk(riskFeatures)}
-                >
-                  <span>Send to Chronic Risk Engine</span>
-                  <ArrowRight size={14} />
-                </button>
               )}
+
+              {isScannedOrOcr && allTestsConfirmed && (
+                <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                  <span className="text-[11px] font-medium text-emerald-800">
+                    Source Verified: All scanned biomarkers confirmed against source report. Transfer enabled.
+                  </span>
+                </div>
+              )}
+
+              <button
+                className={`button-primary w-full text-xs py-2.5 flex items-center justify-center gap-2 text-white shadow ${
+                  allTestsConfirmed
+                    ? "bg-teal-600 hover:bg-teal-700 cursor-pointer"
+                    : "bg-slate-400 cursor-not-allowed opacity-60"
+                }`}
+                disabled={!allTestsConfirmed}
+                onClick={() => onTransferToRisk(riskFeatures)}
+              >
+                <span>Send to Chronic Risk Engine</span>
+                <ArrowRight size={14} />
+              </button>
             </div>
           )}
         </div>
@@ -451,7 +461,22 @@ Sex: Male`;
                   <table className="w-full text-left text-xs">
                     <thead>
                       <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-600">
-                        <th className="py-2.5 px-3 font-semibold text-center w-12">Verify</th>
+                        <th className="py-2.5 px-3 font-semibold text-center w-12">
+                          <input
+                            type="checkbox"
+                            title={allTestsConfirmed ? "Uncheck all" : "Verify and confirm all biomarkers"}
+                            className="rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer h-4 w-4"
+                            checked={allTestsConfirmed}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              const updated: Record<string, boolean> = {};
+                              result.extracted_tests.forEach((t) => {
+                                updated[t.canonical_name] = checked;
+                              });
+                              setConfirmedTests(updated);
+                            }}
+                          />
+                        </th>
                         <th className="py-2.5 px-4 font-semibold">Biomarker / Source Line</th>
                         <th className="py-2.5 px-4 font-semibold">Reported Raw</th>
                         <th className="py-2.5 px-4 font-semibold">Standardized (US)</th>
