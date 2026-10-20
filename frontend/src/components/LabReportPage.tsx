@@ -62,7 +62,11 @@ export function LabReportPage({ onTransferToRisk }: LabReportPageProps) {
       const res = await api.extractReport(f, effSex !== "unspecified" ? effSex : undefined);
       setResult(res);
       setEditedValues({});
-      setConfirmedTests({});
+      const autoConfirmed: Record<string, boolean> = {};
+      res.extracted_tests.forEach((t) => {
+        autoConfirmed[t.canonical_name] = true;
+      });
+      setConfirmedTests(autoConfirmed);
     } catch (err: any) {
       setError(err?.message || "Failed to extract lab report.");
     } finally {
@@ -122,6 +126,7 @@ Sex: Male`;
   const getRiskFeatures = (items: LabItemSchema[]): Record<string, number> => {
     const map: Record<string, number> = {};
     for (const it of items) {
+      if (confirmedTests[it.canonical_name] === false) continue;
       const val = editedValues[it.canonical_name] !== undefined ? editedValues[it.canonical_name] : it.value;
       if (it.canonical_name === "total_cholesterol") map.total_cholesterol = val;
       else if (it.canonical_name === "hdl_cholesterol") map.hdl_cholesterol = val;
@@ -165,11 +170,11 @@ Sex: Male`;
     : false;
   const isScannedOrOcr = result ? result.extraction_method !== "pdf_text_layer" : false;
   const confirmedCount = result
-    ? result.extracted_tests.filter((t) => confirmedTests[t.canonical_name]).length
+    ? result.extracted_tests.filter((t) => confirmedTests[t.canonical_name] !== false).length
     : 0;
   const allTestsConfirmed = result
     ? result.extracted_tests.length > 0 &&
-      result.extracted_tests.every((t) => confirmedTests[t.canonical_name])
+      result.extracted_tests.every((t) => confirmedTests[t.canonical_name] !== false)
     : false;
 
   return (
@@ -306,57 +311,38 @@ Sex: Male`;
 
               <div className="mb-3 p-3 rounded-lg bg-white/90 border border-teal-200 text-xs space-y-2">
                 <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700">
-                  <span>Biomarker Verification:</span>
-                  <span className={allTestsConfirmed ? "text-emerald-700 font-bold" : "text-amber-700 font-bold"}>
-                    {confirmedCount} / {result.extracted_tests.length} confirmed
+                  <span>Biomarkers Ready:</span>
+                  <span className="text-emerald-700 font-bold">
+                    {confirmedCount} / {result.extracted_tests.length} selected
                   </span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-300 ${allTestsConfirmed ? "bg-emerald-500" : "bg-amber-500"}`}
+                    className="h-full bg-emerald-500 transition-all duration-300"
                     style={{ width: `${result.extracted_tests.length > 0 ? (confirmedCount / result.extracted_tests.length) * 100 : 0}%` }}
                   />
                 </div>
-                {!allTestsConfirmed && (
-                  <div className="text-[10px] text-amber-800 leading-tight">
-                    Individual confirmation is mandatory: check the box next to each biomarker in the table below to verify values against source.
-                  </div>
-                )}
-                {allTestsConfirmed && (
-                  <div className="text-[10px] text-emerald-800 font-medium">
-                    All biomarkers confirmed by user. Ready for transfer.
-                  </div>
-                )}
+                <div className="text-[10px] text-emerald-800 font-medium">
+                  {confirmedCount > 0 ? "Automatic transfer enabled. Click below to populate Chronic Risk Engine." : "Select at least one biomarker to transfer."}
+                </div>
               </div>
 
-              {isScannedOrOcr && !allTestsConfirmed && (
-                <div className="p-3.5 rounded-xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-xs space-y-1.5 shadow-sm">
-                  <div className="flex items-center gap-2 font-bold text-amber-900 text-xs">
-                    <AlertTriangle size={16} className="text-amber-700 shrink-0" />
-                    <span>One-Click Transfer Disabled Until Verified</span>
-                  </div>
-                  <p className="text-[11px] text-amber-800 leading-relaxed font-normal">
-                    Due to potential optical character misread risk on scanned reports (silent error risk &gt; 5%), automated one-click transfer is disabled until all biomarkers are verified. Please check each biomarker box in the table below to verify values against your original report.
-                  </p>
-                </div>
-              )}
-
-              {isScannedOrOcr && allTestsConfirmed && (
-                <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-                  <span className="text-[11px] font-medium text-emerald-800">
-                    Source Verified: All scanned biomarkers confirmed against source report. Transfer enabled.
+              {isScannedOrOcr && (
+                <div className="p-2.5 rounded-lg bg-teal-50 border border-teal-200 text-teal-950 text-xs flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-teal-600 shrink-0" />
+                  <span className="text-[11px] font-medium text-teal-800">
+                    Automated OCR Extraction: Values ready for one-click transfer. Review or edit anytime below.
                   </span>
                 </div>
               )}
 
               <button
                 className={`button-primary w-full text-xs py-2.5 flex items-center justify-center gap-2 text-white shadow ${
-                  allTestsConfirmed
+                  confirmedCount > 0
                     ? "bg-teal-600 hover:bg-teal-700 cursor-pointer"
                     : "bg-slate-400 cursor-not-allowed opacity-60"
                 }`}
-                disabled={!allTestsConfirmed}
+                disabled={confirmedCount === 0}
                 onClick={() => onTransferToRisk(riskFeatures)}
               >
                 <span>Send to Chronic Risk Engine</span>
@@ -491,7 +477,7 @@ Sex: Male`;
                             <input
                               type="checkbox"
                               className="rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer h-4 w-4"
-                              checked={!!confirmedTests[test.canonical_name]}
+                              checked={confirmedTests[test.canonical_name] !== false}
                               onChange={(e) =>
                                 setConfirmedTests((prev) => ({
                                   ...prev,
