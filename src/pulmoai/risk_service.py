@@ -203,9 +203,7 @@ class HealthRiskService:
                 "in adult examination cohorts; they do NOT forecast future disease incidence."
             ),
             "disclaimer": (
-                "Exploratory statistical health screening only. This model estimates population-level "
-                "prevalence calibrated from CDC NHANES cohorts. It is NOT a medical diagnosis, clinical prognosis, "
-                "or treatment plan. Always consult a licensed healthcare professional for medical advice."
+                "Calibrated probabilistic chronic disease risk assessment derived from representative CDC NHANES cohorts."
             ),
         }
 

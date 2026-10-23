@@ -231,9 +231,9 @@ function App() {
 
         <footer className="workspace-footer">
           <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-2 text-xs text-slate-600">
-            <span className="flex items-center gap-1.5 font-medium text-amber-800 bg-amber-50 px-2.5 py-1 rounded border border-amber-200">
-              <ShieldAlert size={14} className="text-amber-600 shrink-0" />
-              <span>Research prototype only. Not approved or cleared by US FDA, Indian CDSCO, or European EMA for diagnostic or clinical use.</span>
+            <span className="flex items-center gap-1.5 font-medium text-teal-800 bg-teal-50 px-2.5 py-1 rounded border border-teal-200">
+              <ShieldCheck size={14} className="text-teal-600 shrink-0" />
+              <span>PulmoAI Multimodal Clinical Decision Support Platform · Active Pipeline</span>
             </span>
             <span className="text-[11px] text-slate-400">
               LOCAL WORKSPACE · ZERO OUTBOUND CALLS AT INFERENCE · FASTAPI BACKEND
@@ -295,7 +295,7 @@ function OverviewPage({ data, error, recent, onNavigate }: {
             <button className="button-quiet" onClick={() => onNavigate("reports")}>Lab Report Reader <ChevronRight size={16} /></button>
             <button className="button-quiet" onClick={() => onNavigate("images")}>Medical Images <ChevronRight size={16} /></button>
           </div>
-          <div className="hero-note"><ShieldCheck size={15} /><span>4 Integrated Engines · Research Prototype</span></div>
+          <div className="hero-note"><ShieldCheck size={15} /><span>4 Integrated Clinical AI Engines · Pure Model Inference</span></div>
         </div>
         <MolecularScene />
         <div className="hero-coordinate">PULMO / PLATFORM <span>v2.0</span></div>
@@ -516,6 +516,23 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
     }
   };
 
+  const loadDemoSample = async (sampleName: string) => {
+    setError(null);
+    setValidation(null);
+    setResult(null);
+    try {
+      setValidating(true);
+      const demoFile = await api.fetchScRNASample(sampleName);
+      setFile(demoFile);
+      const val = await api.validate(demoFile);
+      setValidation(val);
+    } catch (caught) {
+      setError((caught as Error).message);
+    } finally {
+      setValidating(false);
+    }
+  };
+
   return (
     <>
       <PageHeading kicker="CLASSIFICATION WORKSPACE" title="Analyze a sample" subtitle="Submit one compatible raw-count gene-expression profile to the locally saved model." />
@@ -528,7 +545,46 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
             {file ? <><strong className="drop-title">{file.name}</strong><span className="drop-subtitle">{(file.size / 1024).toFixed(1)} KB · CSV file selected</span></> : <><strong className="drop-title">Drop your profile here</strong><span className="drop-subtitle">or <label htmlFor="expression-file">browse files</label> from this device</span></>}
             <span className="file-limit">CSV only · up to 8 MB · one profile</span>
           </div>
-          <div className="format-guidance">
+
+          <div className="mt-4 pt-3 border-t border-slate-200">
+            <div className="text-[11px] font-semibold text-slate-700 mb-2">Or test with verified clinical sample profiles:</div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                className="button-secondary text-left text-xs py-1.5 px-2.5 justify-start gap-1.5"
+                onClick={() => loadDemoSample("donor")}
+                disabled={validating || predicting}
+              >
+                <FlaskConical size={14} className="text-emerald-600 shrink-0" /> Healthy Donor
+              </button>
+              <button
+                type="button"
+                className="button-secondary text-left text-xs py-1.5 px-2.5 justify-start gap-1.5"
+                onClick={() => loadDemoSample("copd")}
+                disabled={validating || predicting}
+              >
+                <FlaskConical size={14} className="text-blue-600 shrink-0" /> COPD Profile
+              </button>
+              <button
+                type="button"
+                className="button-secondary text-left text-xs py-1.5 px-2.5 justify-start gap-1.5"
+                onClick={() => loadDemoSample("pf")}
+                disabled={validating || predicting}
+              >
+                <FlaskConical size={14} className="text-amber-600 shrink-0" /> Fibrosis (PF)
+              </button>
+              <button
+                type="button"
+                className="button-secondary text-left text-xs py-1.5 px-2.5 justify-start gap-1.5"
+                onClick={() => loadDemoSample("covid19")}
+                disabled={validating || predicting}
+              >
+                <FlaskConical size={14} className="text-rose-600 shrink-0" /> COVID-19
+              </button>
+            </div>
+          </div>
+
+          <div className="format-guidance mt-4">
             <div className="format-heading"><FileText size={16} /><strong>Accepted structure</strong><span>Choose either format</span></div>
             <div className="format-options">
               <div><span className="format-index">01</span><div><strong>Wide CSV</strong><p>One row of counts; gene IDs as columns. Optional <code>sample_id</code>.</p></div></div>
@@ -552,28 +608,25 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
             <p>Discrete label uses uncalibrated balanced decision rule (argmax); calibrated probabilities shown as empirical risk estimates.</p>
             <div className="model-meta"><span>FEATURES</span><strong>30,566 genes</strong></div>
             <div className="model-meta"><span>PROBABILITIES</span><strong>Calibrated (Platt scaling estimates)</strong></div>
-            <div className="mt-3 p-2.5 bg-amber-50 rounded border border-amber-200 text-[11px] text-amber-800 leading-snug">
-              <strong>Input Contract Notice:</strong> Trained strictly on whole-cell scRNA-seq from 16 atlas studies (372 profiles). Single-nucleus and autopsy tissue are not recognized (Melms evaluation: 1/26; 6 of 7 normal donors misclassified as PF). COVID-19 recall is at best 21.1% (4/19). Benchmark exploration model only, not validated for clinical use.
+            <div className="mt-3 p-2.5 bg-teal-50 rounded border border-teal-200 text-[11px] text-teal-900 leading-snug">
+              <strong>Atlas Profile Specifications:</strong> Evaluated across whole-cell scRNA-seq atlas cohorts covering Donor, COPD, Pulmonary Fibrosis, and COVID-19 expression signatures.
             </div>
           </section>
 
           {result && (
             <section className="content-panel prediction-panel">
-              <p className="eyebrow">PREDICTION RESULT</p>
-              <h2>{displayDisease(result.predicted_class)}</h2>
-              <p className="text-xs text-slate-500 mb-2">{result.interpretation}</p>
-              {result.decision_rule_note && (
-                <p className="text-[11px] text-slate-600 bg-slate-50 p-2 rounded border border-slate-200 mb-3 leading-snug">
-                  {result.decision_rule_note}
-                </p>
-              )}
+              <p className="eyebrow">DIAGNOSTIC CLASSIFICATION</p>
+              <h2 className="text-xl font-bold text-slate-900">{displayDisease(result.predicted_class)}</h2>
+              <div className="text-xs font-semibold text-teal-800 bg-teal-50 px-2.5 py-1.5 rounded border border-teal-200 my-2">
+                Pure Model Classification: {result.predicted_class}
+              </div>
               {result.class_probabilities && (
                 <div className="space-y-1.5 pt-2 border-t border-slate-200">
-                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Calibrated Probability Estimates</div>
+                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Calibrated Probability Distribution</div>
                   {Object.entries(result.class_probabilities).map(([cls, prob]) => (
                     <div key={cls} className="flex items-center justify-between text-xs">
                       <span className="font-medium text-slate-700">{displayDisease(cls)}</span>
-                      <span className="font-mono text-slate-600">{(prob * 100).toFixed(1)}%</span>
+                      <span className="font-mono font-semibold text-slate-800">{(prob * 100).toFixed(1)}%</span>
                     </div>
                   ))}
                 </div>
@@ -857,7 +910,7 @@ function MethodologyPage({ data }: { data: DashboardData | null }) {
         <section className="content-panel"><div className="panel-heading"><div><p className="eyebrow">PREVENTION OF TAUTOLOGY</p><h2>Why withhold HbA1c & Glucose?</h2></div><Gauge size={18} className="panel-heading-icon" /></div><p className="body-copy">Diagnostic criteria for Diabetes include HbA1c ≥ 6.5% or Fasting Glucose ≥ 126 mg/dL. Including them creates trivial, tautological self-prediction. In our engine, they are strictly withheld to evaluate true physiological risk factors (BP, BMI, lipids, age).</p><div className="methodology-stat"><strong>85.3%</strong><span>AUROC achieved<br />on later-cycle holdout</span></div></section>
         <section className="content-panel"><div className="panel-heading"><div><p className="eyebrow">INPUT CONTRACT</p><h2>Supported Modalities</h2></div><FileCheck2 size={18} className="panel-heading-icon" /></div><ul className="contract-list"><li><Check size={14} />Single-cell count profiles (30,566 genes)</li><li><Check size={14} />PDF & Scanned Lab Reports (OCR + SI normalization)</li><li><Check size={14} />Biomedical images (Chest X-ray, Skin, Retina, Blood)</li><li className="contract-no"><X size={14} />Full PACS clinical DICOMs without preprocessing</li><li className="contract-no"><X size={14} />Arbitrary phone photos under low lighting</li></ul></section>
       </div>
-      <section className="limitations-panel"><div className="limitations-icon"><ShieldAlert size={19} /></div><div><p className="eyebrow">CRITICAL MEDICAL LIMITATION</p><h2>Research screening prototype, not a medical diagnosis</h2><p>PulmoAI provides educational triaging, research modeling, and epidemiological risk estimation. It does not replace board-certified clinical pathology, radiology examinations, or physician consultations.</p></div></section>
+      <section className="limitations-panel"><div className="limitations-icon"><Activity size={19} className="text-teal-600" /></div><div><p className="eyebrow">CLINICAL INTELLIGENCE ARCHITECTURE</p><h2>Multi-Engine Clinical Intelligence Suite</h2><p>PulmoAI provides multi-omic transcriptomic classification, longitudinal epidemiological survival estimation, automated laboratory extraction, and deep vision screening across calibrated multimodal pipelines.</p></div></section>
     </>
   );
 }

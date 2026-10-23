@@ -13,6 +13,7 @@ from __future__ import annotations
 import io
 import logging
 from pathlib import Path
+import sys
 
 import joblib
 import numpy as np
@@ -23,6 +24,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("generate_demo_samples")
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+sys.path.insert(0, str(PROJECT_ROOT))
 SAMPLES_DIR = PROJECT_ROOT / "samples"
 SAMPLES_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -122,7 +125,8 @@ All files in this directory are 100% synthetically generated. They contain ZERO 
 def main() -> None:
     generate_pdf_and_scan()
     generate_lung_csv()
-    generate_samples_readme()
+    from scripts.generate_scrna_samples import generate_scrna_samples
+    generate_scrna_samples()
 
 
 if __name__ == "__main__":

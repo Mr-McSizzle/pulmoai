@@ -146,6 +146,7 @@ export interface ImagePredictionResponse {
   predicted_class?: string | null;
   confidence?: number;
   max_confidence?: number;
+  accuracy?: number;
   threshold_applied?: number;
   empirical_false_accept_rate?: number | null;
   ood_benchmark?: any;

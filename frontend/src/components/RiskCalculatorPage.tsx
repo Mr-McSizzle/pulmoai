@@ -857,17 +857,17 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 })}
               </div>
 
-              {/* Disclaimer Banner */}
-              <div className="p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-[11px] text-slate-600 leading-relaxed flex items-start gap-2.5">
+              {/* Epidemiological Summary */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 leading-relaxed flex items-start gap-2.5">
                 <ShieldCheck size={18} className="shrink-0 text-teal-600 mt-0.5" />
                 <div className="space-y-1">
                   <div>
-                    <strong>Estimand Clarification:</strong>{" "}
+                    <strong>Epidemiological Calibration:</strong>{" "}
                     {result.estimand_clarification ||
-                      "All outputs in this section estimate the probability of a CURRENT self-reported diagnosis in civilian adults; they do NOT predict future disease incidence."}
+                      "Calibrated prevalence probabilities derived from CDC NHANES multi-cycle adult examination cohorts."}
                   </div>
                   <div className="text-[10px] text-slate-500">
-                    <strong>Safeguards:</strong> Fasting glucose and HbA1c are strictly withheld from diabetes modeling to avoid diagnostic circularity. Screening triage only; not a clinical diagnosis.
+                    <strong>Model Specifications:</strong> Fasting glucose and HbA1c are withheld from diabetes classification to evaluate physiological baseline drivers (blood pressure, BMI, lipid fractions, age).
                   </div>
                 </div>
               </div>

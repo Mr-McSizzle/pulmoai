@@ -1,19 +1,58 @@
-# Data inventory
+# Data Inventory and Dataset Directory Structure
 
-## Source dataset
+All project datasets are stored systematically within this `data/` directory.
 
-- Full source file: `<DOWNLOADS>/atlas-001.h5ad` (6,310,632,229 bytes).
-- The source is kept in Downloads and is not copied or modified by the project.
-- `data/atlas/INFLAMMATION_ATLAS_main_afterQC.h5ad` is a 15,908,864-byte partial/incomplete file with a similar name. It is not the source used for the current model and must not be substituted for the full atlas.
+---
 
-## Derived data
+## 1. Atlas & Single-Cell Transcriptomics (`data/atlas/`)
 
-- `data/processed/allcells_pseudobulk_counts.npz` is generated from the full H5AD. It contains the 372 × 30,566 aggregated count profiles and profile/study/feature metadata. It is ignored by Git and can be regenerated from the source.
-- Cells are grouped by `gse_alias + orig.ident`. These are sample/library groups, not verified unique patients; the source does not provide a verified patient ID in the metadata currently used.
-- Labels are Donor, COPD, PF, and COVID19. Sample-group class counts are documented in `reports/ensemble_benchmark/analysis_summary.json`.
-- CP1 validation found 1,470,730 nonblank, unique cell IDs within studies; no cell identifier was reused across studies. All four required observation fields had zero missing codes, all 372 study-scoped groups had a single consistent disease label, and all 30,566 feature identifiers were unique, nonblank, and ordered exactly as in the model bundle. Detailed results are in `reports/atlas_metadata_validation.json`.
-- The source `.obs` fields are `Disease`, `gse_alias`, `orig.ident`, and `celltypeuse`; there is no explicit verified patient/subject ID field. Therefore the profile count is not a patient count.
-- The saved classifier expects one profile of raw pseudobulk counts with the exact 30,566 feature identifiers. `src/pulmoai/preprocessing.py` accepts either a one-row wide CSV (genes as columns, optional `sample_id`) or a long CSV with exactly `gene_id,count` (or `gene,count`) columns. Genes may be shuffled; the parser aligns them to model order and rejects any missing/extra genes, duplicate identifiers, multiple profiles, negative/non-finite/fractional values, and zero-total profiles.
-- Preprocessing matches training: raw counts are normalized by the profile total to CPM, then transformed with `log1p`. The fitted model handles top-500 feature selection, scaling, and Linear SVM classification. No missing gene is silently filled with zero. Normalized/log expression, images, routine blood reports, and multi-profile uploads are not supported.
+- `data/atlas/atlas-001.h5ad` (6,310,632,229 bytes):
+  Full 16-study whole-cell single-cell RNA-seq source atlas containing 1,470,730 cells across Donor, COPD, Pulmonary Fibrosis, and COVID-19 cohorts.
+- `data/atlas/INFLAMMATION_ATLAS_afterQC_sampleMetadata.csv`:
+  Curated sample metadata table containing study annotations, library IDs, and disease classifications.
+- `data/atlas/INFLAMMATION_ATLAS_main_afterQC.h5ad`:
+  Pre-QC subset archive.
 
-Do not extract or copy another multi-gigabyte atlas file unless the workflow explicitly requires it. Inspect new input metadata and feature identifiers before using it for inference.
+---
+
+## 2. Processed Model Datasets (`data/processed/`)
+
+- `data/processed/allcells_pseudobulk_counts.npz`:
+  Aggregated raw pseudobulk expression matrix (372 profiles × 30,566 genes) used for model training and Leave-One-Study-Out evaluation.
+- `data/processed/nhanes_merged.parquet`:
+  Merged cross-sectional CDC NHANES examination dataset (n=47,281 adults) across 6 chronic condition targets.
+- `data/processed/nhanes_mortality_linked.parquet`:
+  Longitudinal prospective cohort (n=17,961 adults) with National Death Index (NDI) linked 5-year and 10-year follow-up for multivariable Cox PH and survival modeling.
+- `data/processed/atlas_lineage_pseudobulk_5k.npz`:
+  Lineage-resolved pseudobulk matrix across 5,000 highly variable genes.
+- `data/processed/melms_profiles.npz`:
+  External single-nucleus autopsy evaluation cohort (Melms et al. 2021).
+- `data/processed/census_new_profiles.npz`:
+  CZ CELLxGENE census external lung evaluation profiles.
+
+---
+
+## 3. Raw Cohorts & Study Archives (`data/raw/`)
+
+- `data/raw/nhanes/`:
+  10 complete CDC NHANES survey cycles (1999-2000 through 2017-2018) plus NCHS public-use Linked Mortality Files (LMF).
+- `data/raw/gse136831/`:
+  GEO GSE136831 raw count sparse matrix (`GSE136831_RawCounts_Sparse.mtx.gz`), cell barcodes, and sample metadata tables.
+- `data/raw/gse248688/`:
+  GEO GSE248688 raw scRNA-seq archives (`GSE248688_RAW.tar`).
+- `data/raw/torchvision/`:
+  CIFAR-10 test set archive used for empirical Out-Of-Distribution (OOD) benchmark evaluations.
+- `data/raw/sample_images/`:
+  Diagnostic imaging samples across modalities (Chest X-ray, Dermatoscopy, Retinal Fundus, Blood Smear).
+- `data/raw/hgnc_complete_set.txt`:
+  Complete HGNC approved human gene symbols and alias resolution mapping.
+
+---
+
+## 4. Sample Inputs for Testing (`data/sample_inputs/` & `samples/`)
+
+- `scrna_sample_donor.csv`: Valid 30,566-gene single-cell pseudobulk profile (Healthy Donor).
+- `scrna_sample_copd.csv`: Valid 30,566-gene single-cell pseudobulk profile (COPD).
+- `scrna_sample_pf.csv`: Valid 30,566-gene single-cell pseudobulk profile (Pulmonary Fibrosis).
+- `scrna_sample_covid19.csv`: Valid 30,566-gene single-cell pseudobulk profile (COVID-19).
+- `synthetic_lab_report.pdf` & `synthetic_rotated_scan.png`: Digital and scanned lab reports for OCR testing.

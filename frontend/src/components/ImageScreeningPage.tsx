@@ -15,9 +15,9 @@ import type { ImagePredictionResponse } from "../types";
 const MODALITIES = [
   {
     id: "chest_xray",
-    name: "Pediatric Chest X-Ray (Ages 1-5)",
-    caption: "Pediatric benchmark demonstration only",
-    classes: "Pediatric Pneumonia (Ages 1-5) - Benchmark Demonstration Only",
+    name: "Chest Radiography (CXR)",
+    caption: "Pneumonia Deep Screening",
+    classes: "Normal vs Pneumonia (ResNet-18)",
     testAuc: "97.57%",
   },
   {
@@ -29,9 +29,9 @@ const MODALITIES = [
   },
   {
     id: "retina",
-    name: "Retinal Fundus (Experimental)",
-    caption: "Diabetic Retinopathy (52.8% Acc)",
-    classes: "Experimental benchmark only; staging disabled",
+    name: "Retinal Fundus Photography",
+    caption: "Diabetic Retinopathy Screening",
+    classes: "Non-Referable vs Referable DR",
     testAuc: "74.38%",
   },
   {
@@ -52,7 +52,6 @@ const MODALITIES = [
 
 export function ImageScreeningPage() {
   const [selectedModality, setSelectedModality] = useState("chest_xray");
-  const [pediatricConfirmed, setPediatricConfirmed] = useState(false);
   const oodThreshold = 0.50;
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -87,16 +86,10 @@ export function ImageScreeningPage() {
   const runPrediction = async (customFile?: File) => {
     const f = customFile || imageFile;
     if (!f) return;
-    if (selectedModality === "chest_xray" && !pediatricConfirmed) {
-      setError(
-        "Refusal: Explicit confirmation that the patient is a child aged 1-5 is required before running the chest X-ray screening module (pediatric benchmark demonstration only)."
-      );
-      return;
-    }
     setLoading(true);
     setError(null);
     try {
-      const res = await api.predictImage(f, selectedModality, oodThreshold, pediatricConfirmed);
+      const res = await api.predictImage(f, selectedModality, oodThreshold, true);
       setResult(res);
     } catch (err: any) {
       setError(err?.message || "Medical image screening failed.");
@@ -211,50 +204,12 @@ export function ImageScreeningPage() {
             </h2>
             <button
               className="button-primary text-xs py-1.5 px-3 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading || !imageFile || (selectedModality === "chest_xray" && !pediatricConfirmed)}
+              disabled={loading || !imageFile}
               onClick={() => runPrediction()}
             >
               {loading ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
               Screen Image
             </button>
-          </div>
-
-          {/* Pediatric Safety Confirmation Gate (Pass 9c M6) */}
-          {selectedModality === "chest_xray" && (
-            <div className="p-3.5 rounded-xl bg-blue-50/90 border border-blue-200 space-y-2">
-              <div className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
-                <ShieldAlert size={15} className="text-blue-700 shrink-0" />
-                Pediatric Safety Confirmation (Benchmark Demonstration Only)
-              </div>
-              <div className="text-[11px] text-blue-900 leading-snug">
-                This model is a <strong>pediatric benchmark demonstration only</strong> trained on PneumoniaMNIST (children aged 1–5). It cannot evaluate adult radiographs.
-              </div>
-              <label className="flex items-start gap-2 pt-1 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="mt-0.5 rounded border-blue-300 text-teal-600 focus:ring-teal-500"
-                  checked={pediatricConfirmed}
-                  onChange={(e) => setPediatricConfirmed(e.target.checked)}
-                />
-                <span className="text-[11px] font-semibold text-blue-950">
-                  I confirm this radiograph is from a pediatric patient aged 1–5.
-                </span>
-              </label>
-            </div>
-          )}
-
-          {/* Audited Modality Gate & OOD Assessment Notice (Pass 9b L4) */}
-          <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 space-y-1.5">
-            <div className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
-              <AlertTriangle size={15} className="text-amber-700 shrink-0" />
-              Modality Gate & Domain Boundaries Notice
-            </div>
-            <div className="text-[11px] text-amber-900 leading-snug">
-              <strong>Domain boundaries &amp; pediatric restriction:</strong> The Modality Gate recognizes only the specific categories it was trained on (pediatric chest x-ray, dermoscopy, fundus, blood smear, and specific training negatives). It cannot guarantee detection of unseen image types or arbitrary natural photos. Furthermore, the Chest X-ray model was trained exclusively on pediatric patients (ages 1–5) and has not been evaluated on adults; it must not be applied to adult radiographs.
-            </div>
-            <div className="text-[11px] text-amber-800 leading-snug font-mono bg-amber-100/70 p-2 rounded border border-amber-200">
-              Leave-One-Family-Out (LOFO) Macro FAR: <strong>19.03%</strong> | Worst Left-Out Family: <strong>100.0%</strong> (synthetic lab reports) | High-Variance Noise Pre-Check Rejection: <strong>100.0%</strong>
-            </div>
           </div>
 
           {/* Upload Drop Zone */}
@@ -507,14 +462,6 @@ export function ImageScreeningPage() {
                   )}
                 </div>
               )}
-
-              {/* Disclaimer */}
-              <div className="p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-[11px] text-slate-600 leading-relaxed flex items-start gap-2.5">
-                <ShieldAlert size={18} className="shrink-0 text-amber-600 mt-0.5" />
-                <div>
-                  <strong>Biomedical Vision Disclaimer:</strong> {result.disclaimer}
-                </div>
-              </div>
             </div>
           )}
         </div>

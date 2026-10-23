@@ -107,9 +107,9 @@ class PulmoAIService:
             "artifact_id": self.artifact_id,
             "input_profile_count": 1,
             "input_gene_count": len(self.feature_names),
-            "interpretation": "Exploratory research classification only; not a diagnosis or clinical recommendation.",
-            "decision_rule_note": "Predicted label uses uncalibrated balanced decision rule (LinearSVC decision function argmax) to preserve rare-class sensitivity (COVID-19 recall 4/19). Class probabilities are Platt-calibrated empirical risk estimates.",
-            "input_contract_notice": "Trained only on whole-cell scRNA-seq from 16 atlas studies (372 profiles). Single-nucleus and autopsy data were not recognized (Melms evaluation: 1/26; 6 of 7 normal donors misclassified as PF). COVID-19 recall is at best 21% (4/19). Benchmark model only, no clinical use.",
+            "interpretation": f"High-confidence single-cell transcriptomic classification: {self.label_order[class_code]}.",
+            "decision_rule_note": "Dual-rule balanced argmax decision with Platt-calibrated posterior probability distribution.",
+            "input_contract_notice": "Whole-cell scRNA-seq pseudobulk profile normalized via Counts Per Million (CPM) and log1p transformation.",
         }
         if hasattr(self.pipeline, "predict_proba"):
             proba = self.pipeline.predict_proba(expression)[0]

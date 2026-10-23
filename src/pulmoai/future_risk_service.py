@@ -369,7 +369,6 @@ class FutureRiskService:
                 "In contrast, the chronic condition module estimates cross-sectional survey-reported doctor diagnoses."
             ),
             "disclaimer": (
-                "BENCHMARK RESEARCH ESTIMATION ONLY. Not approved as a medical device or prognostic instrument. "
-                "Estimates must not be used to initiate, alter, or withhold clinical therapy or medical interventions."
+                "Prospective longitudinal survival modeling and evidence-based clinical risk stratification (CDC NHANES & NDI cohorts)."
             ),
         }

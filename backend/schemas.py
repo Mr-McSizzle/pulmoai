@@ -137,6 +137,7 @@ class ImagePredictionResponse(BaseModel):
     predicted_class: str | None = None
     confidence: float | None = None
     max_confidence: float | None = None
+    accuracy: float | None = None
     threshold_applied: float | None = None
     empirical_false_accept_rate: float | None = None
     cifar10_false_accept_rate: float | None = None

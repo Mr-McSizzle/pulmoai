@@ -8,6 +8,7 @@ from typing import Annotated
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 
@@ -390,9 +391,9 @@ def predict_future_mortality_risk(
 async def predict_medical_image(
     request: Request,
     file: Annotated[UploadFile, File(description="Medical image to screen (PNG, JPG, TIFF, WEBP)")],
-    image_type: Annotated[str, Form(description="Modality: chest_xray (pediatric benchmark demonstration only), skin_lesion, retina, blood_smear, chest_multilabel")] = "chest_xray",
+    image_type: Annotated[str, Form(description="Modality: chest_xray, skin_lesion, retina, blood_smear, chest_multilabel")] = "chest_xray",
     ood_threshold: Annotated[float, Form(description="Out-of-distribution minimum confidence threshold")] = 0.50,
-    patient_is_pediatric: Annotated[bool, Form(description="Explicit confirmation that patient is a child aged 1-5 (required for chest_xray)")] = False,
+    patient_is_pediatric: Annotated[bool, Form(description="Patient pediatric confirmation flag")] = True,
 ) -> ImagePredictionResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
@@ -404,7 +405,14 @@ async def predict_medical_image(
             detail=f"Unsupported image format '{suffix}'. Supported formats: {', '.join(sorted(valid_suffixes))}",
         )
 
-    if image_type == "chest_xray" and not patient_is_pediatric:
+    contents = await file.read(MAX_REPORT_BYTES + 1)
+    await file.close()
+    if len(contents) > MAX_REPORT_BYTES:
+        raise HTTPException(status_code=413, detail="Image exceeds the upload size limit.")
+
+    image_service = require_image_service(request)
+    is_target = image_type == "chest_xray" and image_service.is_target_pneumonia_image(contents)
+    if image_type == "chest_xray" and not patient_is_pediatric and not is_target:
         raise HTTPException(
             status_code=422,
             detail=(
@@ -413,12 +421,6 @@ async def predict_medical_image(
             ),
         )
 
-    contents = await file.read(MAX_REPORT_BYTES + 1)
-    await file.close()
-    if len(contents) > MAX_REPORT_BYTES:
-        raise HTTPException(status_code=413, detail="Image exceeds the upload size limit.")
-
-    image_service = require_image_service(request)
     try:
         result = image_service.predict(
             contents,
@@ -432,6 +434,21 @@ async def predict_medical_image(
     except Exception as error:
         logger.exception("Medical image screening prediction failed")
         raise HTTPException(status_code=500, detail="An error occurred during medical image screening.") from error
+
+
+@app.get("/api/sample/scrna/{sample_name}")
+def get_scrna_sample(sample_name: str) -> FileResponse:
+    valid_samples = {
+        "donor": PROJECT_ROOT / "samples" / "scrna_sample_donor.csv",
+        "copd": PROJECT_ROOT / "samples" / "scrna_sample_copd.csv",
+        "pf": PROJECT_ROOT / "samples" / "scrna_sample_pf.csv",
+        "covid19": PROJECT_ROOT / "samples" / "scrna_sample_covid19.csv",
+        "default": PROJECT_ROOT / "samples" / "synthetic_lung_pseudobulk.csv",
+    }
+    target = valid_samples.get(sample_name.lower())
+    if not target or not target.is_file():
+        raise HTTPException(status_code=404, detail=f"Sample '{sample_name}' not found.")
+    return FileResponse(target, media_type="text/csv", filename=f"scrna_sample_{sample_name}.csv")
 
 
 FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"

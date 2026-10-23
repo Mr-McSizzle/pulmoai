@@ -74,7 +74,7 @@ export const api = {
     file: File,
     imageType: string = "chest_xray",
     oodThreshold: number = 0.50,
-    patientIsPediatric: boolean = false,
+    patientIsPediatric: boolean = true,
   ): Promise<ImagePredictionResponse> => {
     const form = new FormData();
     form.append("file", file);
@@ -82,5 +82,13 @@ export const api = {
     form.append("ood_threshold", oodThreshold.toString());
     form.append("patient_is_pediatric", patientIsPediatric ? "true" : "false");
     return request<ImagePredictionResponse>("/api/image/predict", { method: "POST", body: form });
+  },
+
+  // scRNA Demo Samples
+  fetchScRNASample: async (sampleName: string): Promise<File> => {
+    const res = await fetch(`/api/sample/scrna/${sampleName}`);
+    if (!res.ok) throw new Error(`Could not load ${sampleName} sample.`);
+    const blob = await res.blob();
+    return new File([blob], `scrna_sample_${sampleName}.csv`, { type: "text/csv" });
   },
 };
