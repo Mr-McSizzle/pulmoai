@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
-from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import Cookie, Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -21,17 +22,24 @@ from pulmoai.risk_service import HealthRiskService
 from pulmoai.future_risk_service import FutureRiskService
 from pulmoai.image_service import ImageScreeningService
 from backend.schemas import (
+    AuthResponse,
     DashboardResponse,
     FutureRiskResponse,
     GeneInsightsResponse,
     HealthResponse,
     ImagePredictionResponse,
+    LoginRequest,
     PredictionResponse,
+    RegisterRequest,
     ReportExtractResponse,
     RiskPredictionRequest,
     RiskPredictionResponse,
+    StoredRecordDetailResponse,
+    StoredRecordResponse,
+    UserResponse,
     ValidationResponse,
 )
+from backend.storage import DuplicateEmailError, SESSION_DAYS, UserDataStore
 
 
 logging.basicConfig(level=logging.INFO)
@@ -40,6 +48,13 @@ logger = logging.getLogger("pulmoai.api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    store = getattr(app.state, "user_data_store", None)
+    if store is None:
+        user_data_dir = Path(os.environ.get("PULMOAI_USER_DATA_DIR", PROJECT_ROOT / "data" / "user_storage"))
+        store = UserDataStore(user_data_dir)
+        app.state.user_data_store = store
+    store.initialize()
+
     # Automated Startup Artifact Verification
     try:
         sys.path.insert(0, str(PROJECT_ROOT))
@@ -121,10 +136,140 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_credentials=False,
-    allow_methods=["GET", "POST"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["Content-Type"],
 )
+
+SESSION_COOKIE_NAME = "pulmoai_session"
+
+
+def get_user_data_store(request: Request) -> UserDataStore:
+    store = getattr(request.app.state, "user_data_store", None)
+    if store is None:
+        user_data_dir = Path(os.environ.get("PULMOAI_USER_DATA_DIR", PROJECT_ROOT / "data" / "user_storage"))
+        store = UserDataStore(user_data_dir)
+        store.initialize()
+        request.app.state.user_data_store = store
+    return store
+
+
+def optional_current_user(
+    request: Request,
+    session_token: str | None = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+) -> dict[str, str] | None:
+    return get_user_data_store(request).user_for_session(session_token)
+
+
+def required_current_user(
+    user: Annotated[dict[str, str] | None, Depends(optional_current_user)],
+) -> dict[str, str]:
+    if user is None:
+        raise HTTPException(status_code=401, detail="Sign in to access your saved health records.")
+    return user
+
+
+def set_session_cookie(response: Response, request: Request, token: str) -> None:
+    response.set_cookie(
+        key=SESSION_COOKIE_NAME,
+        value=token,
+        max_age=SESSION_DAYS * 24 * 60 * 60,
+        httponly=True,
+        secure=request.url.scheme == "https",
+        samesite="lax",
+        path="/api",
+    )
+
+
+@app.post("/api/auth/register", response_model=AuthResponse, status_code=201)
+def register_account(payload: RegisterRequest, request: Request, response: Response) -> AuthResponse:
+    store = get_user_data_store(request)
+    try:
+        user = store.register(payload.full_name, payload.email, payload.password)
+    except DuplicateEmailError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    token, _ = store.create_session(user["id"])
+    set_session_cookie(response, request, token)
+    return AuthResponse(authenticated=True, user=UserResponse(**user))
+
+
+@app.post("/api/auth/login", response_model=AuthResponse)
+def login_account(payload: LoginRequest, request: Request, response: Response) -> AuthResponse:
+    store = get_user_data_store(request)
+    user = store.authenticate(payload.email, payload.password)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Email or password is incorrect.")
+    token, _ = store.create_session(user["id"])
+    set_session_cookie(response, request, token)
+    return AuthResponse(authenticated=True, user=UserResponse(**user))
+
+
+@app.post("/api/auth/logout", status_code=204)
+def logout_account(
+    request: Request,
+    response: Response,
+    session_token: str | None = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+) -> Response:
+    get_user_data_store(request).revoke_session(session_token)
+    response.delete_cookie(key=SESSION_COOKIE_NAME, path="/api", samesite="lax")
+    response.status_code = 204
+    return response
+
+
+@app.get("/api/auth/me", response_model=AuthResponse)
+def current_account(
+    request: Request,
+    session_token: str | None = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+) -> AuthResponse:
+    user = get_user_data_store(request).user_for_session(session_token)
+    return AuthResponse(authenticated=user is not None, user=UserResponse(**user) if user else None)
+
+
+@app.get("/api/uploads", response_model=list[StoredRecordResponse])
+def list_saved_records(
+    request: Request,
+    user: Annotated[dict[str, str], Depends(required_current_user)],
+) -> list[dict[str, Any]]:
+    return get_user_data_store(request).list_records(user["id"])
+
+
+@app.get("/api/uploads/{record_id}", response_model=StoredRecordDetailResponse)
+def get_saved_record(
+    record_id: str,
+    request: Request,
+    user: Annotated[dict[str, str], Depends(required_current_user)],
+) -> dict[str, Any]:
+    record = get_user_data_store(request).get_record(user["id"], record_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Saved record not found.")
+    return record
+
+
+@app.get("/api/uploads/{record_id}/download")
+def download_saved_file(
+    record_id: str,
+    request: Request,
+    user: Annotated[dict[str, str], Depends(required_current_user)],
+) -> FileResponse:
+    stored = get_user_data_store(request).get_record_file(user["id"], record_id)
+    if stored is None:
+        raise HTTPException(status_code=404, detail="This saved record has no downloadable file.")
+    path, details = stored
+    return FileResponse(path, media_type=details["content_type"], filename=details["filename"])
+
+
+@app.delete("/api/uploads/{record_id}", status_code=204)
+def delete_saved_record(
+    record_id: str,
+    request: Request,
+    user: Annotated[dict[str, str], Depends(required_current_user)],
+) -> Response:
+    deleted = get_user_data_store(request).delete_record(user["id"], record_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Saved record not found.")
+    return Response(status_code=204)
 
 
 def get_artifact_verification(app: FastAPI) -> dict[str, Any]:
@@ -308,11 +453,25 @@ async def validate_upload(
 async def predict_upload(
     request: Request,
     file: Annotated[UploadFile, File(description="One compatible raw-count gene-expression CSV")],
+    user: Annotated[dict[str, str] | None, Depends(optional_current_user)],
 ) -> PredictionResponse:
     service = require_service(request)
     contents = await read_csv_upload(file)
     try:
-        return PredictionResponse(**service.predict_upload(contents))
+        result = PredictionResponse(**service.predict_upload(contents))
+        if user is not None:
+            record = get_user_data_store(request).save_record(
+                user["id"],
+                "scrna_csv",
+                file.filename or "lung-expression.csv",
+                file.content_type or "text/csv",
+                result.model_dump(mode="json"),
+                f"Predicted class: {result.predicted_class}",
+                contents,
+            )
+            result.upload_id = record["id"]
+            result.uploaded_at = record["uploaded_at"]
+        return result
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
     except (RuntimeError, AttributeError) as error:
@@ -329,8 +488,10 @@ MAX_REPORT_BYTES = 10 * 1024 * 1024  # 10 MB limit for lab PDFs/photos
 
 @app.post("/api/report/extract", response_model=ReportExtractResponse)
 async def extract_report(
+    request: Request,
     file: Annotated[UploadFile, File(description="Lab report PDF or photo (PNG, JPG, TIFF)")],
     sex: Annotated[str | None, Form(description="Patient biological sex (male/female) for sex-specific reference ranges")] = None,
+    user: Annotated[dict[str, str] | None, Depends(optional_current_user)] = None,
 ) -> ReportExtractResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
@@ -349,7 +510,20 @@ async def extract_report(
 
     try:
         extraction_result = process_lab_report(contents, file.filename, file.content_type, sex=sex)
-        return ReportExtractResponse(**extraction_result)
+        response = ReportExtractResponse(**extraction_result)
+        if user is not None:
+            record = get_user_data_store(request).save_record(
+                user["id"],
+                "lab_report",
+                file.filename,
+                file.content_type or "application/octet-stream",
+                response.model_dump(mode="json", exclude={"upload_id", "uploaded_at"}),
+                f"Extracted {response.count} lab values",
+                contents,
+            )
+            response.upload_id = record["id"]
+            response.uploaded_at = record["uploaded_at"]
+        return response
     except Exception as error:
         logger.exception("Lab report extraction failed")
         raise HTTPException(status_code=500, detail="An error occurred while parsing the lab report.") from error
@@ -359,11 +533,21 @@ async def extract_report(
 def predict_chronic_risk(
     request: Request,
     payload: RiskPredictionRequest,
+    user: Annotated[dict[str, str] | None, Depends(optional_current_user)],
 ) -> RiskPredictionResponse:
     risk_service = require_risk_service(request)
     try:
-        result = risk_service.predict_risk(payload.inputs)
-        return RiskPredictionResponse(**result)
+        response = RiskPredictionResponse(**risk_service.predict_risk(payload.inputs))
+        if user is not None:
+            get_user_data_store(request).save_record(
+                user["id"],
+                "risk_assessment",
+                "Chronic disease risk assessment",
+                "application/json",
+                {"inputs": payload.inputs, "result": response.model_dump(mode="json")},
+                f"Calculated {len(response.risk_predictions)} condition risk estimates",
+            )
+        return response
     except Exception as error:
         logger.exception("Risk prediction calculation failed")
         raise HTTPException(status_code=500, detail="An error occurred while calculating chronic disease risk.") from error
@@ -373,11 +557,21 @@ def predict_chronic_risk(
 def predict_future_mortality_risk(
     request: Request,
     payload: RiskPredictionRequest,
+    user: Annotated[dict[str, str] | None, Depends(optional_current_user)],
 ) -> FutureRiskResponse:
     future_service = require_future_risk_service(request)
     try:
-        result = future_service.predict_future_risk(payload.inputs)
-        return FutureRiskResponse(**result)
+        response = FutureRiskResponse(**future_service.predict_future_risk(payload.inputs))
+        if user is not None:
+            get_user_data_store(request).save_record(
+                user["id"],
+                "future_risk_assessment",
+                "Future risk assessment",
+                "application/json",
+                {"inputs": payload.inputs, "result": response.model_dump(mode="json")},
+                "Calculated future mortality risk estimates",
+            )
+        return response
     except Exception as error:
         logger.exception("Future risk prediction calculation failed")
         raise HTTPException(status_code=500, detail="An error occurred while calculating prospective future risk.") from error
@@ -394,6 +588,7 @@ async def predict_medical_image(
     image_type: Annotated[str, Form(description="Modality: chest_xray, skin_lesion, retina, blood_smear, chest_multilabel")] = "chest_xray",
     ood_threshold: Annotated[float, Form(description="Out-of-distribution minimum confidence threshold")] = 0.50,
     patient_is_pediatric: Annotated[bool, Form(description="Patient pediatric confirmation flag")] = True,
+    user: Annotated[dict[str, str] | None, Depends(optional_current_user)] = None,
 ) -> ImagePredictionResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
@@ -428,7 +623,20 @@ async def predict_medical_image(
             ood_threshold=ood_threshold,
             patient_is_pediatric=patient_is_pediatric,
         )
-        return ImagePredictionResponse(**result)
+        response = ImagePredictionResponse(**result)
+        if user is not None:
+            record = get_user_data_store(request).save_record(
+                user["id"],
+                "medical_image",
+                file.filename,
+                file.content_type or "application/octet-stream",
+                response.model_dump(mode="json", exclude={"upload_id", "uploaded_at"}),
+                f"{response.modality_name}: {response.predicted_class or response.status}",
+                contents,
+            )
+            response.upload_id = record["id"]
+            response.uploaded_at = record["uploaded_at"]
+        return response
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
     except Exception as error:

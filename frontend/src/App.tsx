@@ -37,16 +37,18 @@ import { LabReportPage } from "./components/LabReportPage";
 import { RiskCalculatorPage } from "./components/RiskCalculatorPage";
 import { ImageScreeningPage } from "./components/ImageScreeningPage";
 import { AuthPage, type AuthMode } from "./components/AuthPage";
+import { MyUploadsPage } from "./components/MyUploadsPage";
 import generatedMetrics from "./generated_metrics.json";
 import type {
   DashboardData,
   GeneInsights,
   HealthResponse,
+  AuthUser,
   PredictionResponse,
   ValidationResponse,
 } from "./types";
 
-type PageId = "overview" | "analyze" | "reports" | "risk" | "images" | "performance" | "genes" | "methodology" | "about";
+type PageId = "overview" | "analyze" | "reports" | "risk" | "images" | "uploads" | "performance" | "genes" | "methodology" | "about";
 
 interface RecentAnalysis {
   filename: string;
@@ -68,6 +70,7 @@ const navigation: NavigationItem[] = [
   { id: "reports", label: "Lab report OCR", icon: FileText, section: "workspace" },
   { id: "risk", label: "Chronic disease risk", icon: Heart, section: "workspace" },
   { id: "images", label: "Medical imaging", icon: ImageIcon, section: "workspace" },
+  { id: "uploads", label: "My uploads", icon: Clock3, section: "workspace" },
   { id: "performance", label: "Model benchmarks", icon: BarChart3, section: "research" },
   { id: "genes", label: "Gene insights", icon: Dna, section: "research" },
   { id: "methodology", label: "Methodology", icon: Microscope, section: "research" },
@@ -80,6 +83,7 @@ const pageTitles: Record<PageId, string> = {
   reports: "Clinical Lab Report Reader (OCR)",
   risk: "NHANES Chronic Disease Risk Engine",
   images: "Biomedical Image Screening (MedMNIST)",
+  uploads: "My Uploads & Analysis History",
   performance: "Multi-Model Performance & Benchmarks",
   genes: "Gene Insights & Model Weights",
   methodology: "Multimodal Research Methodology",
@@ -106,7 +110,8 @@ function percent(value: number | undefined): string {
 }
 
 function App() {
-  const [hasDemoAccess, setHasDemoAccess] = useState(false);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [authChecking, setAuthChecking] = useState(true);
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [activePage, setActivePage] = useState<PageId>("overview");
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
@@ -135,9 +140,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!hasDemoAccess) return;
+    api.authMe().then((session) => {
+      setCurrentUser(session.authenticated ? session.user : null);
+    }).catch(() => {
+      setCurrentUser(null);
+    }).finally(() => {
+      setAuthChecking(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) return;
     refresh();
-  }, [hasDemoAccess, refresh]);
+  }, [currentUser, refresh]);
 
   const navigate = (page: PageId) => {
     setActivePage(page);
@@ -158,9 +173,22 @@ function App() {
 
   const online = health?.status === "ok" && health.model_loaded;
   const activeTitle = pageTitles[activePage];
+  const signOut = () => {
+    void api.logout().catch(() => undefined).finally(() => {
+      setCurrentUser(null);
+      setAuthMode("login");
+      setActivePage("overview");
+      setRecent([]);
+      setRiskInitialFeatures(null);
+    });
+  };
 
-  if (!hasDemoAccess) {
-    return <AuthPage mode={authMode} onModeChange={setAuthMode} onEnterDemo={() => setHasDemoAccess(true)} />;
+  if (authChecking) {
+    return <div className="auth-loading"><span className="button-spinner" /> Checking your local session…</div>;
+  }
+
+  if (!currentUser) {
+    return <AuthPage mode={authMode} onModeChange={setAuthMode} onAuthenticated={setCurrentUser} />;
   }
 
   return (
@@ -215,8 +243,8 @@ function App() {
               <span>{online ? "MODELS READY" : health ? "MODELS LOADED" : "API OFFLINE"}</span>
             </div>
             <button className="topbar-refresh" onClick={refresh} aria-label="Refresh model and report status"><Activity size={16} /><span>Refresh</span></button>
-            <div className="topbar-avatar" aria-label="PulmoAI research workspace">P</div>
-            <button className="topbar-exit-demo" onClick={() => { setHasDemoAccess(false); setAuthMode("login"); }} type="button"><LogOut size={14} /><span>Exit demo</span></button>
+            <div className="topbar-avatar" aria-label={`Signed in as ${currentUser.full_name}`}>{currentUser.full_name.slice(0, 1).toUpperCase()}</div>
+            <button className="topbar-exit-demo" onClick={signOut} type="button"><LogOut size={14} /><span>Sign out</span></button>
           </div>
         </header>
 
@@ -233,6 +261,7 @@ function App() {
           )}
           {activePage === "risk" && <RiskCalculatorPage initialFeatures={riskInitialFeatures} />}
           {activePage === "images" && <ImageScreeningPage />}
+          {activePage === "uploads" && <MyUploadsPage user={currentUser} />}
           {activePage === "performance" && <PerformancePage data={dashboard} error={dashboardError} />}
           {activePage === "genes" && <GeneInsightsPage />}
           {activePage === "methodology" && <MethodologyPage data={dashboard} />}

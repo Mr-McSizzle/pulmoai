@@ -1,5 +1,8 @@
 import type {
   DashboardData,
+  AuthResponse,
+  StoredRecord,
+  StoredRecordDetail,
   GeneInsights,
   HealthResponse,
   FutureRiskResponse,
@@ -27,6 +30,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     }
     throw new Error(message);
   }
+  if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
 
@@ -37,6 +41,21 @@ function upload(path: string, file: File): Promise<ValidationResponse | Predicti
 }
 
 export const api = {
+  authMe: () => request<AuthResponse>("/api/auth/me"),
+  register: (fullName: string, email: string, password: string) => request<AuthResponse>("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ full_name: fullName, email, password }),
+  }),
+  login: (email: string, password: string) => request<AuthResponse>("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  }),
+  logout: () => request<void>("/api/auth/logout", { method: "POST" }),
+  uploads: () => request<StoredRecord[]>("/api/uploads"),
+  uploadDetail: (id: string) => request<StoredRecordDetail>(`/api/uploads/${encodeURIComponent(id)}`),
+  deleteUpload: (id: string) => request<void>(`/api/uploads/${encodeURIComponent(id)}`, { method: "DELETE" }),
   health: () => request<HealthResponse>("/api/health"),
   dashboard: () => request<DashboardData>("/api/dashboard"),
   insights: () => request<GeneInsights>("/api/insights"),

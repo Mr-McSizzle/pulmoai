@@ -35,6 +35,8 @@ class PredictionResponse(BaseModel):
     interpretation: str
     decision_rule_note: str | None = None
     input_contract_notice: str | None = None
+    upload_id: str | None = None
+    uploaded_at: str | None = None
 
 
 class DashboardResponse(BaseModel):
@@ -88,6 +90,8 @@ class ReportExtractResponse(BaseModel):
     raw_text: str
     unmatched_lines: list[str] = Field(default_factory=list)
     count: int
+    upload_id: str | None = None
+    uploaded_at: str | None = None
 
 
 class RiskPredictionRequest(BaseModel):
@@ -154,6 +158,46 @@ class ImagePredictionResponse(BaseModel):
     staging_notice: str | None = None
     clinical_notice: str = "Benchmark model, not for clinical use."
     disclaimer: str
+    upload_id: str | None = None
+    uploaded_at: str | None = None
+
+
+class RegisterRequest(BaseModel):
+    full_name: str = Field(min_length=1, max_length=120)
+    email: str = Field(min_length=3, max_length=254)
+    password: str = Field(min_length=8, max_length=128)
+
+
+class LoginRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=254)
+    password: str = Field(min_length=1, max_length=128)
+
+
+class UserResponse(BaseModel):
+    id: str
+    full_name: str
+    email: str
+    created_at: str
+
+
+class AuthResponse(BaseModel):
+    authenticated: bool
+    user: UserResponse | None = None
+
+
+class StoredRecordResponse(BaseModel):
+    id: str
+    kind: str
+    filename: str
+    content_type: str
+    size_bytes: int
+    summary: str
+    uploaded_at: str
+    has_file: bool
+
+
+class StoredRecordDetailResponse(StoredRecordResponse):
+    result: dict[str, Any]
 
 
 class IntegrityResponse(BaseModel):

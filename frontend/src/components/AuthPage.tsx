@@ -4,12 +4,12 @@ import {
   ArrowRight,
   Check,
   CircleAlert,
+  Database,
   Dna,
   Eye,
   EyeOff,
   FileText,
   HeartPulse,
-  Layers3,
   LockKeyhole,
   Mail,
   Microscope,
@@ -17,13 +17,15 @@ import {
   Sparkles,
   UserRound,
 } from "lucide-react";
+import { api } from "../api";
+import type { AuthUser } from "../types";
 
 export type AuthMode = "login" | "create-account";
 
 interface AuthPageProps {
   mode: AuthMode;
   onModeChange: (mode: AuthMode) => void;
-  onEnterDemo: () => void;
+  onAuthenticated: (user: AuthUser) => void;
 }
 
 const modules = [
@@ -33,13 +35,14 @@ const modules = [
   { icon: Microscope, label: "Image screening", detail: "Model-assisted review" },
 ];
 
-export function AuthPage({ mode, onModeChange, onEnterDemo }: AuthPageProps) {
+export function AuthPage({ mode, onModeChange, onAuthenticated }: AuthPageProps) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState<{ kind: "info" | "error"; message: string } | null>(null);
   const creatingAccount = mode === "create-account";
 
@@ -50,25 +53,32 @@ export function AuthPage({ mode, onModeChange, onEnterDemo }: AuthPageProps) {
     onModeChange(nextMode);
   };
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (creatingAccount && password !== confirmPassword) {
       setNotice({ kind: "error", message: "Those passwords do not match. Please check them and try again." });
       return;
     }
 
-    setPassword("");
-    setConfirmPassword("");
-    setNotice({
-      kind: "info",
-      message: creatingAccount
-        ? "Account creation is not connected yet. No account details were sent or saved."
-        : "Sign-in is not connected yet. Your credentials were not sent or saved.",
-    });
+    setSubmitting(true);
+    setNotice(null);
+    try {
+      const session = creatingAccount
+        ? await api.register(fullName, email, password)
+        : await api.login(email, password);
+      if (!session.user) throw new Error("The server did not return an account session.");
+      setPassword("");
+      setConfirmPassword("");
+      onAuthenticated(session.user);
+    } catch (error) {
+      setNotice({ kind: "error", message: (error as Error).message || "Could not sign in. Please try again." });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const showResetNotice = () => {
-    setNotice({ kind: "info", message: "Password recovery is not configured because account authentication is not connected yet." });
+    setNotice({ kind: "info", message: "Password reset is not available yet because this local prototype has no email recovery service." });
   };
 
   return (
@@ -117,13 +127,13 @@ export function AuthPage({ mode, onModeChange, onEnterDemo }: AuthPageProps) {
             <h2 id="auth-form-heading">{creatingAccount ? "Create your account" : "Welcome back"}</h2>
             <p className="auth-form-intro">{creatingAccount ? "Set up your profile to get started with PulmoAI." : "Sign in to continue to your PulmoAI workspace."}</p>
 
-            <form className="auth-form" onSubmit={submit}>
+            <form className="auth-form" onSubmit={submit} aria-busy={submitting}>
               {creatingAccount && (
                 <label className="auth-field">
                   <span>Full name</span>
                   <span className="auth-input-wrap">
                     <UserRound size={17} aria-hidden="true" />
-                    <input autoComplete="name" name="name" onChange={(event) => setFullName(event.target.value)} placeholder="Your name" required value={fullName} />
+                  <input autoComplete="name" maxLength={120} name="name" onChange={(event) => setFullName(event.target.value)} placeholder="Your name" required value={fullName} />
                   </span>
                 </label>
               )}
@@ -132,7 +142,7 @@ export function AuthPage({ mode, onModeChange, onEnterDemo }: AuthPageProps) {
                 <span>Email address</span>
                 <span className="auth-input-wrap">
                   <Mail size={17} aria-hidden="true" />
-                  <input autoComplete="email" name="email" onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required type="email" value={email} />
+                  <input autoComplete="email" maxLength={254} name="email" onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required type="email" value={email} />
                 </span>
               </label>
 
@@ -140,7 +150,7 @@ export function AuthPage({ mode, onModeChange, onEnterDemo }: AuthPageProps) {
                 <span>Password</span>
                 <span className="auth-input-wrap">
                   <LockKeyhole size={17} aria-hidden="true" />
-                  <input autoComplete={creatingAccount ? "new-password" : "current-password"} minLength={8} name="password" onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" required type={passwordVisible ? "text" : "password"} value={password} />
+                  <input autoComplete={creatingAccount ? "new-password" : "current-password"} maxLength={128} minLength={8} name="password" onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" required type={passwordVisible ? "text" : "password"} value={password} />
                   <button aria-label={passwordVisible ? "Hide password" : "Show password"} className="auth-password-toggle" onClick={() => setPasswordVisible((visible) => !visible)} type="button">
                     {passwordVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -152,7 +162,7 @@ export function AuthPage({ mode, onModeChange, onEnterDemo }: AuthPageProps) {
                   <span>Confirm password</span>
                   <span className="auth-input-wrap">
                     <LockKeyhole size={17} aria-hidden="true" />
-                    <input autoComplete="new-password" minLength={8} name="confirm-password" onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Enter your password again" required type={confirmationVisible ? "text" : "password"} value={confirmPassword} />
+                    <input autoComplete="new-password" maxLength={128} minLength={8} name="confirm-password" onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Enter your password again" required type={confirmationVisible ? "text" : "password"} value={confirmPassword} />
                     <button aria-label={confirmationVisible ? "Hide confirmation password" : "Show confirmation password"} className="auth-password-toggle" onClick={() => setConfirmationVisible((visible) => !visible)} type="button">
                       {confirmationVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -172,9 +182,9 @@ export function AuthPage({ mode, onModeChange, onEnterDemo }: AuthPageProps) {
                 </div>
               )}
 
-              <button className="auth-submit" type="submit">
-                <span>{creatingAccount ? "Create account" : "Sign in"}</span>
-                <ArrowRight size={17} />
+              <button className="auth-submit" disabled={submitting} type="submit">
+                <span>{submitting ? "Please wait…" : creatingAccount ? "Create account" : "Sign in"}</span>
+                {!submitting && <ArrowRight size={17} />}
               </button>
             </form>
 
@@ -185,13 +195,11 @@ export function AuthPage({ mode, onModeChange, onEnterDemo }: AuthPageProps) {
               </button>
             </p>
 
-            <div className="auth-divider"><span>OR</span></div>
-            <button className="auth-demo-button" onClick={onEnterDemo} type="button">
-              <span className="auth-demo-icon"><Layers3 size={17} /></span>
-              <span><strong>Preview the local workspace</strong><small>Continue without signing in</small></span>
-              <ArrowRight size={16} />
-            </button>
-            <p className="auth-backend-note"><Activity size={13} /> Account authentication is not connected in this prototype.</p>
+            <div className="auth-storage-note">
+              <span className="auth-storage-icon"><Database size={16} /></span>
+              <span><strong>Your records stay on this computer</strong><small>Uploaded files and analysis results are saved to your account.</small></span>
+            </div>
+            <p className="auth-backend-note"><Activity size={13} /> Local prototype storage is not encrypted at rest. Use synthetic or de-identified data.</p>
           </div>
           <footer className="auth-form-footer">PULMOAI · LOCAL RESEARCH ONLY <span>•</span> v2.0</footer>
         </section>

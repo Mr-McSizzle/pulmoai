@@ -13,7 +13,8 @@ Every model, metric, confidence interval, and sample size in this repository is 
 - **US survey data (CDC NHANES):** The chronic disease risk and future mortality risk engines are trained and evaluated strictly on United States national survey data (CDC NHANES 1999-2018 cycles and Linked Mortality Files through 2015). They model US adult epidemiological statistics and are not calibrated for international populations.
 - **Synthetic OCR test benchmark:** The clinical laboratory report parser benchmark is evaluated strictly on synthetic documents (Templates A-H) across clean and degraded conditions. Real-world clinical performance on arbitrary unstandardized hospital layouts remains unknown.
 - **Fully integrated local full-stack application:** A single-port web application (`FastAPI` backend + `React 19` SPA frontend) running 100% locally on consumer hardware (<= 8 GB RAM) with zero cloud dependencies.
-- **Prototype access screen:** The frontend opens to sign-in/create-account screens, but account authentication is not implemented. Those forms do not send or save credentials; use “Preview the local workspace” to enter the local demo.
+- **Local accounts & history:** Users can create local accounts and sign in. Authenticated CSV, lab-report, image, and risk analyses are associated with the account and shown in **My uploads** with timestamps, result details, download, and delete controls.
+- **Local-only storage limitation:** The SQLite database and original uploads live on the computer running FastAPI under `data/user_storage/`. Stored health data is not encrypted at rest; use synthetic or de-identified data, not identifiable patient records.
 
 ### What It Is NOT
 - **NOT a medical device:** PulmoAI has NOT undergone clinical trials, clinical validation, or regulatory clearance/approval under US FDA (21 CFR § 820), Indian CDSCO (Medical Device Rules 2017), or European EMA/EU IVDR (2017/746).
@@ -69,6 +70,8 @@ Open your browser to:
 - **Interactive OpenAPI Documentation:** `http://127.0.0.1:8000/docs`
 - **ReDoc Technical Specification:** `http://127.0.0.1:8000/redoc`
 
+Create a local account in the app to use the workspace. Successful authenticated analyses are stored in `data/user_storage/pulmoai.sqlite3` and `data/user_storage/uploads/`; the **My uploads** page shows local upload times and lets each owner view, download, or delete their own records. The local prototype does not encrypt those files/database at rest and is not suitable for identifiable patient data.
+
 ### 3. Rebuilding Frontend Assets (Optional)
 The static distribution (`frontend/dist`) is pre-compiled and tracked for immediate deployment. To rebuild the frontend after modifications:
 
@@ -83,7 +86,7 @@ cd ..
 
 ## 4. Automated Test Suite
 
-Run all 56 unit, integration, estimand, and offline privacy tests:
+Run all 66 unit, integration, estimand, storage, and offline privacy tests:
 
 ```bash
 PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
@@ -99,6 +102,7 @@ PulmoAI operates with a strict zero-telemetry, zero-cloud execution policy:
 - **Zero Outbound Calls at Inference Time:** Confirmed by code audit and verified by `tests/test_privacy_offline.py` across all 5 clinical modules.
 - **Local Tesseract OCR:** Document text extraction and image processing execute entirely via local CPU/MPS libraries (`pymupdf`, `pytesseract`, `PIL`).
 - **No Remote Telemetry or Tracking:** No user data, uploaded images, single-cell counts, or lab values are transmitted over external networks.
+- **Local retention:** After an authenticated analysis, original files and result/input JSON are saved locally until the user deletes that record. SQLite stores salted PBKDF2 password hashes and hashed session tokens. The local database and uploads are permission-restricted by the operating system but not encrypted at rest.
 
 ---
 

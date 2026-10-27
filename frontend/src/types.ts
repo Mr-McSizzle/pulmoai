@@ -6,6 +6,33 @@ export interface HealthResponse {
   message: string;
 }
 
+export interface AuthUser {
+  id: string;
+  full_name: string;
+  email: string;
+  created_at: string;
+}
+
+export interface AuthResponse {
+  authenticated: boolean;
+  user: AuthUser | null;
+}
+
+export interface StoredRecord {
+  id: string;
+  kind: string;
+  filename: string;
+  content_type: string;
+  size_bytes: number;
+  summary: string;
+  uploaded_at: string;
+  has_file: boolean;
+}
+
+export interface StoredRecordDetail extends StoredRecord {
+  result: Record<string, unknown>;
+}
+
 export interface Metrics {
   accuracy: number;
   balanced_accuracy: number;
@@ -64,6 +91,8 @@ export interface PredictionResponse {
   interpretation: string;
   decision_rule_note?: string | null;
   input_contract_notice?: string | null;
+  upload_id?: string | null;
+  uploaded_at?: string | null;
 }
 
 export interface GeneCoefficient {
@@ -105,6 +134,8 @@ export interface ReportExtractResponse {
   raw_text: string;
   unmatched_lines: string[];
   count: number;
+  upload_id?: string | null;
+  uploaded_at?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -162,6 +193,8 @@ export interface ImagePredictionResponse {
   staging_notice?: string | null;
   clinical_notice?: string;
   disclaimer: string;
+  upload_id?: string | null;
+  uploaded_at?: string | null;
 }
 
 // ---------------------------------------------------------------------------

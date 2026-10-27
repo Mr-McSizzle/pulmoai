@@ -14,6 +14,14 @@ uvicorn backend.main:app --host 127.0.0.1 --port 8000
 1. **Unified Dashboard**: Visit `http://127.0.0.1:8000/` to use the interactive React 19 application (served directly from `frontend/dist`).
 2. **Interactive API Docs**: Visit `http://127.0.0.1:8000/docs` for the OpenAPI / Swagger UI.
 
+## Local Accounts and Saved Records
+
+- `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, and `GET /api/auth/me` manage local accounts and an HttpOnly session cookie.
+- Authenticated successful lung CSV, lab report, medical image, chronic-risk, and future-risk analyses are saved with their original file (when present), inputs/results, and a UTC upload timestamp.
+- `GET /api/uploads` lists only the current account's records. `GET /api/uploads/{id}` returns the saved result, `GET /api/uploads/{id}/download` downloads its original file, and `DELETE /api/uploads/{id}` removes that record and file.
+- By default the SQLite database is `data/user_storage/pulmoai.sqlite3`; original files are under `data/user_storage/uploads/`. Set `PULMOAI_USER_DATA_DIR` before starting the server to choose another local directory.
+- Passwords are stored as salted PBKDF2 hashes; random session tokens are stored hashed. The database and files are not encrypted at rest. This localhost research prototype should use synthetic or de-identified inputs, not identifiable patient records.
+
 ---
 
 ## Multimodal Endpoints

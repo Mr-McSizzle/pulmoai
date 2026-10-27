@@ -11,6 +11,7 @@ backend/.pytest_cache/
 
 # Datasets (large files not needed to run the website)
 data/
+data/user_storage/
 *.h5ad
 *.h5
 *.npz
