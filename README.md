@@ -13,6 +13,7 @@ Every model, metric, confidence interval, and sample size in this repository is 
 - **US survey data (CDC NHANES):** The chronic disease risk and future mortality risk engines are trained and evaluated strictly on United States national survey data (CDC NHANES 1999-2018 cycles and Linked Mortality Files through 2015). They model US adult epidemiological statistics and are not calibrated for international populations.
 - **Synthetic OCR test benchmark:** The clinical laboratory report parser benchmark is evaluated strictly on synthetic documents (Templates A-H) across clean and degraded conditions. Real-world clinical performance on arbitrary unstandardized hospital layouts remains unknown.
 - **Fully integrated local full-stack application:** A single-port web application (`FastAPI` backend + `React 19` SPA frontend) running 100% locally on consumer hardware (<= 8 GB RAM) with zero cloud dependencies.
+- **Prototype access screen:** The frontend opens to sign-in/create-account screens, but account authentication is not implemented. Those forms do not send or save credentials; use “Preview the local workspace” to enter the local demo.
 
 ### What It Is NOT
 - **NOT a medical device:** PulmoAI has NOT undergone clinical trials, clinical validation, or regulatory clearance/approval under US FDA (21 CFR § 820), Indian CDSCO (Medical Device Rules 2017), or European EMA/EU IVDR (2017/746).

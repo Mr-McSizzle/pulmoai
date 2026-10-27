@@ -19,6 +19,7 @@ import {
   Image as ImageIcon,
   Layers3,
   LayoutDashboard,
+  LogOut,
   Menu,
   Microscope,
   Search,
@@ -35,6 +36,7 @@ import { api } from "./api";
 import { LabReportPage } from "./components/LabReportPage";
 import { RiskCalculatorPage } from "./components/RiskCalculatorPage";
 import { ImageScreeningPage } from "./components/ImageScreeningPage";
+import { AuthPage, type AuthMode } from "./components/AuthPage";
 import generatedMetrics from "./generated_metrics.json";
 import type {
   DashboardData,
@@ -104,6 +106,8 @@ function percent(value: number | undefined): string {
 }
 
 function App() {
+  const [hasDemoAccess, setHasDemoAccess] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [activePage, setActivePage] = useState<PageId>("overview");
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
@@ -131,8 +135,9 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!hasDemoAccess) return;
     refresh();
-  }, [refresh]);
+  }, [hasDemoAccess, refresh]);
 
   const navigate = (page: PageId) => {
     setActivePage(page);
@@ -153,6 +158,10 @@ function App() {
 
   const online = health?.status === "ok" && health.model_loaded;
   const activeTitle = pageTitles[activePage];
+
+  if (!hasDemoAccess) {
+    return <AuthPage mode={authMode} onModeChange={setAuthMode} onEnterDemo={() => setHasDemoAccess(true)} />;
+  }
 
   return (
     <div className="workspace-shell">
@@ -207,6 +216,7 @@ function App() {
             </div>
             <button className="topbar-refresh" onClick={refresh} aria-label="Refresh model and report status"><Activity size={16} /><span>Refresh</span></button>
             <div className="topbar-avatar" aria-label="PulmoAI research workspace">P</div>
+            <button className="topbar-exit-demo" onClick={() => { setHasDemoAccess(false); setAuthMode("login"); }} type="button"><LogOut size={14} /><span>Exit demo</span></button>
           </div>
         </header>
 
