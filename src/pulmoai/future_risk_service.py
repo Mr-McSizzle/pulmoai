@@ -291,10 +291,15 @@ class FutureRiskService:
         )
 
         # Published point scores need explicit answers; model-imputed values are not measurements.
+        field_labels = {"age": "age", "sex_male": "reported biological sex", "race_black": "race/ethnicity for PCE",
+                        "current_smoker": "smoking status", "bp_medication": "BP medication", "target_diabetes": "diagnosed diabetes",
+                        "systolic_bp": "systolic blood pressure", "total_cholesterol": "total cholesterol", "hdl_cholesterol": "HDL cholesterol",
+                        "prior_cvd": "prior cardiovascular disease", "waist_cm": "waist circumference", "activity_level": "physical activity",
+                        "family_history_diabetes": "family history of diabetes"}
         pce_required = ("age", "sex_male", "race_black", "current_smoker", "bp_medication",
                         "target_diabetes", "systolic_bp", "total_cholesterol", "hdl_cholesterol", "prior_cvd")
         pce_missing = [name for name in pce_required if user_inputs.get(name) is None]
-        pce_notice = "Provide: " + ", ".join(pce_missing) if pce_missing else None
+        pce_notice = "Provide: " + ", ".join(field_labels[name] for name in pce_missing) if pce_missing else None
         if pce_missing or user_inputs.get("prior_cvd") != 0:
             pce_risk, pce_category = None, None
             if not pce_missing:
@@ -303,7 +308,7 @@ class FutureRiskService:
             pce_notice = "Outside the equation's supported age or measurement range."
         idrs_required = ("age", "sex_male", "waist_cm", "activity_level", "family_history_diabetes")
         idrs_missing = [name for name in idrs_required if user_inputs.get(name) is None]
-        idrs_notice = "Provide: " + ", ".join(idrs_missing) if idrs_missing else None
+        idrs_notice = "Provide: " + ", ".join(field_labels[name] for name in idrs_missing) if idrs_missing else None
         if idrs_missing:
             idrs_res = {"score": None, "tier": "Unavailable", "interpretation": idrs_notice, "components": {}}
 

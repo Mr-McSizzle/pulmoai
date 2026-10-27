@@ -310,9 +310,9 @@ class FutureRiskEstimandTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         scores = response.json()["published_scores"]
         self.assertIsNone(scores["pooled_cohort_equations_pce"]["estimated_10yr_ascvd_risk_pct"])
-        self.assertIn("current_smoker", scores["pooled_cohort_equations_pce"]["availability_notice"])
+        self.assertIn("smoking status", scores["pooled_cohort_equations_pce"]["availability_notice"])
         self.assertIsNone(scores["indian_diabetes_risk_score_idrs"]["score"])
-        self.assertIn("waist_cm", scores["indian_diabetes_risk_score_idrs"]["availability_notice"])
+        self.assertIn("waist circumference", scores["indian_diabetes_risk_score_idrs"]["availability_notice"])
 
     def test_pce_unit_test_worked_examples(self) -> None:
         """Verify PCE calculation matches 2013 ACC/AHA published worked examples."""
