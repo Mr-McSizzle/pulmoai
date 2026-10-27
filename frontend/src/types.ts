@@ -37,7 +37,7 @@ export interface Metrics {
   accuracy: number;
   balanced_accuracy: number;
   macro_f1: number;
-  weighted_f1: number;
+  weighted_f1?: number;
 }
 
 export interface ClassMetrics {
@@ -88,6 +88,7 @@ export interface PredictionResponse {
   input_gene_count: number;
   probabilities_available: boolean;
   class_probabilities?: Record<string, number> | null;
+  sex_context?: { reported_sex: ReportedSex; model_scope: string; sex_specific_available: boolean; notice: string };
   interpretation: string;
   decision_rule_note?: string | null;
   input_contract_notice?: string | null;
@@ -129,6 +130,7 @@ export interface LabItemSchema {
 }
 
 export interface ReportExtractResponse {
+  data_origin: DataOrigin;
   extraction_method: string;
   extracted_tests: LabItemSchema[];
   raw_text: string;
@@ -170,10 +172,11 @@ export interface RiskPredictionResponse {
 // ---------------------------------------------------------------------------
 
 export interface ImagePredictionResponse {
+  data_origin: DataOrigin;
   image_type: string;
   modality_name: string;
   recognized: boolean;
-  status: "success" | "low_confidence" | "error";
+  status: "not_screened" | "success" | "low_confidence" | "error" | "rejected_modality_mismatch" | "rejected_non_medical_input" | "rejected_pediatric_confirmation_required";
   predicted_class?: string | null;
   confidence?: number;
   max_confidence?: number;
@@ -251,3 +254,65 @@ export interface FutureRiskResponse {
   disclaimer: string;
 }
 
+
+export type ReportedSex = "female" | "male" | "intersex" | "unknown";
+export interface Patient {
+  id: string;
+  alias: string;
+  reported_sex: ReportedSex;
+  created_at: string;
+  record_count?: number;
+  latest_observation?: string | null;
+}
+export interface TimelineRecord extends StoredRecordDetail {
+  patient_id: string;
+  observed_on: string;
+  series_label: string;
+  review_status: "unreviewed" | "reviewed";
+}
+export interface TrendPoint {
+  date: string;
+  value: number;
+  record_id: string;
+  filename: string;
+  reference_range?: string;
+  corrected?: boolean;
+}
+export interface TrendSeries {
+  id: string;
+  name: string;
+  unit: string;
+  direction: string;
+  reason: string;
+  change: number | null;
+  points: TrendPoint[];
+  modality?: string;
+  series_label?: string;
+  artifact_id?: string;
+}
+export interface PatientTimeline {
+  patient: Patient;
+  records: TimelineRecord[];
+  lab_series: TrendSeries[];
+  image_series: TrendSeries[];
+  excluded_unreviewed: number;
+  comparison_version: string;
+  notice: string;
+}
+export interface BatchOutcome {
+  filename: string;
+  status: "saved" | "duplicate" | "error";
+  record_id?: string;
+  summary?: string;
+  message?: string;
+}
+export interface AuditEvent { action: string; resource_id: string; occurred_at: string }
+
+export type DataOrigin = "user_supplied_unverified" | "generated_example";
+export interface EvidenceMetric { label: string; value: number; lower_is_better: boolean }
+export interface ModuleEvidence {
+  id: string; name: string; source_filename: string; source_url: string; source_sha256?: string;
+  artifact_integrity: boolean | null; evidence_status: "reported" | "unavailable";
+  evaluation_scope: string; cohort: string; protocol: string; metrics: EvidenceMetric[];
+}
+export interface BenchmarkEvidence { modules: ModuleEvidence[]; notice: string }

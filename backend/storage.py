@@ -79,6 +79,8 @@ class UserDataStore:
                     ON uploads(user_id, uploaded_at DESC);
                 """
             )
+            from backend.workspace_storage import migrate_workspace
+            migrate_workspace(connection)
         if self.database_path.exists():
             os.chmod(self.database_path, 0o600)
 
@@ -209,6 +211,8 @@ class UserDataStore:
                         uploaded_at,
                     ),
                 )
+                connection.execute("INSERT INTO audit_events(user_id, action, resource_id, occurred_at) VALUES (?, ?, ?, ?)",
+                                   (user_id, "record.created", record_id, uploaded_at))
         except Exception:
             if target_path is not None:
                 target_path.unlink(missing_ok=True)
@@ -264,7 +268,7 @@ class UserDataStore:
         }
 
     def delete_record(self, user_id: str, record_id: str) -> bool:
-        with self._connect() as connection:
+        with self._connection() as connection:
             row = connection.execute(
                 "SELECT stored_filename FROM uploads WHERE id = ? AND user_id = ?",
                 (record_id, user_id),
@@ -275,6 +279,8 @@ class UserDataStore:
                 target = self.files_dir / user_id / row["stored_filename"]
                 target.unlink(missing_ok=True)
             connection.execute("DELETE FROM uploads WHERE id = ? AND user_id = ?", (record_id, user_id))
+            connection.execute("INSERT INTO audit_events(user_id, action, resource_id, occurred_at) VALUES (?, ?, ?, ?)",
+                               (user_id, "record.deleted", record_id, self._now()))
         return True
 
     def _connect(self) -> sqlite3.Connection:

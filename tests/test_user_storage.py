@@ -3,6 +3,7 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -122,11 +123,12 @@ class UserStorageApiTests(unittest.TestCase):
 
                 app.state.image_service = FakeImageService()
                 try:
-                    image_response = client.post(
-                        "/api/image/predict",
-                        files={"file": ("smear.png", b"test image bytes", "image/png")},
-                        data={"image_type": "blood_smear"},
-                    )
+                    with patch("backend.main.require_image_service", return_value=FakeImageService()):
+                        image_response = client.post(
+                            "/api/image/predict",
+                            files={"file": ("smear.png", (PROJECT_ROOT / "samples/images/medmnist_chest_xray_normal.png").read_bytes(), "image/png")},
+                            data={"image_type": "blood_smear"},
+                        )
                 finally:
                     if original_image_service is None:
                         del app.state.image_service

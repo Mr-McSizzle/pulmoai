@@ -37,6 +37,9 @@ import { LabReportPage } from "./components/LabReportPage";
 import { RiskCalculatorPage } from "./components/RiskCalculatorPage";
 import { ImageScreeningPage } from "./components/ImageScreeningPage";
 import { AuthPage, type AuthMode } from "./components/AuthPage";
+import { EvidencePanel } from "./components/EvidencePanel";
+import { PatientTimelinePage } from "./components/PatientTimelinePage";
+import type { ReportedSex } from "./types";
 import { MyUploadsPage } from "./components/MyUploadsPage";
 import generatedMetrics from "./generated_metrics.json";
 import type {
@@ -48,7 +51,7 @@ import type {
   ValidationResponse,
 } from "./types";
 
-type PageId = "overview" | "analyze" | "reports" | "risk" | "images" | "uploads" | "performance" | "genes" | "methodology" | "about";
+type PageId = "timeline" | "overview" | "analyze" | "reports" | "risk" | "images" | "uploads" | "performance" | "genes" | "methodology" | "about";
 
 interface RecentAnalysis {
   filename: string;
@@ -66,6 +69,7 @@ interface NavigationItem {
 
 const navigation: NavigationItem[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard, section: "workspace" },
+  { id: "timeline", label: "Patient timelines", icon: Activity, section: "workspace" },
   { id: "analyze", label: "Single-cell RNA", icon: Sparkles, section: "workspace" },
   { id: "reports", label: "Lab report OCR", icon: FileText, section: "workspace" },
   { id: "risk", label: "Chronic disease risk", icon: Heart, section: "workspace" },
@@ -78,6 +82,7 @@ const navigation: NavigationItem[] = [
 ];
 
 const pageTitles: Record<PageId, string> = {
+  timeline: "Patient Journeys & Evolution",
   overview: "Multimodal Platform Overview",
   analyze: "Analyze Single-Cell RNA Sample",
   reports: "Clinical Lab Report Reader (OCR)",
@@ -240,19 +245,20 @@ function App() {
           <div className="topbar-right">
             <div className={`api-state ${online ? "api-online" : "api-offline"}`} title={healthError ?? health?.message ?? "Checking model status"}>
               <span className="api-state-dot" />
-              <span>{online ? "MODELS READY" : health ? "MODELS LOADED" : "API OFFLINE"}</span>
+              <span>{online ? "LUNG MODEL READY" : health ? "MODEL UNAVAILABLE" : "API OFFLINE"}</span>
             </div>
             <button className="topbar-refresh" onClick={refresh} aria-label="Refresh model and report status"><Activity size={16} /><span>Refresh</span></button>
             <div className="topbar-avatar" aria-label={`Signed in as ${currentUser.full_name}`}>{currentUser.full_name.slice(0, 1).toUpperCase()}</div>
-            <button className="topbar-exit-demo" onClick={signOut} type="button"><LogOut size={14} /><span>Sign out</span></button>
+            <button className="topbar-sign-out" onClick={signOut} type="button"><LogOut size={14} /><span>Sign out</span></button>
           </div>
         </header>
 
         <div className="page-content">
           {activePage === "overview" && <OverviewPage data={dashboard} error={dashboardError} recent={recent} onNavigate={navigate} />}
+          {activePage === "timeline" && <PatientTimelinePage />}
           {activePage === "analyze" && <AnalyzePage onPrediction={addRecentAnalysis} />}
           {activePage === "reports" && (
-            <LabReportPage
+            <LabReportPage onOpenTimeline={() => navigate("timeline")}
               onTransferToRisk={(features) => {
                 setRiskInitialFeatures(features);
                 setActivePage("risk");
@@ -260,7 +266,7 @@ function App() {
             />
           )}
           {activePage === "risk" && <RiskCalculatorPage initialFeatures={riskInitialFeatures} />}
-          {activePage === "images" && <ImageScreeningPage />}
+          {activePage === "images" && <ImageScreeningPage onOpenTimeline={() => navigate("timeline")} />}
           {activePage === "uploads" && <MyUploadsPage user={currentUser} />}
           {activePage === "performance" && <PerformancePage data={dashboard} error={dashboardError} />}
           {activePage === "genes" && <GeneInsightsPage />}
@@ -272,7 +278,7 @@ function App() {
           <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-2 text-xs text-slate-600">
             <span className="flex items-center gap-1.5 font-medium text-teal-800 bg-teal-50 px-2.5 py-1 rounded border border-teal-200">
               <ShieldCheck size={14} className="text-teal-600 shrink-0" />
-              <span>PulmoAI Multimodal Clinical Decision Support Platform · Active Pipeline</span>
+              <span>PulmoAI · Local research workspace · Not for clinical diagnosis</span>
             </span>
             <span className="text-[11px] text-slate-400">
               LOCAL WORKSPACE · ZERO OUTBOUND CALLS AT INFERENCE · FASTAPI BACKEND
@@ -324,21 +330,23 @@ function OverviewPage({ data, error, recent, onNavigate }: {
       <section className="hero-panel spatial-panel">
         <div className="hero-copy">
           <div className="hero-kicker"><span className="hero-kicker-dot" /> MULTIMODAL HEALTH PLATFORM <span className="hero-kicker-line" /></div>
-          <h1>Precision diagnostics<br /><em>across scales.</em></h1>
+          <h1>Connected insights.<br /><em>Across every visit.</em></h1>
           <p>
-            An integrated multi-module clinical AI suite: from single-cell transcriptomic disease atlases
-            to laboratory report OCR, NHANES epidemiological risk engines, and MedMNIST biomedical vision screening.
+            A local research workspace for patient timelines, single-cell transcriptomic profiles,
+            laboratory reports, NHANES risk estimates and biomedical image screening.
           </p>
           <div className="hero-actions">
-            <button className="button-primary" onClick={() => onNavigate("risk")}>Open Chronic Risk Engine <ArrowRight size={16} /></button>
+            <button className="button-primary" onClick={() => onNavigate("timeline")}>Open Patient Timelines <ArrowRight size={16} /></button>
             <button className="button-quiet" onClick={() => onNavigate("reports")}>Lab Report Reader <ChevronRight size={16} /></button>
             <button className="button-quiet" onClick={() => onNavigate("images")}>Medical Images <ChevronRight size={16} /></button>
           </div>
-          <div className="hero-note"><ShieldCheck size={15} /><span>4 Integrated Clinical AI Engines · Pure Model Inference</span></div>
+          <div className="hero-note"><ShieldCheck size={15} /><span>Local data · Reviewed sources · Research use only</span></div>
         </div>
         <MolecularScene />
         <div className="hero-coordinate">PULMO / PLATFORM <span>v2.0</span></div>
       </section>
+
+      <EvidencePanel />
 
       {/* Multimodal Hub Cards */}
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -351,7 +359,7 @@ function OverviewPage({ data, error, recent, onNavigate }: {
             </div>
             <h3 className="text-sm font-bold text-slate-900">Single-Cell Lung Atlas</h3>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-              17 studies & 407 donors under honest Leave-One-Study-Out CV (COPD, PF, COVID-19, Donor).
+              {data ? `${data.studies} studies and ${data.profiles} sample/library profiles` : "Study-held-out research evaluation"} across COPD, PF, COVID-19 and Donor. Profiles are not verified independent patients.
             </p>
           </div>
           <button className="button-secondary text-xs mt-4 w-full py-1.5 justify-center" onClick={() => onNavigate("analyze")}>
@@ -422,7 +430,7 @@ function OverviewPage({ data, error, recent, onNavigate }: {
 
         <div className="overview-grid">
           <section className="content-panel performance-glance">
-            <div className="panel-heading"><div><p className="eyebrow">CROSS-STUDY VALIDATION</p><h2>Model at a glance</h2></div><div className="verified-chip"><span /> {data.verification_status === "independently_verified" ? "REPRODUCED" : "NOT VERIFIED"}</div></div>
+            <div className="panel-heading"><div><p className="eyebrow">CROSS-STUDY VALIDATION</p><h2>Model at a glance</h2></div><div className="verified-chip"><span /> {data.verification_status === "reported_research_audit" ? "HISTORICAL AUDIT" : data.verification_status === "independently_verified" ? "REPRODUCED" : "NOT VERIFIED"}</div></div>
             {data.metrics ? <div className="headline-metrics">
               <div className="headline-metric"><span>Accuracy</span><strong>{percent(data.metrics.accuracy)}</strong><small>Overall correct profiles</small><div className="metric-line"><i style={{ width: `${data.metrics.accuracy * 100}%` }} /></div></div>
               <div className="headline-metric"><span>Macro-F1</span><strong>{percent(data.metrics.macro_f1)}</strong><small>Balances performance by class</small><div className="metric-line metric-line-violet"><i style={{ width: `${data.metrics.macro_f1 * 100}%` }} /></div></div>
@@ -508,6 +516,7 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
   const [dragging, setDragging] = useState(false);
   const [validating, setValidating] = useState(false);
   const [predicting, setPredicting] = useState(false);
+  const [reportedSex, setReportedSex] = useState<ReportedSex>("unknown");
   const [validation, setValidation] = useState<ValidationResponse | null>(null);
   const [result, setResult] = useState<PredictionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -545,7 +554,7 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
     setPredicting(true);
     setError(null);
     try {
-      const prediction = await api.predict(file);
+      const prediction = await api.predict(file, reportedSex);
       setResult(prediction);
       onPrediction(file.name, prediction);
     } catch (caught) {
@@ -586,7 +595,7 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-200">
-            <div className="text-[11px] font-semibold text-slate-700 mb-2">Or test with verified clinical sample profiles:</div>
+            <div className="text-[11px] font-semibold text-slate-700 mb-2">Or test with research example profiles:</div>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -631,6 +640,7 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
             </div>
             <div className="format-warning"><CircleAlert size={15} /><span>Must include the exact 30,566 model genes with raw, integer-like counts. Missing genes are not filled in.</span></div>
           </div>
+          <div className="sex-model-context"><label>Reported biological sex<select className="sex-context-select" value={reportedSex} disabled={predicting} onChange={e => { setReportedSex(e.target.value as ReportedSex); setResult(null); }}><option value="unknown">Unknown / not provided</option><option value="female">Female</option><option value="male">Male</option><option value="intersex">Intersex</option></select></label><p>The released model is pooled: verified sex annotations are absent from the atlas. Sex-specific research models can be selected only after local training, held-out-study evaluation and checksum verification. Gender identity is not a model input.</p></div>
           <div className="upload-actions">
             <button className="button-secondary" onClick={validate} disabled={!file || validating || predicting}>{validating ? <><span className="button-spinner" /> Validating…</> : <><FileCheck2 size={16} /> Validate file</>}</button>
             <button className="button-primary" onClick={predict} disabled={!validation?.valid || predicting || validating}>{predicting ? <><span className="button-spinner" /> Analyzing…</> : <>Run classification <ArrowRight size={16} /></>}</button>
@@ -646,7 +656,7 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
             <h2>Linear SVM (Dual-Rule Decision)</h2>
             <p>Discrete label uses uncalibrated balanced decision rule (argmax); calibrated probabilities shown as empirical risk estimates.</p>
             <div className="model-meta"><span>FEATURES</span><strong>30,566 genes</strong></div>
-            <div className="model-meta"><span>PROBABILITIES</span><strong>Calibrated (Platt scaling estimates)</strong></div>
+            <div className="model-meta"><span>PROBABILITIES</span><strong>Model estimates, not individual accuracy</strong></div>
             <div className="mt-3 p-2.5 bg-teal-50 rounded border border-teal-200 text-[11px] text-teal-900 leading-snug">
               <strong>Atlas Profile Specifications:</strong> Evaluated across whole-cell scRNA-seq atlas cohorts covering Donor, COPD, Pulmonary Fibrosis, and COVID-19 expression signatures.
             </div>
@@ -654,11 +664,13 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
 
           {result && (
             <section className="content-panel prediction-panel">
-              <p className="eyebrow">DIAGNOSTIC CLASSIFICATION</p>
+              <p className="eyebrow">RESEARCH CLASSIFICATION</p>
               <h2 className="text-xl font-bold text-slate-900">{displayDisease(result.predicted_class)}</h2>
               <div className="text-xs font-semibold text-teal-800 bg-teal-50 px-2.5 py-1.5 rounded border border-teal-200 my-2">
                 Pure Model Classification: {result.predicted_class}
               </div>
+              {result.sex_context && <div className="sex-model-context"><strong>{result.sex_context.model_scope === "pooled" ? "Pooled model · sex-specific model unavailable" : "Sex-specific research model"}</strong><p>Reported sex: {result.sex_context.reported_sex}. {result.sex_context.notice}</p></div>}
+              <p className="timeline-muted">{result.interpretation}</p>
               {result.class_probabilities && (
                 <div className="space-y-1.5 pt-2 border-t border-slate-200">
                   <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Calibrated Probability Distribution</div>
@@ -681,7 +693,9 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
 function PerformancePage({ data, error }: { data: DashboardData | null; error: string | null }) {
   return (
     <>
-      <PageHeading kicker="EVALUATION / MULTI-MODULE BENCHMARKS" title="Rigorous Out-of-Sample Performance" subtitle="Evaluation results computed strictly on held-out test splits and unseen outer hospital cohorts." />
+      <PageHeading kicker="MODEL EVIDENCE" title="Performance, with context." subtitle="Source-linked historical audits, evaluated populations and current checkpoint integrity." />
+      <EvidencePanel />
+      <p className="timeline-notice">The reference tables below describe earlier evaluation runs and may use different model configurations. Consult the linked reports above for the named procedure.</p>
       
       {/* 1. Single-Cell Lung Metrics */}
       <div className="mb-8 space-y-4">
@@ -694,7 +708,7 @@ function PerformancePage({ data, error }: { data: DashboardData | null; error: s
             <MetricCard icon={Gauge} label="Accuracy" value={percent(data.metrics?.accuracy)} suffix="all profiles" accent="cyan" />
             <MetricCard icon={Activity} label="Balanced accuracy" value={percent(data.metrics?.balanced_accuracy)} suffix="class-balanced recall" accent="violet" />
             <MetricCard icon={Layers3} label="Macro-F1" value={percent(data.metrics?.macro_f1)} suffix="equal class weighting" accent="blue" />
-            <MetricCard icon={BarChart3} label="Weighted F1" value={percent(data.metrics?.weighted_f1)} suffix="support-weighted" accent="mint" />
+            <MetricCard icon={BarChart3} label="Metric source" value={data.verification_status === "reported_research_audit" ? "Audit" : "Reference"} suffix="historical evaluation report" accent="mint" />
           </div>
           <div className="performance-grid">
             <section className="content-panel confusion-panel">
@@ -884,6 +898,7 @@ function PerformancePage({ data, error }: { data: DashboardData | null; error: s
 }
 
 function ConfusionMatrix({ data }: { data: DashboardData }) {
+  if (!data.confusion_matrix?.length) return <p className="timeline-muted">A matching confusion matrix is not available for this reported procedure.</p>;
   const matrix = data.confusion_matrix ?? [];
   const maximum = Math.max(...matrix.flat(), 1);
   return <div className="matrix-scroll"><div className="matrix-grid" style={{ gridTemplateColumns: `82px repeat(${data.classes.length}, minmax(54px, 1fr))` }}>

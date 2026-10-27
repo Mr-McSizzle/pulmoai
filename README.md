@@ -6,6 +6,14 @@ Every model, metric, confidence interval, and sample size in this repository is 
 
 ---
 
+## Longitudinal workspace upgrade
+
+Patient timelines now connect dated batches of lab reports and medical images, source review, corrected values, compatible comparisons, activity logging and JSON export. The lung workflow records reported biological sex, discloses pooled-model fallback, and supports optional separately trained/evaluated sex-specific research artifacts. No sex-specific accuracy is claimed for the unannotated released atlas.
+
+See [upgrade review and runbook](docs/UPGRADE_REVIEW.md) and [local validation](VALIDATION.md) for changes, installation, model requirements and limits. Install runtime dependencies with `pip install -r requirements.txt -c requirements-runtime.txt`. Vision checkpoints are absent from the upstream checkout; their unavailability is reported explicitly. Original-image archives and side-by-side review work without them using the no-screening workflow. The overview now links measured results to named audit sources; see [presentation and evidence update](docs/PRESENTATION_UPDATE.md).
+
+---
+
 ## 1. What This System Is and Is Not
 
 ### What It Is
@@ -30,7 +38,7 @@ All metrics below are dynamically verified from versioned JSON audit reports in 
 
 | Module / Engine | Modality / Data Source | Evaluated Cohort | Audited Performance | Baseline / Safeguards |
 | :--- | :--- | :--- | :--- | :--- |
-| **Module 1: Lung Atlas Classifier** | Single-Cell RNA-seq (30,566 genes, pseudobulk counts) | 16 GEO studies, 372 donor profiles (1.47M cells) | **64.78% Acc / 53.49% Bal-Acc / 0.5218 Macro-F1** (Dual-Rule); COVID recall: **21.05% (4/19)** | Leave-One-Study-Out CV across 16 hospital batches. Platt calibration provided as estimate. Majority class baseline: PF (48.12%). Melms post-mortem autopsy holdout (GSE171524): 25/26 predicted PF. |
+| **Module 1: Lung Atlas Classifier** | Single-Cell RNA-seq (30,566 genes, pseudobulk counts) | 16 GEO studies, 372 donor profiles (1.47M cells) | **64.78% Acc / 57.92% Bal-Acc / 0.5349 Macro-F1** (Dual-Rule historical audit); COVID recall: **21.05% (4/19)** | Leave-One-Study-Out CV across 16 hospital batches. Platt calibration provided as estimate. Majority class baseline: PF (48.12%). Melms post-mortem autopsy holdout (GSE171524): 25/26 predicted PF. |
 | **Module 2: Chronic Disease Risk Engine** | CDC NHANES Vitals & Labs (43 features) | 17,961 US adults (Train: Cycles H & I, n=12,105; Test: Cycle J, n=5,856) | **Diabetes: 0.8525 AUROC / 86.6% Acc**; HTN: 0.8384; High Chol: 0.8413; CVD: 0.7904; Stroke: 0.7733; COPD: 0.7479 | Evaluated on forward temporal Cycle J (2017-2018). Estimand: current doctor-diagnosed prevalence, NOT future incidence. Glycemic markers excluded to prevent circularity. OOF-derived Low/Mod/High risk tiers (RR up to 9.25x). |
 | **Module 3: Clinical Lab Report Reader** | Clinical PDF & Scanned Image Reports | Honest holdout: 8 hospital/clinic layouts (Templates A-H, n=392/cond) | **Clean PDF: 94.64% accurate, 0.00% silent errors**; Rotated scans: adaptive orientation recovery; **Blur: 100% refused by Quality Gate (0.00% silent error)** | Native PyMuPDF text layer prioritized. Pre-OCR blur/skew quality gate. Settled inclusive range limits [ref_min, ref_max]. 100% of extracted values blocked from automatic risk engine transfer without human confirmation. Synthetic benchmark only; real-world accuracy unknown. |
 | **Module 4: Medical Image Screening & Gate** | MedMNIST v2 (64x64) + Negative Families | 5 medical modalities + 6 negative non-target families | **Modality Gate v3: 99.50% Target TAR** (X-ray 99.75%, Derma 99.00%, Fundus 99.25%, Smear 100.00%); **LOFO Macro FAR: 19.03%** | ResNet-18 modality classifier gate rejects cross-modality mismatches and non-medical photos. Pixel std pre-check (std < 0.040) eliminates blank/noise (FAR: 0.00%). Worst LOFO family: document layouts (100.0% FAR). Warning banner permanently active. Pneumonia restricted to pediatric ages 1-5; retina staging disabled. |
@@ -86,13 +94,13 @@ cd ..
 
 ## 4. Automated Test Suite
 
-Run all 66 unit, integration, estimand, storage, and offline privacy tests:
+Run the unit, integration, timeline, storage and offline privacy tests:
 
 ```bash
 PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
 ```
 
-All 56 tests execute in under 12 seconds with 100% pass rate.
+See `VALIDATION.md` for the measured results and optional-dependency skips for this upgrade.
 
 ---
 

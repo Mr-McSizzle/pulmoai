@@ -16,10 +16,11 @@ import { api } from "../api";
 import type { ReportExtractResponse, LabItemSchema } from "../types";
 
 interface LabReportPageProps {
+  onOpenTimeline: () => void;
   onTransferToRisk: (features: Record<string, number>) => void;
 }
 
-export function LabReportPage({ onTransferToRisk }: LabReportPageProps) {
+export function LabReportPage({ onTransferToRisk, onOpenTimeline }: LabReportPageProps) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +65,7 @@ export function LabReportPage({ onTransferToRisk }: LabReportPageProps) {
       setEditedValues({});
       const autoConfirmed: Record<string, boolean> = {};
       res.extracted_tests.forEach((t) => {
-        autoConfirmed[t.canonical_name] = true;
+        autoConfirmed[t.canonical_name] = false;
       });
       setConfirmedTests(autoConfirmed);
     } catch (err: any) {
@@ -79,7 +80,8 @@ export function LabReportPage({ onTransferToRisk }: LabReportPageProps) {
     let name = "";
     if (sampleType === "lipid") {
       name = "sample_lipid_panel.txt";
-      content = `CLINICAL BIOCHEMISTRY REPORT - PATIENT: DOE, JOHN
+      content = `GENERATED EXAMPLE DATA — NOT A PATIENT RECORD
+BIOCHEMISTRY REPORT
 Cholesterol Total: 245 mg/dL (Reference: <200)
 HDL Cholesterol: 38 mg/dL (Reference: >40)
 Triglycerides: 210 mg/dL (Reference: <150)
@@ -91,7 +93,8 @@ Age: 56
 Sex: Male`;
     } else if (sampleType === "metabolic") {
       name = "sample_metabolic_si_units.txt";
-      content = `METABOLIC LAB PROFILE (SI UNITS)
+      content = `GENERATED EXAMPLE DATA — NOT A PATIENT RECORD
+METABOLIC LAB PROFILE (SI UNITS)
 Total Cholesterol: 6.2 mmol/L (Normal: <5.2)
 HDL: 0.95 mmol/L (Normal: >1.0)
 Triglycerides: 2.4 mmol/L (Normal: <1.7)
@@ -102,7 +105,8 @@ Age: 62
 Sex: Female`;
     } else {
       name = "sample_cbc_panel.txt";
-      content = `COMPLETE BLOOD COUNT (CBC)
+      content = `GENERATED EXAMPLE DATA — NOT A PATIENT RECORD
+COMPLETE BLOOD COUNT (CBC)
 White Blood Cells (WBC): 6.8 x10^9/L (4.0-10.0)
 Hemoglobin: 14.2 g/dL (13.0-17.0)
 Platelet Count: 245 x10^9/L (150-450)
@@ -249,6 +253,7 @@ Sex: Male`;
                 >
                   {loading ? (
                     <>
+      <div className="module-timeline-link"><div><strong>Compare multiple reports over time</strong><p>Upload dated batches to a patient workspace, review values, and explore lab evolution.</p></div><button className="button-secondary" onClick={onOpenTimeline}>Open patient timelines <ArrowRight size={15} /></button></div>
                       <RefreshCw size={14} className="animate-spin" /> Extracting...
                     </>
                   ) : (
@@ -277,7 +282,7 @@ Sex: Male`;
             </div>
 
             <div className="mt-4 pt-4 border-t border-slate-200">
-              <div className="text-[11px] font-semibold text-slate-600 mb-2">Or test with clinical samples:</div>
+              <div className="text-[11px] font-semibold text-slate-600 mb-2">Explore example reports · generated data:</div>
               <div className="flex flex-col gap-2">
                 <button
                   className="button-secondary text-left text-xs py-1.5 px-2.5 justify-start"
@@ -401,12 +406,13 @@ Sex: Male`;
                   <div>
                     <div className="text-sm font-bold">scanned input: values may be wrong</div>
                     <div className="text-[11px] font-normal text-amber-800 mt-0.5">
-                      Benchmark evaluation: <em>synthetic set; real-world accuracy unknown</em>. Mandatory side-by-side verification required for each biomarker before chronic risk prediction.
+                      Benchmark evaluation used generated documents; accuracy on real hospital reports is unknown. Mandatory side-by-side verification required for each biomarker before chronic risk prediction.
                     </div>
                   </div>
                 </div>
               )}
 
+              <p className="data-origin-badge">{result.data_origin === "generated_example" ? "Generated example data · not a patient record" : "Uploaded source · authenticity unverified"}</p>
               {/* Summary Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-sm">

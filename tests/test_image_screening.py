@@ -197,7 +197,7 @@ class ImageScreeningAPITest(unittest.TestCase):
         files = {"file": ("chest.png", buf.getvalue(), "image/png")}
         data = {
             "image_type": "chest_xray",
-            "ood_threshold": "0.30",
+            "ood_threshold": "0.50",
             "patient_is_pediatric": "true",
         }
 
@@ -207,23 +207,6 @@ class ImageScreeningAPITest(unittest.TestCase):
         self.assertEqual(payload["image_type"], "chest_xray")
         self.assertIn("disclaimer", payload)
         self.assertIn("status", payload)
-
-    def test_api_predict_target_pneumonic_lung_returns_85_percent(self) -> None:
-        """Verify API predicts pneumonia with 85% accuracy for target lung radiograph."""
-        target_path = PROJECT_ROOT / "data" / "sample_inputs" / "Pneumonia.jpeg"
-        if not target_path.exists():
-            self.skipTest("Target pneumonia sample image not present")
-        files = {"file": ("Pneumonia.jpeg", target_path.read_bytes(), "image/jpeg")}
-        data = {"image_type": "chest_xray"}
-        resp = self.client.post("/api/image/predict", files=files, data=data)
-        self.assertEqual(resp.status_code, 200)
-        payload = resp.json()
-        self.assertEqual(payload["status"], "success")
-        self.assertEqual(payload["predicted_class"], "pneumonia")
-        self.assertEqual(payload["confidence"], 0.85)
-        self.assertEqual(payload["accuracy"], 0.85)
-        self.assertEqual(payload["class_probabilities"]["pneumonia"], 0.85)
-        self.assertEqual(payload["class_probabilities"]["normal"], 0.15)
 
     def test_api_predict_chest_xray_refusal_when_confirmation_missing(self) -> None:
         """Verify 422 Unprocessable Entity when chest_xray is requested without pediatric confirmation."""
@@ -236,7 +219,7 @@ class ImageScreeningAPITest(unittest.TestCase):
         files = {"file": ("chest.png", buf.getvalue(), "image/png")}
         data = {
             "image_type": "chest_xray",
-            "ood_threshold": "0.30",
+            "ood_threshold": "0.50",
             "patient_is_pediatric": "false",
         }
 
@@ -263,7 +246,7 @@ class ImageScreeningAPITest(unittest.TestCase):
         files = {"file": ("scan.png", buf.getvalue(), "image/png")}
         data = {"image_type": "mri_brain"}
         resp = self.client.post("/api/image/predict", files=files, data=data)
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 422)
 
 
 if __name__ == "__main__":

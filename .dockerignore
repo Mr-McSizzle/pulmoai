@@ -1,0 +1,8 @@
+.git
+.venv
+**/__pycache__
+frontend/node_modules
+data/user_storage
+work
+outputs
+*.log

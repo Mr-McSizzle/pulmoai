@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -28,6 +28,7 @@ class PredictionResponse(BaseModel):
     predicted_class: str
     model_name: str
     artifact_id: str
+    sex_context: dict[str, Any] | None = None
     input_profile_count: int
     input_gene_count: int
     probabilities_available: bool
@@ -85,6 +86,8 @@ class LabItemSchema(BaseModel):
 
 
 class ReportExtractResponse(BaseModel):
+    data_origin: Literal["user_supplied_unverified", "generated_example"] = "user_supplied_unverified"
+    quality_tier: str | None = None
     extraction_method: str
     extracted_tests: list[LabItemSchema]
     raw_text: str
@@ -95,7 +98,7 @@ class ReportExtractResponse(BaseModel):
 
 
 class RiskPredictionRequest(BaseModel):
-    inputs: dict[str, float | int | None]
+    inputs: dict[str, Annotated[float, Field(allow_inf_nan=False)] | int | None] = Field(max_length=100)
 
 
 class ConditionRiskResult(BaseModel):
@@ -126,10 +129,13 @@ class RiskPredictionResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 class ImagePredictionResponse(BaseModel):
+    data_origin: Literal["user_supplied_unverified", "generated_example"] = "user_supplied_unverified"
+    artifact_id: str | None = None
     image_type: str
     modality_name: str
     recognized: bool
     status: Literal[
+        "not_screened",
         "success",
         "low_confidence",
         "rejected_modality_mismatch",

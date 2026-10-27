@@ -17,6 +17,7 @@ from pulmoai.preprocessing import read_single_profile_csv
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MODEL_PATH = PROJECT_ROOT / "models" / "lung_uncalibrated_dual_rule.joblib"
 DEFAULT_SUMMARY_PATH = PROJECT_ROOT / "reports" / "ensemble_benchmark" / "analysis_summary.json"
+DEFAULT_DUAL_RULE_AUDIT_PATH = PROJECT_ROOT / "reports" / "audit_lung_part_a.json"
 DEFAULT_VERIFICATION_PATH = PROJECT_ROOT / "reports" / "ensemble_benchmark" / "independent_verification.json"
 MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 
@@ -78,10 +79,10 @@ class PulmoAIService:
         if len(contents) > MAX_UPLOAD_BYTES:
             raise ValueError(f"file exceeds the {MAX_UPLOAD_BYTES // (1024 * 1024)} MB upload limit")
         try:
-            with tempfile.NamedTemporaryFile(suffix=".csv") as temporary_file:
-                temporary_file.write(contents)
-                temporary_file.flush()
-                return read_single_profile_csv(temporary_file.name, self.feature_names)
+            with tempfile.TemporaryDirectory() as temporary_dir:
+                path = Path(temporary_dir) / "profile.csv"
+                path.write_bytes(contents)
+                return read_single_profile_csv(path, self.feature_names)
         except UnicodeDecodeError as error:
             raise ValueError("CSV must be UTF-8 encoded") from error
 
@@ -96,7 +97,13 @@ class PulmoAIService:
             "message": "One complete profile matches the model's gene set and input format.",
         }
 
-    def predict_upload(self, contents: bytes) -> dict[str, Any]:
+    def predict_upload(self, contents: bytes, reported_sex: str = "unknown") -> dict[str, Any]:
+        from pulmoai.sex_models import select_model
+        selected, context = select_model(self, reported_sex)
+        if selected is not self:
+            result = selected.predict_upload(contents)
+            result["sex_context"] = context
+            return result
         expression = self.parse_csv_bytes(contents)
         class_code = int(self.pipeline.predict(expression)[0])
         if class_code < 0 or class_code >= len(self.label_order):
@@ -107,8 +114,9 @@ class PulmoAIService:
             "artifact_id": self.artifact_id,
             "input_profile_count": 1,
             "input_gene_count": len(self.feature_names),
-            "interpretation": f"High-confidence single-cell transcriptomic classification: {self.label_order[class_code]}.",
-            "decision_rule_note": "Dual-rule balanced argmax decision with Platt-calibrated posterior probability distribution.",
+            "interpretation": f"Exploratory transcriptomic class: {self.label_order[class_code]}. This is not a clinical diagnosis; held-out-study COVID-19 recall was 4/19.",
+            "sex_context": context,
+            "decision_rule_note": ("Dual-rule balanced argmax decision with Platt-calibrated estimates." if hasattr(self.pipeline, "base_pipeline") else "Research classifier decision rule; probability estimates are displayed only when supported."),
             "input_contract_notice": "Whole-cell scRNA-seq pseudobulk profile normalized via Counts Per Million (CPM) and log1p transformation.",
         }
         if hasattr(self.pipeline, "predict_proba"):
@@ -137,8 +145,26 @@ class PulmoAIService:
                 verification = json.load(stream)
         verified = bool(verification and verification.get("status") == "passed")
         validation = summary.get("validation", {})
+        metrics = verification.get("selected_procedure_metrics") if verified else None
+        per_class = verification.get("per_class_metrics") if verified else None
+        confusion = verification.get("confusion_matrix") if verified else None
+        verification_status = "independently_verified" if verified else "not_verified"
+        evaluation = "Nested selection with each entire source study held out once; candidate choice uses only training-study folds."
+        if isinstance(self.pipeline, DualRuleLungModel):
+            metrics, per_class, confusion = None, None, None
+            verification_status = "not_verified"
+            evaluation = "Historical leave-one-study-out audit of the dual-rule procedure; not re-evaluated for this release."
+            try:
+                with DEFAULT_DUAL_RULE_AUDIT_PATH.open(encoding="utf-8") as stream:
+                    audit = json.load(stream)["configuration_comparison"]["model_c_dual_rule"]
+                metrics = {key: float(audit[key]) for key in ("accuracy", "balanced_accuracy", "macro_f1")}
+                if not all(np.isfinite(value) and 0 <= value <= 1 for value in metrics.values()):
+                    raise ValueError("Invalid audit metric")
+                verification_status = "reported_research_audit"
+            except (OSError, ValueError, KeyError, TypeError):
+                metrics = None
         return {
-            "verification_status": "independently_verified" if verified else "not_verified",
+            "verification_status": verification_status,
             "cells": int(summary.get("cells_aggregated_into_profiles", 0)),
             "studies": int(summary.get("source_study_count", 0)),
             "profiles": int(summary.get("sample_group_count", 0)),
@@ -147,14 +173,14 @@ class PulmoAIService:
             "class_distribution": summary.get("sample_group_counts", {}),
             "model_name": self.model_name,
             "artifact_id": self.artifact_id,
-            "metrics": verification.get("selected_procedure_metrics") if verified else None,
-            "per_class_metrics": verification.get("per_class_metrics") if verified else None,
-            "confusion_matrix": verification.get("confusion_matrix") if verified else None,
+            "metrics": metrics,
+            "per_class_metrics": per_class,
+            "confusion_matrix": confusion,
             "candidate_metrics": validation.get("fixed_candidate_heldout_study_metrics", []) if verified else [],
             "methodology": {
                 "aggregation": "Cells aggregated by source study + orig.ident into sample/library profiles.",
                 "normalization": "Profile counts normalized to counts per million, then log1p transformed.",
-                "evaluation": "Nested selection with each entire source study held out once; candidate choice uses only training-study folds.",
+                "evaluation": evaluation,
                 "feature_selection": "Top 500 ANOVA features selected inside each training fold.",
                 "calibration": "Final model probabilities calibrated with Platt scaling (sigmoid) using 5-fold cross-validation.",
             },

@@ -52,3 +52,8 @@ frontend/.vite/
 
 # Release bundle (untracked weights and release notes)
 release/
+
+# Research candidate artifacts must be reviewed before deployment.
+work/
+models/lung_sex_specific/*.joblib
+models/lung_sex_specific/registry.json

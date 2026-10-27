@@ -10,9 +10,7 @@ and outputs confidence scores so the user can review and edit values.
 from __future__ import annotations
 
 import io
-import json
 import logging
-import os
 import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -858,6 +856,11 @@ def extract_text_from_bytes(
         (extracted_text, method_used)
     """
     ext = Path(filename).suffix.lower()
+    if ext == ".txt":
+        try:
+            return file_bytes.decode("utf-8-sig").strip(), "text_input"
+        except UnicodeDecodeError as error:
+            raise ValueError("Text reports must be UTF-8 encoded.") from error
     is_pdf = ext == ".pdf" or (mime_type and "pdf" in mime_type.lower())
 
     if is_pdf:
@@ -923,9 +926,11 @@ def extract_text_from_bytes(
     except Exception as e:
         logger.warning("Local Tesseract OCR error: %s", e)
 
-    # If both failed or empty, try plain text decode if user uploaded .txt
+    # Binary PDF/image bytes must never be treated as a text report.
+    if ext != ".txt":
+        return "", "unrecognized"
     try:
-        raw_decoded = file_bytes.decode("utf-8", errors="ignore").strip()
+        raw_decoded = file_bytes.decode("utf-8").strip()
         if len(raw_decoded) > 10:
             return raw_decoded, "text_input"
     except Exception:
@@ -934,94 +939,6 @@ def extract_text_from_bytes(
     return "", "unrecognized"
 
 
-def extract_with_gemini(
-    file_bytes: bytes,
-    filename: str,
-    mime_type: str,
-    api_key: str | None = None,
-) -> list[ExtractedTestItem] | None:
-    """Optional extraction path using Gemini API if GEMINI_API_KEY is configured."""
-    key = api_key or os.environ.get("GEMINI_API_KEY")
-    if not key:
-        return None
-
-    try:
-        import base64
-        import requests
-
-        b64_data = base64.b64encode(file_bytes).decode("utf-8")
-        prompt = (
-            "You are a medical laboratory report extractor. Extract all lab test results "
-            "from this document into structured JSON. Format must be a JSON array of objects:\n"
-            '[{"test_name": str, "value": float, "unit": str, "reference_range": str, "flag": "NORMAL"|"HIGH"|"LOW"}]\n'
-            "Only output valid JSON, no markdown formatting."
-        )
-
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {"text": prompt},
-                        {
-                            "inline_data": {
-                                "mime_type": mime_type or "application/pdf",
-                                "data": b64_data,
-                            }
-                        },
-                    ]
-                }
-            ],
-            "generationConfig": {"temperature": 0.0, "response_mime_type": "application/json"},
-        }
-
-        resp = requests.post(url, json=payload, timeout=25)
-        if resp.status_code == 200:
-            res_data = resp.json()
-            text_resp = res_data["candidates"][0]["content"]["parts"][0]["text"]
-            parsed_json = json.loads(text_resp)
-            items = []
-            for entry in parsed_json:
-                raw_name = str(entry.get("test_name", ""))
-                try:
-                    val = float(entry.get("value", 0))
-                except (ValueError, TypeError):
-                    continue
-                unit = str(entry.get("unit", ""))
-                ref = str(entry.get("reference_range", ""))
-                flag_str = str(entry.get("flag", "UNKNOWN"))
-
-                # Match with canonical catalog
-                canon_def = match_test_name(raw_name)
-                if not canon_def:
-                    continue
-                norm_val, norm_unit, _ = normalize_unit_and_value(canon_def.canonical_name, val, unit)
-                flag = determine_flag(canon_def.canonical_name, norm_val, flag_str)
-
-                items.append(
-                    ExtractedTestItem(
-                        raw_name=raw_name,
-                        canonical_name=canon_def.canonical_name,
-                        display_name=canon_def.display_name,
-                        category=canon_def.category,
-                        value=norm_val,
-                        raw_value=str(val),
-                        unit=norm_unit,
-                        raw_unit=unit,
-                        reference_range=ref or canon_def.ref_str,
-                        flag=flag,
-                        confidence=0.96,
-                    )
-                )
-            return items
-    except Exception as e:
-        logger.warning("Gemini extraction failed: %s; using local parsing", e)
-    return None
-
-
-# ---------------------------------------------------------------------------
-# Rule-Based Structured Table & Line Parser
-# ---------------------------------------------------------------------------
 
 def match_test_name(name_candidate: str) -> CanonicalTestDef | None:
     """Fuzzy and alias match a candidate line against the canonical test catalog."""
@@ -1337,21 +1254,8 @@ def process_lab_report(
     sex: str | None = None,
 ) -> dict[str, Any]:
     """End-to-end pipeline to extract and normalize laboratory report."""
-    # 1. Optional Gemini Vision path if key is provided or set in env
-    key = gemini_key or os.environ.get("GEMINI_API_KEY")
-    if key:
-        gemini_items = extract_with_gemini(file_bytes, filename, mime_type or "application/pdf", key)
-        if gemini_items:
-            return {
-                "extraction_method": "gemini_vision",
-                "extracted_tests": [item.to_dict() for item in gemini_items],
-                "raw_text": f"[Extracted via Gemini Vision multimodal model with key from env]",
-                "unmatched_lines": [],
-                "count": len(gemini_items),
-                "quality_tier": "high_confidence",
-            }
-
-    # 2. Local extraction (PyMuPDF text layer or local Tesseract OCR)
+    # The runtime pipeline never transmits uploads, even if a cloud key is present.
+    # Local extraction (PyMuPDF text layer or local Tesseract OCR)
     raw_text, method = extract_text_from_bytes(file_bytes, filename, mime_type)
     if method == "refused_low_quality":
         return {

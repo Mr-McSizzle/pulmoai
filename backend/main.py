@@ -5,12 +5,13 @@ import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from fastapi import Cookie, Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -76,12 +77,12 @@ async def lifespan(app: FastAPI):
             )
     except Exception as e:
         logger.warning("Startup artifact verification skipped: %s", e)
-        app.state.artifact_verification = {"all_passed": True, "artifacts": {}, "module_status": {}}
-        app.state.checkpoint_verification = {"all_critical_passed": True, "checkpoints": {}}
+        app.state.artifact_verification = {"all_passed": False, "artifacts": {}, "module_status": {name: False for name in ("pulmo_service", "risk_service", "future_risk_service", "image_service")}}
+        app.state.checkpoint_verification = {"all_critical_passed": False, "checkpoints": {}}
 
     mod_status = app.state.artifact_verification.get("module_status", {})
 
-    if not mod_status.get("pulmo_service", True):
+    if not mod_status.get("pulmo_service", False):
         app.state.pulmo_service = None
         app.state.model_error = "Model artifact failed cryptographic integrity verification against models/checksums.sha256."
     else:
@@ -94,7 +95,7 @@ async def lifespan(app: FastAPI):
             app.state.model_error = "Model artifact could not be loaded; check the local server logs."
             logger.exception("PulmoAI model startup failed")
 
-    if not mod_status.get("risk_service", True):
+    if not mod_status.get("risk_service", False):
         app.state.risk_service = None
         app.state.risk_model_error = "NHANES risk model artifact failed cryptographic integrity verification against models/checksums.sha256."
     else:
@@ -107,7 +108,7 @@ async def lifespan(app: FastAPI):
             app.state.risk_model_error = "NHANES risk model artifact could not be loaded; check server logs."
             logger.exception("NHANES risk model startup failed")
 
-    if not mod_status.get("future_risk_service", True):
+    if not mod_status.get("future_risk_service", False):
         app.state.future_risk_service = None
         app.state.future_risk_model_error = "Future risk model artifact failed cryptographic integrity verification against models/checksums.sha256."
     else:
@@ -120,7 +121,7 @@ async def lifespan(app: FastAPI):
             app.state.future_risk_model_error = "Future risk models artifact could not be loaded; check server logs."
             logger.exception("Future risk model startup failed")
 
-    if not mod_status.get("image_service", True):
+    if not mod_status.get("image_service", False):
         app.state.image_service = None
         app.state.image_model_error = "MedMNIST screening image model artifact failed cryptographic integrity verification against models/checksums.sha256."
     yield
@@ -129,7 +130,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="PulmoAI Research API",
     description="Research-only lung gene-expression classification using the saved PulmoAI model.",
-    version="1.0.0",
+    version="2.1.0",
     lifespan=lifespan,
 )
 
@@ -137,9 +138,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "DELETE"],
+    allow_methods=["GET", "POST", "DELETE", "PATCH"],
     allow_headers=["Content-Type"],
 )
+
+from backend.security import ApiSecurityMiddleware
+app.add_middleware(ApiSecurityMiddleware)
 
 SESSION_COOKIE_NAME = "pulmoai_session"
 
@@ -284,7 +288,7 @@ def get_artifact_verification(app: FastAPI) -> dict[str, Any]:
 def require_service(request: Request) -> PulmoAIService:
     artifact_verif = get_artifact_verification(request.app)
     mod_status = artifact_verif.get("module_status", {})
-    if not mod_status.get("pulmo_service", True):
+    if not mod_status.get("pulmo_service", False):
         raise HTTPException(
             status_code=503,
             detail="Single-cell lung atlas model artifact failed cryptographic integrity verification against models/checksums.sha256.",
@@ -304,7 +308,7 @@ def require_service(request: Request) -> PulmoAIService:
 def require_risk_service(request: Request) -> HealthRiskService:
     artifact_verif = get_artifact_verification(request.app)
     mod_status = artifact_verif.get("module_status", {})
-    if not mod_status.get("risk_service", True):
+    if not mod_status.get("risk_service", False):
         raise HTTPException(
             status_code=503,
             detail="NHANES chronic disease risk model artifact failed cryptographic integrity verification against models/checksums.sha256.",
@@ -324,7 +328,7 @@ def require_risk_service(request: Request) -> HealthRiskService:
 def require_future_risk_service(request: Request) -> FutureRiskService:
     artifact_verif = get_artifact_verification(request.app)
     mod_status = artifact_verif.get("module_status", {})
-    if not mod_status.get("future_risk_service", True):
+    if not mod_status.get("future_risk_service", False):
         raise HTTPException(
             status_code=503,
             detail="Future mortality risk model artifact failed cryptographic integrity verification against models/checksums.sha256.",
@@ -344,7 +348,7 @@ def require_future_risk_service(request: Request) -> FutureRiskService:
 def require_image_service(request: Request) -> ImageScreeningService:
     artifact_verif = get_artifact_verification(request.app)
     mod_status = artifact_verif.get("module_status", {})
-    if not mod_status.get("image_service", True):
+    if not mod_status.get("image_service", False):
         raise HTTPException(
             status_code=503,
             detail="MedMNIST screening image model artifact failed cryptographic integrity verification against models/checksums.sha256.",
@@ -374,16 +378,17 @@ async def read_csv_upload(upload: UploadFile) -> bytes:
 @app.get("/api/health", response_model=HealthResponse)
 def health(request: Request) -> HealthResponse:
     verif = get_artifact_verification(request.app)
-    integrity_ok = verif.get("all_passed", True)
+    integrity_ok = verif.get("all_passed", False)
     artifact_status = verif.get("artifacts")
-    service = getattr(request.app.state, "pulmo_service", None)
-    if service is None:
+    lung_integrity_ok = verif.get("module_status", {}).get("pulmo_service", False)
+    service = getattr(request.app.state, "pulmo_service", None) if lung_integrity_ok else None
+    if service is None and lung_integrity_ok:
         try:
             service = PulmoAIService.load()
             request.app.state.pulmo_service = service
         except Exception:
             service = None
-    if service is None:
+    if service is None or not verif.get("module_status", {}).get("pulmo_service", False):
         return HealthResponse(
             status="unavailable",
             model_loaded=False,
@@ -454,11 +459,12 @@ async def predict_upload(
     request: Request,
     file: Annotated[UploadFile, File(description="One compatible raw-count gene-expression CSV")],
     user: Annotated[dict[str, str] | None, Depends(optional_current_user)],
+    reported_sex: Annotated[Literal["female", "male", "intersex", "unknown"], Form()] = "unknown",
 ) -> PredictionResponse:
     service = require_service(request)
     contents = await read_csv_upload(file)
     try:
-        result = PredictionResponse(**service.predict_upload(contents))
+        result = PredictionResponse(**await run_in_threadpool(service.predict_upload, contents, reported_sex=reported_sex))
         if user is not None:
             record = get_user_data_store(request).save_record(
                 user["id"],
@@ -492,6 +498,7 @@ async def extract_report(
     file: Annotated[UploadFile, File(description="Lab report PDF or photo (PNG, JPG, TIFF)")],
     sex: Annotated[str | None, Form(description="Patient biological sex (male/female) for sex-specific reference ranges")] = None,
     user: Annotated[dict[str, str] | None, Depends(optional_current_user)] = None,
+    data_origin: Annotated[Literal["user_supplied_unverified", "generated_example"], Form()] = "user_supplied_unverified",
 ) -> ReportExtractResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
@@ -509,7 +516,11 @@ async def extract_report(
         raise HTTPException(status_code=413, detail="File exceeds the 10 MB upload limit.")
 
     try:
-        extraction_result = process_lab_report(contents, file.filename, file.content_type, sex=sex)
+        from backend.workspace_api import validate_file
+        validate_file(file.filename, contents, "lab_report")
+        extraction_result = await run_in_threadpool(process_lab_report, contents, file.filename, file.content_type, sex=sex)
+        from pulmoai.provenance import data_origin as resolve_origin
+        extraction_result["data_origin"] = resolve_origin(contents, file.filename, data_origin)
         response = ReportExtractResponse(**extraction_result)
         if user is not None:
             record = get_user_data_store(request).save_record(
@@ -524,6 +535,8 @@ async def extract_report(
             response.upload_id = record["id"]
             response.uploaded_at = record["uploaded_at"]
         return response
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
     except Exception as error:
         logger.exception("Lab report extraction failed")
         raise HTTPException(status_code=500, detail="An error occurred while parsing the lab report.") from error
@@ -585,10 +598,11 @@ def predict_future_mortality_risk(
 async def predict_medical_image(
     request: Request,
     file: Annotated[UploadFile, File(description="Medical image to screen (PNG, JPG, TIFF, WEBP)")],
-    image_type: Annotated[str, Form(description="Modality: chest_xray, skin_lesion, retina, blood_smear, chest_multilabel")] = "chest_xray",
-    ood_threshold: Annotated[float, Form(description="Out-of-distribution minimum confidence threshold")] = 0.50,
-    patient_is_pediatric: Annotated[bool, Form(description="Patient pediatric confirmation flag")] = True,
+    image_type: Annotated[Literal["chest_xray", "skin_lesion", "retina", "blood_smear", "chest_multilabel"], Form(description="Medical image modality")] = "chest_xray",
+    ood_threshold: Annotated[float, Form(ge=0.5, le=1.0, description="Out-of-distribution minimum confidence threshold")] = 0.50,
+    patient_is_pediatric: Annotated[bool, Form(description="Patient pediatric confirmation flag")] = False,
     user: Annotated[dict[str, str] | None, Depends(optional_current_user)] = None,
+    data_origin: Annotated[Literal["user_supplied_unverified", "generated_example"], Form()] = "user_supplied_unverified",
 ) -> ImagePredictionResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
@@ -605,9 +619,12 @@ async def predict_medical_image(
     if len(contents) > MAX_REPORT_BYTES:
         raise HTTPException(status_code=413, detail="Image exceeds the upload size limit.")
 
-    image_service = require_image_service(request)
-    is_target = image_type == "chest_xray" and image_service.is_target_pneumonia_image(contents)
-    if image_type == "chest_xray" and not patient_is_pediatric and not is_target:
+    from backend.workspace_api import validate_file
+    try:
+        validate_file(file.filename, contents, "medical_image")
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    if image_type == "chest_xray" and not patient_is_pediatric:
         raise HTTPException(
             status_code=422,
             detail=(
@@ -616,13 +633,18 @@ async def predict_medical_image(
             ),
         )
 
+    image_service = require_image_service(request)
     try:
-        result = image_service.predict(
+        result = await run_in_threadpool(image_service.predict,
             contents,
             image_type=image_type,
             ood_threshold=ood_threshold,
             patient_is_pediatric=patient_is_pediatric,
         )
+        from backend.workspace_api import image_artifact_id
+        result["artifact_id"] = image_artifact_id(request, image_type) if ood_threshold == 0.5 else None
+        from pulmoai.provenance import data_origin as resolve_origin
+        result["data_origin"] = resolve_origin(contents, file.filename, data_origin)
         response = ImagePredictionResponse(**result)
         if user is not None:
             record = get_user_data_store(request).save_record(
@@ -658,6 +680,9 @@ def get_scrna_sample(sample_name: str) -> FileResponse:
         raise HTTPException(status_code=404, detail=f"Sample '{sample_name}' not found.")
     return FileResponse(target, media_type="text/csv", filename=f"scrna_sample_{sample_name}.csv")
 
+
+from backend.workspace_api import router as workspace_router
+app.include_router(workspace_router)
 
 FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
 if FRONTEND_DIST.is_dir():

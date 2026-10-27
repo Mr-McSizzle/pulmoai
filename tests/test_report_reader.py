@@ -222,6 +222,7 @@ class ReportReaderUnitTest(unittest.TestCase):
         self.assertIn("systolic_bp", test_names)
         self.assertEqual(test_names["systolic_bp"], 134.0)
 
+    @unittest.skipUnless(__import__("shutil").which("tesseract"), "Local Tesseract executable is not installed")
     def test_image_tesseract_ocr_extraction(self) -> None:
         """Create an in-memory image and verify local Tesseract OCR extracts lab text."""
         img = Image.new("RGB", (500, 150), color=(255, 255, 255))

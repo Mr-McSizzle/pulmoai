@@ -26,6 +26,7 @@ MODULE_MAPPING = {
     "models/ensemble_benchmark_best.joblib": "pulmo_service",
     "models/lung_uncalibrated_dual_rule.joblib": "pulmo_service",
     "models/nhanes_risk_models.joblib": "risk_service",
+    "models/future_risk_models.joblib": "future_risk_service",
     "models/future_risk_models_v3.joblib": "future_risk_service",
     "models/modality_gate_resnet18_v3.pt": "image_service",
     "models/medmnist/pneumoniamnist_resnet18.pt": "image_service",
@@ -69,7 +70,7 @@ def verify_artifacts(
             "all_passed": False,
             "error": f"Checksums file not found at {checksums_path}",
             "artifacts": {},
-            "module_status": {},
+            "module_status": {name: False for name in set(MODULE_MAPPING.values())},
         }
 
     artifacts: dict[str, Any] = {}
@@ -115,7 +116,10 @@ def verify_artifacts(
                 "passed": passed,
             }
 
-    all_passed = len(artifacts) > 0 and all(a["passed"] for a in artifacts.values())
+    for required_path, module in MODULE_MAPPING.items():
+        if required_path not in artifacts:
+            module_status[module] = False
+    all_passed = all(module_status.values()) and len(artifacts) > 0 and all(a["passed"] for a in artifacts.values())
     verified_count = sum(1 for a in artifacts.values() if a["passed"])
     failed_count = len(artifacts) - verified_count
 

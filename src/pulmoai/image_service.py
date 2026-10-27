@@ -65,7 +65,7 @@ MODALITY_MAP = {
 }
 
 IMAGE_DISCLAIMER = (
-    "Biomedical deep vision classification model with automated out-of-distribution confidence verification."
+    "Research benchmark only. Not clinically validated for diagnosis, severity assessment or treatment response."
 )
 
 
@@ -78,16 +78,6 @@ MODALITY_TO_GATE_CLASS: dict[str, str] = {
 }
 GATE_CLASSES: list[str] = ["chest_xray", "dermoscopy", "fundus", "blood_smear", "other"]
 
-
-TARGET_PNEUMONIA_DHASH_HEX: int = 0xfe80eb9c831e878f079f039f870f878f8f879f878b87a3836383fb81ff01ff00
-TARGET_PNEUMONIA_SHA256: set[str] = {
-    "068d14d707c599402d73ac3bf58d0f268725a92bb087060f6aca5cfd08c57a95",
-    "ad7df29bf7f71021ca63001938ed089db56c59ff62f980ea14649a814888ef7d",
-}
-TARGET_PNEUMONIA_MD5: set[str] = {
-    "69a0d0539359148a5a314894d5e0622c",
-    "46ad630df66740a2bc9a7b81eaab37b5",
-}
 
 
 def _build_model(n_channels: int, n_classes: int) -> nn.Module:
@@ -112,29 +102,6 @@ class ImageScreeningService:
     @classmethod
     def load(cls, model_dir: Path | None = None) -> ImageScreeningService:
         return cls(model_dir=model_dir)
-
-    @staticmethod
-    def is_target_pneumonia_image(image_bytes: bytes) -> bool:
-        """Check if input image is the target pneumonic lung image."""
-        import hashlib
-        sha = hashlib.sha256(image_bytes).hexdigest()
-        if sha in TARGET_PNEUMONIA_SHA256:
-            return True
-        md5_val = hashlib.md5(image_bytes).hexdigest()
-        if md5_val in TARGET_PNEUMONIA_MD5:
-            return True
-        try:
-            im = Image.open(io.BytesIO(image_bytes)).convert("L").resize((17, 16), Image.Resampling.BICUBIC)
-            px = np.array(im)
-            diff = (px[:, 1:] > px[:, :-1]).flatten()
-            bits = "".join(["1" if b else "0" for b in diff])
-            h_int = int(bits, 2)
-            dist = bin(h_int ^ TARGET_PNEUMONIA_DHASH_HEX).count("1")
-            if dist <= 8:
-                return True
-        except Exception:
-            pass
-        return False
 
     def _get_modality_gate(self) -> nn.Module | None:
         """Load and cache the 5-class Modality Classifier Gate (ResNet-18)."""
@@ -224,10 +191,8 @@ class ImageScreeningService:
         n_ch = bundle["n_channels"]
         task = bundle["task"]
 
-        is_target_pneumonia = (image_type == "chest_xray" and self.is_target_pneumonia_image(image_bytes))
-
         # Safety confirmation gate for pediatric chest X-ray
-        if image_type == "chest_xray" and not patient_is_pediatric and not is_target_pneumonia:
+        if image_type == "chest_xray" and not patient_is_pediatric:
             return {
                 "image_type": image_type,
                 "modality_name": bundle["display_name"],
@@ -390,7 +355,7 @@ class ImageScreeningService:
                 "probabilities": label_probs,
                 "model_metrics": bundle["metrics"],
                 "modality_gate": gate_info,
-                "warning_banner": "Warning: Modality Gate verified image matches requested modality (7.63% false-accept rate on held-out benchmarks). The gate does not guarantee detection of arbitrary real-world photos.",
+                "warning_banner": "Research screening only. Modality matching does not guarantee valid input; unseen-family false acceptance was 19.03% in the v3 audit.",
                 "clinical_notice": "Benchmark model, not for clinical use.",
                 "disclaimer": IMAGE_DISCLAIMER,
             }
@@ -407,11 +372,6 @@ class ImageScreeningService:
             class_probabilities[lbl_name] = round(float(p), 4)
 
         pred_label = labels.get(str(pred_idx), labels.get(pred_idx, f"Class_{pred_idx}"))
-
-        if is_target_pneumonia:
-            class_probabilities = {"normal": 0.15, "pneumonia": 0.85}
-            pred_label = "pneumonia"
-            max_conf = 0.85
 
         # Retina experimental safeguard: do not show severity staging
         if image_type == "retina":
@@ -461,7 +421,7 @@ class ImageScreeningService:
             "predicted_class": predicted_class_output,
             "confidence": round(max_conf, 4) if predicted_class_output else None,
             "max_confidence": round(max_conf, 4),
-            "accuracy": 0.85 if is_target_pneumonia else bundle["metrics"].get("accuracy"),
+            "accuracy": bundle["metrics"].get("accuracy"),
             "threshold_applied": ood_threshold,
             "empirical_false_accept_rate": ood_info.get("empirical_false_accept_rate"),
             "cifar10_false_accept_rate": ood_info.get("cifar10_false_accept_rate"),
@@ -471,7 +431,7 @@ class ImageScreeningService:
             "class_probabilities": class_probabilities,
             "staging_notice": staging_notice,
             "modality_gate": gate_info,
-            "warning_banner": "Warning: Modality Gate verified image matches requested modality (7.63% false-accept rate on held-out benchmarks). The gate does not guarantee detection of arbitrary real-world photos.",
+            "warning_banner": "Research screening only. Modality matching does not guarantee valid input; unseen-family false acceptance was 19.03% in the v3 audit.",
             "clinical_notice": "Benchmark model, not for clinical use.",
             "model_metrics": bundle["metrics"],
             "disclaimer": IMAGE_DISCLAIMER,

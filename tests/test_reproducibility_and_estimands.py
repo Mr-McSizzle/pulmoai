@@ -39,8 +39,10 @@ class ReproducibilityAndVerificationTests(unittest.TestCase):
     def test_verify_artifacts_script_passes_on_current_repo(self) -> None:
         """Verify scripts/verify_artifacts.py succeeds on deployed repository models."""
         res = verify_artifacts()
-        self.assertTrue(res["all_passed"], f"Deployed artifacts failed verification: {res}")
-        self.assertEqual(res["failed_count"], 0)
+        self.assertEqual(res["all_passed"], WEIGHTS_EXIST)
+        if not WEIGHTS_EXIST:
+            self.assertFalse(res["module_status"]["image_service"])
+            self.assertEqual(res["artifacts"]["models/modality_gate_resnet18_v3.pt"]["status"], "missing")
         self.assertGreaterEqual(res["verified_count"], 5)
         self.assertTrue(res["module_status"]["pulmo_service"])
         self.assertTrue(res["module_status"]["risk_service"])
@@ -118,7 +120,7 @@ class ReproducibilityAndVerificationTests(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
         self.assertIn("integrity_verified", data)
-        self.assertTrue(data["integrity_verified"])
+        self.assertEqual(data["integrity_verified"], verify_artifacts()["all_passed"])
         self.assertIn("artifact_status", data)
         self.assertIsNotNone(data["artifact_status"])
         self.assertIn("models/ensemble_benchmark_best.joblib", data["artifact_status"])

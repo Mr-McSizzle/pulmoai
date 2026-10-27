@@ -10,7 +10,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { api } from "../api";
-import type { ImagePredictionResponse } from "../types";
+import type { DataOrigin, ImagePredictionResponse } from "../types";
 
 const MODALITIES = [
   {
@@ -18,39 +18,36 @@ const MODALITIES = [
     name: "Chest Radiography (CXR)",
     caption: "Pneumonia Deep Screening",
     classes: "Normal vs Pneumonia (ResNet-18)",
-    testAuc: "97.57%",
   },
   {
     id: "skin_lesion",
     name: "Dermatoscopy",
     caption: "Skin Lesions (7 Classes)",
     classes: "Melanoma, Basal Cell, Keratosis...",
-    testAuc: "93.70%",
   },
   {
     id: "retina",
     name: "Retinal Fundus Photography",
     caption: "Diabetic Retinopathy Screening",
     classes: "Non-Referable vs Referable DR",
-    testAuc: "74.38%",
   },
   {
     id: "blood_smear",
     name: "Blood Smear",
     caption: "Hematopoietic Cells (8 Types)",
     classes: "Neutrophil, Basophil, Platelet...",
-    testAuc: "99.80%",
   },
   {
     id: "chest_multilabel",
     name: "Chest 14-Condition",
     caption: "Multi-Label Thoracic Pathology",
     classes: "Cardiomegaly, Effusion, Mass...",
-    testAuc: "77.30%",
   },
 ];
 
-export function ImageScreeningPage() {
+export function ImageScreeningPage({ onOpenTimeline }: { onOpenTimeline: () => void }) {
+  const [dataOrigin, setDataOrigin] = useState<DataOrigin>("user_supplied_unverified");
+  const [pediatric, setPediatric] = useState(false);
   const [selectedModality, setSelectedModality] = useState("chest_xray");
   const oodThreshold = 0.50;
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -60,7 +57,9 @@ export function ImageScreeningPage() {
   const [result, setResult] = useState<ImagePredictionResponse | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
-  const handleImage = (file: File) => {
+  const handleImage = (file: File, origin: DataOrigin = "user_supplied_unverified") => {
+    if (loading) return;
+    setDataOrigin(origin);
     setImageFile(file);
     setError(null);
     setResult(null);
@@ -83,13 +82,13 @@ export function ImageScreeningPage() {
     }
   };
 
-  const runPrediction = async (customFile?: File) => {
+  const runPrediction = async (customFile?: File, originOverride?: DataOrigin) => {
     const f = customFile || imageFile;
     if (!f) return;
     setLoading(true);
     setError(null);
     try {
-      const res = await api.predictImage(f, selectedModality, oodThreshold, true);
+      const res = await api.predictImage(f, selectedModality, oodThreshold, pediatric, originOverride ?? dataOrigin);
       setResult(res);
     } catch (err: any) {
       setError(err?.message || "Medical image screening failed.");
@@ -98,8 +97,9 @@ export function ImageScreeningPage() {
     }
   };
 
-  // Generate synthetic clinical test images (canvas base64)
-  const loadSyntheticImage = (type: "chest" | "skin" | "retina" | "noise") => {
+  // Generate labelled input-gate patterns for preview (canvas base64)
+  const loadExampleImage = (type: "chest" | "skin" | "retina" | "noise") => {
+    if (loading) return;
     const canvas = document.createElement("canvas");
     canvas.width = 64;
     canvas.height = 64;
@@ -149,15 +149,16 @@ export function ImageScreeningPage() {
 
     canvas.toBlob((blob) => {
       if (blob) {
-        const f = new File([blob], `synthetic_${type}.png`, { type: "image/png" });
-        handleImage(f);
-        runPrediction(f);
+        const f = new File([blob], `generated-example-${type}.png`, { type: "image/png" });
+        handleImage(f, "generated_example");
+        // Preview first; screening requires an explicit action after state updates.
       }
     });
   };
 
   return (
     <div className="module-page space-y-6">
+      <div className="module-timeline-link"><div><strong>Compare imaging observations over time</strong><p>Batch uploads, original images and compatible model score trends in one patient workspace.</p></div><button className="button-secondary" onClick={onOpenTimeline}>Open patient timelines</button></div>
       <div className="page-heading">
         <div>
           <div className="eyebrow page-kicker">PHASE 4 · MEDICAL IMAGE SCREENING</div>
@@ -179,6 +180,7 @@ export function ImageScreeningPage() {
                 ? "bg-teal-50 border-teal-500 shadow-sm"
                 : "bg-white border-slate-200 hover:border-teal-300"
             }`}
+            disabled={loading}
             onClick={() => {
               setSelectedModality(mod.id);
               setResult(null);
@@ -187,7 +189,7 @@ export function ImageScreeningPage() {
             <div className="flex items-center justify-between gap-3">
               <span className="text-xs font-bold text-slate-900">{mod.name}</span>
               <span className="text-[10px] font-semibold text-teal-700 bg-teal-100/60 px-1.5 py-0.5 rounded">
-                AUC {mod.testAuc}
+                Research model
               </span>
             </div>
             <div className="text-[10px] text-slate-500 mt-1">{mod.caption}</div>
@@ -204,7 +206,7 @@ export function ImageScreeningPage() {
             </h2>
             <button
               className="button-primary text-xs py-1.5 px-3 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading || !imageFile}
+              disabled={loading || !imageFile || (selectedModality === "chest_xray" && !pediatric)}
               onClick={() => runPrediction()}
             >
               {loading ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
@@ -212,6 +214,7 @@ export function ImageScreeningPage() {
             </button>
           </div>
 
+          {selectedModality === "chest_xray" && <label className="timeline-confirm"><input type="checkbox" checked={pediatric} onChange={e => setPediatric(e.target.checked)} /> I confirm this image is from a child aged 1–5, matching the training cohort.</label>}
           {/* Upload Drop Zone */}
           <div
             className={`drop-zone border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer ${
@@ -228,6 +231,7 @@ export function ImageScreeningPage() {
             <input
               id="image-file-input"
               type="file"
+              disabled={loading}
               className="hidden"
               accept=".png,.jpg,.jpeg,.tiff,.bmp,.webp"
               onChange={onSelect}
@@ -254,38 +258,38 @@ export function ImageScreeningPage() {
 
           {/* Test Presets */}
           <div className="pt-2 border-t border-slate-200">
-            <div className="text-[11px] font-semibold text-slate-600 mb-2">Or test with synthetic patterns:</div>
+            <div className="text-[11px] font-semibold text-slate-600 mb-2">Generated patterns · input-gate examples:</div>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 className="button-secondary py-1.5 px-2 text-left justify-start text-[11px]"
                 onClick={() => {
                   setSelectedModality("chest_xray");
-                  loadSyntheticImage("chest");
+                  loadExampleImage("chest");
                 }}
               >
-                Synthetic Chest X-Ray
+                Chest-like example
               </button>
               <button
                 className="button-secondary py-1.5 px-2 text-left justify-start text-[11px]"
                 onClick={() => {
                   setSelectedModality("skin_lesion");
-                  loadSyntheticImage("skin");
+                  loadExampleImage("skin");
                 }}
               >
-                Synthetic Skin Lesion
+                Skin-like example
               </button>
               <button
                 className="button-secondary py-1.5 px-2 text-left justify-start text-[11px]"
                 onClick={() => {
                   setSelectedModality("retina");
-                  loadSyntheticImage("retina");
+                  loadExampleImage("retina");
                 }}
               >
-                Synthetic Retina Scan
+                Retina-like example
               </button>
               <button
                 className="button-secondary py-1.5 px-2 text-left justify-start text-[11px] border-amber-300 bg-amber-50/50"
-                onClick={() => loadSyntheticImage("noise")}
+                onClick={() => loadExampleImage("noise")}
               >
                 Random Noise Pattern (OOD Test)
               </button>
@@ -306,7 +310,7 @@ export function ImageScreeningPage() {
               <ImageIcon size={40} className="mx-auto text-slate-300 mb-3" />
               <div className="text-sm font-medium text-slate-700">Ready for image screening</div>
               <div className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-                Select a modality above, upload an image or synthetic preset, and test the OOD confidence guard.
+                Select a modality above, upload an image or a clearly marked generated pattern, and test the OOD confidence guard.
               </div>
             </div>
           )}
@@ -323,6 +327,7 @@ export function ImageScreeningPage() {
 
           {result && (
             <div className="space-y-4">
+              <p className="data-origin-badge">{result.data_origin === "generated_example" ? "Generated pattern · not a medical scan" : "Uploaded source · authenticity unverified"}</p>
               {/* Benchmark model clinical notice banner */}
               <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
@@ -358,7 +363,7 @@ export function ImageScreeningPage() {
                     </div>
                     {result.confidence && (
                       <span className="text-xs font-bold bg-emerald-200/70 text-emerald-900 px-2 py-0.5 rounded-full">
-                        {(result.confidence * 100).toFixed(1)}% Confidence
+                        {(result.confidence * 100).toFixed(1)}% model score
                       </span>
                     )}
                   </div>
@@ -384,7 +389,7 @@ export function ImageScreeningPage() {
                   {result.multilabel && result.active_conditions && (
                     <div className="mt-3">
                       <div className="text-[11px] font-semibold text-emerald-800 mb-1.5">
-                        Positive Findings (Probability &ge; 50%):
+                        Labels above the model score threshold (≥ 50%):
                       </div>
                       {result.active_conditions.length > 0 ? (
                         <div className="flex flex-wrap gap-1.5">
@@ -398,7 +403,7 @@ export function ImageScreeningPage() {
                           ))}
                         </div>
                       ) : (
-                        <div className="text-xs text-emerald-700 italic">No thoracic abnormalities detected above 50% probability.</div>
+                        <div className="text-xs text-emerald-700 italic">No model label crossed the 50% threshold. This does not rule out abnormalities.</div>
                       )}
                     </div>
                   )}
