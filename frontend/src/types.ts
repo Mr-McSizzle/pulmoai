@@ -19,6 +19,9 @@ export interface AuthResponse {
 }
 
 export interface StoredRecord {
+  patient_id?: string | null;
+  observed_on?: string | null;
+  review_status?: string;
   id: string;
   kind: string;
   filename: string;
@@ -81,6 +84,7 @@ export interface ValidationResponse {
 }
 
 export interface PredictionResponse {
+  patient_id?: string | null; observed_on?: string | null;
   predicted_class: string;
   model_name: string;
   artifact_id: string;
@@ -130,6 +134,7 @@ export interface LabItemSchema {
 }
 
 export interface ReportExtractResponse {
+  patient_id?: string | null; observed_on?: string | null;
   data_origin: DataOrigin;
   extraction_method: string;
   extracted_tests: LabItemSchema[];
@@ -160,6 +165,7 @@ export interface ConditionRiskResult {
 }
 
 export interface RiskPredictionResponse {
+  upload_id?: string; uploaded_at?: string; patient_id?: string | null; observed_on?: string | null; source_record_id?: string | null; data_origin?: DataOrigin;
   risk_predictions: Record<string, ConditionRiskResult>;
   contributing_factors: string[];
   features_provided_count: number;
@@ -172,6 +178,7 @@ export interface RiskPredictionResponse {
 // ---------------------------------------------------------------------------
 
 export interface ImagePredictionResponse {
+  patient_id?: string | null; observed_on?: string | null;
   data_origin: DataOrigin;
   image_type: string;
   modality_name: string;
@@ -221,6 +228,7 @@ export interface FutureRiskEndpoint {
 }
 
 export interface PCEScoreResult {
+  availability_notice?: string | null;
   display_name: string;
   eligible: boolean;
   eligibility_criteria: string;
@@ -232,8 +240,9 @@ export interface PCEScoreResult {
 }
 
 export interface IDRSScoreResult {
+  availability_notice?: string | null;
   display_name: string;
-  score: number;
+  score: number | null;
   risk_tier: "Low" | "Moderate" | "High" | string;
   interpretation: string;
   components: Record<string, number>;
@@ -242,6 +251,7 @@ export interface IDRSScoreResult {
 }
 
 export interface FutureRiskResponse {
+  upload_id?: string; uploaded_at?: string; patient_id?: string | null; observed_on?: string | null; source_record_id?: string | null; data_origin?: DataOrigin;
   future_endpoints: Record<string, FutureRiskEndpoint>;
   published_scores: {
     pooled_cohort_equations_pce: PCEScoreResult;
@@ -268,7 +278,7 @@ export interface TimelineRecord extends StoredRecordDetail {
   patient_id: string;
   observed_on: string;
   series_label: string;
-  review_status: "unreviewed" | "reviewed";
+  review_status: "unreviewed" | "reviewed" | "partially_reviewed";
 }
 export interface TrendPoint {
   date: string;
@@ -296,6 +306,9 @@ export interface PatientTimeline {
   lab_series: TrendSeries[];
   image_series: TrendSeries[];
   excluded_unreviewed: number;
+  assessment: OverallAssessment;
+  risk_series: TrendSeries[];
+  rna_history: OverallAssessment["rna_findings"];
   comparison_version: string;
   notice: string;
 }
@@ -316,3 +329,15 @@ export interface ModuleEvidence {
   evaluation_scope: string; cohort: string; protocol: string; metrics: EvidenceMetric[];
 }
 export interface BenchmarkEvidence { modules: ModuleEvidence[]; notice: string }
+
+export interface AnalysisContext { patient_id: string; observed_on: string; series_label?: string }
+export interface RiskTransfer { features: Record<string, number>; source_record_id?: string | null; data_origin: DataOrigin; context: AnalysisContext }
+export interface AssessmentFinding { record_id: string; date: string; review_status: string; data_origin?: DataOrigin; name: string; probability: number | null; tier: string; horizon: string; estimand: string }
+export interface OverallAssessment {
+  title: string; status: string; headline: string; as_of: string | null; generated_example_count: number; coverage: Record<string, number>; unreviewed_count: number;
+  labs: {name: string; unit: string; value: number; flag: string; reference_range: string; date: string; record_id: string; direction: string; change: number | null}[];
+  chronic_risks: AssessmentFinding[]; future_risks: AssessmentFinding[];
+  rna_findings: {record_id: string; date: string; predicted_class: string; review_status: string; artifact_id?: string; interpretation: string}[];
+  image_findings: {record_id: string; date: string; modality: string; series_label: string; status: string; predicted_class: string | null; active_conditions: string[]; message: string; review_status: string}[];
+  gaps: string[]; trend_summary: {toward_range: number; away_from_range: number; comparable_image_series: number; comparable_risk_series: number}; interpretation: string;
+}

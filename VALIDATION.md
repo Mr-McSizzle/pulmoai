@@ -4,9 +4,9 @@ Baseline: `927c78d3342fb14a92295c7af7fff0eb64e2cfa8`.
 
 ## Results
 
-- **Backend: 102 tests run; 92 passed, 10 skipped; no failures.**
+- **Backend: 115 tests run; 105 passed, 10 skipped; no failures.**
 - Nine skips require the upstream-excluded vision checkpoints. One integration test requires a local Tesseract executable, which is absent here. Decoder, parser and image-model safety regressions using controlled inputs still run.
-- **Frontend:** TypeScript check and Vite production build passed (1,588 modules; built assets included).
+- **Frontend:** TypeScript check and Vite production build passed (1,590 modules; built assets included).
 - **Diff hygiene:** `git diff --check` passed.
 - **Compose:** `docker compose config --quiet` passed. A Docker daemon was not running, so no image build or container runtime is claimed.
 - **Browser:** exercised isolated synthetic local sign-in, batch creation of three dated reports, explicit source review of each, persistence after reload, chronological charts, baseline/latest deltas, and narrow-viewport layout. The original timeline preview shows the generated cholesterol series (220 → 170 → 130 mg/dL). The evidence update also has browser coverage of the source-backed metric cards and processing workflow controls.
@@ -14,6 +14,12 @@ Baseline: `927c78d3342fb14a92295c7af7fff0eb64e2cfa8`.
 - **Vision deployment:** missing `.pt` artifacts remain missing. Tests confirm the missing module fails closed; no substitute prediction is generated.
 - **CI:** workflow authored but not dispatched to GitHub.
 - **Evidence/provenance regressions:** confirm exact report values, no fabricated fallback on missing evidence, report-download whitelisting, correct lung procedure selection, persistent generated-example labels after review/export, and original-image archival without invoking a vision model, authenticated TIFF-to-PNG previews, and unchanged original downloads.
+
+## Connected-module update
+
+- All five module kinds auto-link with owner-checked patient/date context; exact source and model lineage persist. Twelve new integration/comparison tests cover module coverage, partial OCR confirmation, correction transfer, source/patient isolation, reassignment, account-only compatibility, repeated inference, risk model/date separation and rejected-image handling.
+- One additional regression verifies published PCE/IDRS scores remain unavailable when required inputs are absent. The complete-input fixture now explicitly supplies PCE primary-prevention eligibility.
+- Browser verification with the shipped numerical models: corrected generated OCR cholesterol (245 to 230 mg/dL), explicit confirmation and transfer, chronic/future calculation, RNA classification, and archive-only generated image all appear under the same patient. The consolidated panel shows coverage for all five module kinds and keeps unreviewed findings visible with review status.
 
 ## Commands
 

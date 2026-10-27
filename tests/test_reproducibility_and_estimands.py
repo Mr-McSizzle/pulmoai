@@ -252,6 +252,7 @@ class FutureRiskEstimandTests(unittest.TestCase):
                 "age": 58,
                 "sex_male": 1,
                 "race_black": 0,
+                "prior_cvd": 0,
                 "bmi": 28.5,
                 "waist_cm": 98,
                 "systolic_bp": 138,
@@ -303,6 +304,15 @@ class FutureRiskEstimandTests(unittest.TestCase):
         idrs = scores["indian_diabetes_risk_score_idrs"]
         self.assertEqual(idrs["score"], 80)
         self.assertEqual(idrs["risk_tier"], "High")
+
+    def test_missing_score_inputs_are_not_replaced_with_defaults(self) -> None:
+        response = self.client.post("/api/risk/future", json={"inputs": {"age": 56, "bmi": 25, "sex_male": 0}})
+        self.assertEqual(response.status_code, 200)
+        scores = response.json()["published_scores"]
+        self.assertIsNone(scores["pooled_cohort_equations_pce"]["estimated_10yr_ascvd_risk_pct"])
+        self.assertIn("current_smoker", scores["pooled_cohort_equations_pce"]["availability_notice"])
+        self.assertIsNone(scores["indian_diabetes_risk_score_idrs"]["score"])
+        self.assertIn("waist_cm", scores["indian_diabetes_risk_score_idrs"]["availability_notice"])
 
     def test_pce_unit_test_worked_examples(self) -> None:
         """Verify PCE calculation matches 2013 ACC/AHA published worked examples."""

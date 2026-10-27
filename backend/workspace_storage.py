@@ -86,14 +86,14 @@ class WorkspaceRepository:
                 AND observed_on=? AND content_sha256=?""", (user_id, patient_id, kind, observed_on, digest)).fetchone()
             return row[0] if row else None
 
-    def attach(self, user_id: str, record_id: str, patient_id: str, observed_on: str, series_label: str = "") -> None:
+    def attach(self, user_id: str, record_id: str, patient_id: str, observed_on: str, series_label: str = "", *, deduplicate: bool = True) -> None:
         self.validate_date(observed_on)
         if not self.patient(user_id, patient_id):
             raise LookupError("Patient not found.")
         if not self.store.get_record(user_id, record_id):
             raise LookupError("Record not found.")
         original = self.store.get_record_file(user_id, record_id)
-        digest = hashlib.sha256(original[0].read_bytes()).hexdigest() if original else None
+        digest = hashlib.sha256(original[0].read_bytes()).hexdigest() if original and deduplicate else None
         with self.store._connection() as c:
             try:
                 c.execute("""UPDATE uploads SET review_status=CASE WHEN patient_id=? AND observed_on=? AND series_label=? THEN review_status ELSE 'unreviewed' END, patient_id=?, observed_on=?, series_label=?, content_sha256=?
@@ -115,7 +115,7 @@ class WorkspaceRepository:
                  "series_label": r["series_label"], "review_status": r["review_status"],
                  "result": with_origin(r)} for r in rows]
 
-    def review(self, user_id: str, record_id: str, corrections: dict[str, float]) -> None:
+    def review(self, user_id: str, record_id: str, corrections: dict[str, float], confirmed_tests: list[str] | None = None) -> None:
         with self.store._connection() as c:
             row = c.execute("SELECT * FROM uploads WHERE id=? AND user_id=?", (record_id, user_id)).fetchone()
             if not row:
@@ -124,11 +124,24 @@ class WorkspaceRepository:
             tests = result.get("extracted_tests", [])
             if row["kind"] == "lab_report" and not tests:
                 raise ValueError("A report with no extracted values cannot be reviewed.")
-            if set(corrections) - {t["canonical_name"] for t in tests}:
-                raise ValueError("Corrections must refer to extracted tests in this report.")
-            result["reviewed_values"] = {t["canonical_name"]: corrections.get(t["canonical_name"], result.get("reviewed_values", {}).get(t["canonical_name"], t["value"])) for t in tests}
-            c.execute("UPDATE uploads SET review_status='reviewed', result_json=? WHERE id=? AND user_id=?",
-                      (json.dumps(result, allow_nan=False), record_id, user_id))
+            names = {t["canonical_name"] for t in tests}
+            confirmed = names if confirmed_tests is None else set(confirmed_tests)
+            if confirmed_tests is not None and (not confirmed or len(confirmed) != len(confirmed_tests)):
+                raise ValueError("Select at least one distinct extracted test to confirm.")
+            if confirmed - names or set(corrections) - confirmed:
+                raise ValueError("Confirmations and corrections must refer to selected extracted tests.")
+            previous = names if row["review_status"] == "reviewed" else set(result.get("reviewed_tests", [])) if row["review_status"] == "partially_reviewed" else set()
+            reviewed = previous | confirmed
+            values = dict(result.get("reviewed_values", {}))
+            for test in tests:
+                name = test["canonical_name"]
+                if name in confirmed:
+                    values[name] = corrections.get(name, values.get(name, test["value"]))
+            result["reviewed_values"] = values
+            result["reviewed_tests"] = sorted(reviewed)
+            status = "reviewed" if row["kind"] != "lab_report" or reviewed == names else "partially_reviewed"
+            c.execute("UPDATE uploads SET review_status=?, result_json=? WHERE id=? AND user_id=?",
+                      (status, json.dumps(result, allow_nan=False), record_id, user_id))
             self._audit(c, user_id, "record.reviewed", record_id)
 
     def audit(self, user_id: str) -> list[dict[str, Any]]:

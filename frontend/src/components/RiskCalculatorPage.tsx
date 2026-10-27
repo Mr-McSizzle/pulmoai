@@ -1,3 +1,5 @@
+import { SavedToTimeline, usePatientWorkspace } from "./PatientWorkspace";
+import type { DataOrigin, RiskTransfer } from "../types";
 import { useState, useEffect } from "react";
 import {
   Activity,
@@ -20,75 +22,62 @@ import type {
 } from "../types";
 
 interface RiskCalculatorPageProps {
-  initialFeatures?: Record<string, number> | null;
+  transfer?: RiskTransfer | null;
 }
 
-export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps) {
-  const [inputs, setInputs] = useState<Record<string, any>>({
-    age: 52,
-    gender: 1, // 1: Male, 2: Female
-    systolic_bp: 136,
-    diastolic_bp: 86,
-    bmi: 28.5,
-    pulse: 74,
-    total_cholesterol: 215,
-    hdl_cholesterol: 44,
-    triglycerides: 165,
-    creatinine: 1.05,
-    smoking_status: 0, // 0: Never, 1: Former, 2: Current
-    waist_circumference_cm: 92,
-    physical_activity: 1, // 0: Vigorous, 1: Moderate, 2: Sedentary
-    family_history_diabetes: 0, // 0: None, 1: One Parent, 2: Both Parents
-    bp_medication: 0, // 0: No, 1: Yes
-    history_diabetes: 0, // 0: No, 1: Yes
-    race_black: 0, // 0: Non-Black, 1: African American / Black
-  });
+export function RiskCalculatorPage({ transfer }: RiskCalculatorPageProps) {
+  const workspace = usePatientWorkspace();
+  const [origin, setOrigin] = useState<DataOrigin>("user_supplied_unverified");
+  const [sourceId, setSourceId] = useState<string | null>(null);
+  const emptyInputs = () => Object.fromEntries(["age", "gender", "systolic_bp", "diastolic_bp", "bmi", "pulse", "total_cholesterol", "hdl_cholesterol", "triglycerides", "creatinine", "smoking_status", "waist_circumference_cm", "physical_activity", "family_history_diabetes", "bp_medication", "history_diabetes", "race_black", "prior_cvd"].map(key => [key, ""]));
+  const [inputs, setInputs] = useState<Record<string, any>>(emptyInputs);
+
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<RiskPredictionResponse | null>(null);
   const [futureResult, setFutureResult] = useState<FutureRiskResponse | null>(null);
 
-  // Sync initialFeatures if passed from Lab Report transfer
   useEffect(() => {
-    if (initialFeatures && Object.keys(initialFeatures).length > 0) {
-      const merged: Record<string, any> = { ...inputs, ...initialFeatures };
-      if (initialFeatures.serum_creatinine !== undefined && initialFeatures.creatinine === undefined) {
-        merged.creatinine = initialFeatures.serum_creatinine;
-      }
-      if (initialFeatures.pulse_bpm !== undefined && initialFeatures.pulse === undefined) {
-        merged.pulse = initialFeatures.pulse_bpm;
-      }
-      if (initialFeatures.sex_male !== undefined && initialFeatures.gender === undefined) {
-        merged.gender = initialFeatures.sex_male === 1.0 ? 1 : 2;
-      }
-      setInputs(merged);
-      runPrediction(merged);
-    } else {
-      runPrediction(inputs);
+    const next: Record<string, any> = emptyInputs();
+    if (workspace.patient?.reported_sex === "male") next.gender = 1;
+    if (workspace.patient?.reported_sex === "female") next.gender = 2;
+    setResult(null); setFutureResult(null); setError(null); setSourceId(null); setOrigin("user_supplied_unverified");
+    if (transfer && transfer.context.patient_id === workspace.patientId && transfer.context.observed_on === workspace.observedOn) {
+      Object.assign(next, transfer.features);
+      if (next.serum_creatinine !== undefined) next.creatinine = next.serum_creatinine;
+      if (next.pulse_bpm !== undefined) next.pulse = next.pulse_bpm;
+      if (next.waist_cm !== undefined) next.waist_circumference_cm = next.waist_cm;
+      if (next.sex_male !== undefined) next.gender = next.sex_male === 1 ? 1 : 2;
+      for (const key of ["sex_male", "serum_creatinine", "pulse_bpm", "waist_cm"]) delete next[key];
+      setSourceId(transfer.source_record_id ?? null); setOrigin(transfer.data_origin);
     }
-  }, [initialFeatures]);
+    setInputs(next);
+  }, [transfer, workspace.patientId, workspace.observedOn]);
 
   const updateInput = (key: string, value: any) => {
     setInputs((prev) => ({ ...prev, [key]: value }));
+    setResult(null); setFutureResult(null);
   };
 
-  const runPrediction = async (customInputs?: Record<string, any>) => {
-    const payload = customInputs || inputs;
-    setLoading(true);
-    setError(null);
-    try {
-      const [resRisk, resFuture] = await Promise.all([
-        api.predictRisk(payload),
-        api.predictFutureRisk(payload),
-      ]);
-      setResult(resRisk);
-      setFutureResult(resFuture);
-    } catch (err: any) {
-      setError(err?.message || "Failed to calculate chronic disease and prospective survival risk.");
-    } finally {
-      setLoading(false);
+  const runPrediction = async () => {
+    if (!workspace.context) { setError("Select a patient and visit date before calculating."); return; }
+    const payload: Record<string, number> = Object.fromEntries(Object.entries(inputs).filter(([, value]) => typeof value === "number" && Number.isFinite(value)));
+    if (!payload.age || !Object.keys(payload).some(key => ["bmi", "systolic_bp", "total_cholesterol", "hemoglobin", "hba1c", "fasting_glucose"].includes(key))) {
+      setError("Enter age and at least one measured biomarker or vital. Missing values are handled by each research model's training-time imputation."); return;
     }
+    setResult(null); setFutureResult(null); setLoading(true); setError(null); const done = workspace.beginAnalysis();
+    try {
+      const results = await Promise.allSettled([
+        api.predictRisk(payload, workspace.context, sourceId, origin),
+        api.predictFutureRisk(payload, workspace.context, sourceId, origin),
+      ]);
+      if (results[0].status === "fulfilled") setResult(results[0].value);
+      if (results[1].status === "fulfilled") setFutureResult(results[1].value);
+      if (results.some(result => result.status === "fulfilled")) workspace.analysisSaved();
+      const errors = results.flatMap((result, index) => result.status === "rejected" ? [`${index ? "Future" : "Chronic"} risk: ${result.reason?.message ?? "unavailable"}`] : []);
+      if (errors.length) setError(errors.join("; "));
+    } finally { setLoading(false); done(); }
   };
 
   const loadPreset = (preset: "healthy" | "metabolic" | "senior") => {
@@ -111,7 +100,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
         family_history_diabetes: 0,
         bp_medication: 0,
         history_diabetes: 0,
-        race_black: 0,
+        race_black: 0, prior_cvd: 0,
       };
     } else if (preset === "metabolic") {
       p = {
@@ -131,7 +120,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
         family_history_diabetes: 1,
         bp_medication: 1,
         history_diabetes: 1,
-        race_black: 0,
+        race_black: 0, prior_cvd: 0,
       };
     } else {
       p = {
@@ -151,11 +140,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
         family_history_diabetes: 0,
         bp_medication: 1,
         history_diabetes: 0,
-        race_black: 0,
+        race_black: 0, prior_cvd: 0,
       };
     }
     setInputs(p);
-    runPrediction(p);
+    setOrigin("generated_example"); setSourceId(null); setResult(null); setFutureResult(null);
   };
 
   const getTierColor = (tier: string) => {
@@ -185,7 +174,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
   };
 
   return (
-    <div className="module-page space-y-6">
+    <div className="module-page space-y-6 risk-input-page">
       <div className="page-heading">
         <div>
           <div className="eyebrow page-kicker">PHASE 2 & PART B · CHRONIC RISK & FUTURE MORTALITY ENGINE</div>
@@ -197,10 +186,12 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
         </div>
       </div>
 
+      {sourceId && <div className="ocr-transfer-action"><strong>Confirmed OCR values imported</strong><p>Patient and report date were preserved. Check missing inputs, then choose Calculate. Both results will be linked back to this source report in the timeline.</p></div>}
+      {(result || futureResult) && <SavedToTimeline patientId={result?.patient_id ?? futureResult?.patient_id} observedOn={result?.observed_on ?? futureResult?.observed_on} />}
       {/* Preset Buttons */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
-          <Zap size={14} className="text-amber-500" /> Quick Patient Presets:
+          <Zap size={14} className="text-amber-500" /> Load illustrative inputs · generated examples:
         </span>
         <button
           className="button-secondary text-xs py-1.5 px-3"
@@ -222,6 +213,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
         </button>
       </div>
 
+      <p className="timeline-notice">Leave unknown fields blank. Research models may use training-time imputation; published point scores require their explicit inputs. Review the input record before comparing visits.</p>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Input Parameters Panel */}
         <div className="lg:col-span-5 content-panel space-y-4">
@@ -231,7 +223,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
             </h2>
             <button
               className="button-primary text-xs py-1.5 px-3 flex items-center gap-1"
-              disabled={loading}
+              disabled={loading || !workspace.context}
               onClick={() => runPrediction()}
             >
               {loading ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
@@ -246,11 +238,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 Age: <strong className="text-slate-800">{inputs.age} yrs</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="18"
                 max="85"
                 value={inputs.age}
-                onChange={(e) => updateInput("age", Number(e.target.value))}
+                onChange={(e) => updateInput("age", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -290,11 +282,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 Systolic BP: <strong className="text-slate-800">{inputs.systolic_bp} mmHg</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="90"
                 max="200"
                 value={inputs.systolic_bp}
-                onChange={(e) => updateInput("systolic_bp", Number(e.target.value))}
+                onChange={(e) => updateInput("systolic_bp", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -305,11 +297,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 Diastolic BP: <strong className="text-slate-800">{inputs.diastolic_bp} mmHg</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="50"
                 max="120"
                 value={inputs.diastolic_bp}
-                onChange={(e) => updateInput("diastolic_bp", Number(e.target.value))}
+                onChange={(e) => updateInput("diastolic_bp", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -320,12 +312,12 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 BMI: <strong className="text-slate-800">{inputs.bmi} kg/m2</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="16"
                 max="45"
                 step="0.1"
                 value={inputs.bmi}
-                onChange={(e) => updateInput("bmi", Number(e.target.value))}
+                onChange={(e) => updateInput("bmi", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -336,11 +328,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 Resting Pulse: <strong className="text-slate-800">{inputs.pulse} bpm</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="45"
                 max="120"
                 value={inputs.pulse}
-                onChange={(e) => updateInput("pulse", Number(e.target.value))}
+                onChange={(e) => updateInput("pulse", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -351,11 +343,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 Total Cholesterol: <strong className="text-slate-800">{inputs.total_cholesterol} mg/dL</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="110"
                 max="350"
                 value={inputs.total_cholesterol}
-                onChange={(e) => updateInput("total_cholesterol", Number(e.target.value))}
+                onChange={(e) => updateInput("total_cholesterol", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -366,11 +358,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 HDL Cholesterol: <strong className="text-slate-800">{inputs.hdl_cholesterol} mg/dL</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="20"
                 max="100"
                 value={inputs.hdl_cholesterol}
-                onChange={(e) => updateInput("hdl_cholesterol", Number(e.target.value))}
+                onChange={(e) => updateInput("hdl_cholesterol", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -381,11 +373,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 Triglycerides: <strong className="text-slate-800">{inputs.triglycerides} mg/dL</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="40"
                 max="400"
                 value={inputs.triglycerides}
-                onChange={(e) => updateInput("triglycerides", Number(e.target.value))}
+                onChange={(e) => updateInput("triglycerides", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -396,12 +388,12 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 Creatinine: <strong className="text-slate-800">{inputs.creatinine} mg/dL</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="0.4"
                 max="3.0"
                 step="0.05"
                 value={inputs.creatinine}
-                onChange={(e) => updateInput("creatinine", Number(e.target.value))}
+                onChange={(e) => updateInput("creatinine", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -412,11 +404,11 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                 Waist Circ: <strong className="text-slate-800">{inputs.waist_circumference_cm} cm</strong>
               </label>
               <input
-                type="range"
+                type="number"
                 min="60"
                 max="140"
                 value={inputs.waist_circumference_cm}
-                onChange={(e) => updateInput("waist_circumference_cm", Number(e.target.value))}
+                onChange={(e) => updateInput("waist_circumference_cm", (e.target.value === "" ? "" : Number(e.target.value)))}
                 className="w-full accent-teal-600"
               />
             </div>
@@ -578,6 +570,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
               </div>
             </div>
           </div>
+          <label className="risk-history-field">Prior cardiovascular disease (for PCE eligibility)<select value={inputs.prior_cvd} onChange={e => updateInput("prior_cvd", e.target.value === "" ? "" : Number(e.target.value))}><option value="">Not provided</option><option value="0">No</option><option value="1">Yes</option></select></label>
         </div>
 
         {/* Prediction Results Display */}
@@ -730,7 +723,7 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                       <div className="mt-2 text-lg font-black text-slate-900">
                         {futureResult.published_scores.pooled_cohort_equations_pce.estimated_10yr_ascvd_risk_pct !== null
                           ? `${futureResult.published_scores.pooled_cohort_equations_pce.estimated_10yr_ascvd_risk_pct.toFixed(1)}% 10-Yr ASCVD Risk`
-                          : "Ineligible (Age outside 40-79 or missing lipids)"}
+                          : (futureResult.published_scores.pooled_cohort_equations_pce.availability_notice ?? "Unavailable for supplied inputs")}
                       </div>
                       <div className="text-[10px] text-slate-500 mt-1">
                         Primary prevention cohort (ages 40-79 without prior CVD). Evaluated for discrimination against fatal CVD.
@@ -763,10 +756,10 @@ export function RiskCalculatorPage({ initialFeatures }: RiskCalculatorPageProps)
                       </div>
 
                       <div className="mt-2 text-lg font-black text-slate-900">
-                        {futureResult.published_scores.indian_diabetes_risk_score_idrs.score} / 100 Points
+                        {futureResult.published_scores.indian_diabetes_risk_score_idrs.score === null ? "Missing required inputs" : `${futureResult.published_scores.indian_diabetes_risk_score_idrs.score} / 100 Points`}
                       </div>
                       <div className="text-[10px] text-slate-600 mt-0.5">
-                        Age: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.age_points} · Waist: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.waist_points} · Activity: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.activity_points} · Family: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.family_history_points}
+                        {futureResult.published_scores.indian_diabetes_risk_score_idrs.availability_notice}<br />Age: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.age_points} · Waist: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.waist_points} · Activity: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.activity_points} · Family: {futureResult.published_scores.indian_diabetes_risk_score_idrs.components?.family_history_points}
                       </div>
                       <div className="text-[10px] text-slate-500 mt-1">
                         * Physical activity and family history are approximate mappings from NHANES variables.

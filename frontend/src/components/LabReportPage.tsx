@@ -1,4 +1,6 @@
-import { useState, type ChangeEvent, type DragEvent } from "react";
+import { SavedToTimeline, usePatientWorkspace } from "./PatientWorkspace";
+import type { RiskTransfer } from "../types";
+import { useEffect, useState, type ChangeEvent, type DragEvent } from "react";
 import {
   FileText,
   Upload,
@@ -17,10 +19,12 @@ import type { ReportExtractResponse, LabItemSchema } from "../types";
 
 interface LabReportPageProps {
   onOpenTimeline: () => void;
-  onTransferToRisk: (features: Record<string, number>) => void;
+  onTransferToRisk: (transfer: RiskTransfer) => void;
 }
 
 export function LabReportPage({ onTransferToRisk, onOpenTimeline }: LabReportPageProps) {
+  const workspace = usePatientWorkspace();
+  const [transferring, setTransferring] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +34,11 @@ export function LabReportPage({ onTransferToRisk, onOpenTimeline }: LabReportPag
   const [patientSex, setPatientSex] = useState<string>("unspecified");
   const [editedValues, setEditedValues] = useState<Record<string, number>>({});
   const [confirmedTests, setConfirmedTests] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    setResult(null); setFile(null); setEditedValues({}); setConfirmedTests({}); setError(null);
+    setPatientSex(workspace.patient?.reported_sex ?? "unspecified");
+  }, [workspace.patientId, workspace.observedOn]);
 
   const handleFile = (selected: File) => {
     setFile(selected);
@@ -56,12 +65,14 @@ export function LabReportPage({ onTransferToRisk, onOpenTimeline }: LabReportPag
   const runExtraction = async (targetFile?: File, sexOverride?: string) => {
     const f = targetFile || file;
     if (!f) return;
+    if (!workspace.context) { setError("Select a patient and report date above before extraction."); return; }
+    const done = workspace.beginAnalysis();
     setLoading(true);
     setError(null);
     const effSex = sexOverride !== undefined ? sexOverride : patientSex;
     try {
-      const res = await api.extractReport(f, effSex !== "unspecified" ? effSex : undefined);
-      setResult(res);
+      const res = await api.extractReport(f, effSex !== "unspecified" ? effSex : undefined, "user_supplied_unverified", workspace.context);
+      setResult(res); workspace.analysisSaved();
       setEditedValues({});
       const autoConfirmed: Record<string, boolean> = {};
       res.extracted_tests.forEach((t) => {
@@ -71,7 +82,7 @@ export function LabReportPage({ onTransferToRisk, onOpenTimeline }: LabReportPag
     } catch (err: any) {
       setError(err?.message || "Failed to extract lab report.");
     } finally {
-      setLoading(false);
+      setLoading(false); done();
     }
   };
 
@@ -124,13 +135,14 @@ Sex: Male`;
 
   const handleEditValue = (canonicalName: string, val: number) => {
     setEditedValues((prev) => ({ ...prev, [canonicalName]: val }));
+    setConfirmedTests(prev => ({ ...prev, [canonicalName]: false }));
   };
 
   // Convert extracted tests to risk engine features
   const getRiskFeatures = (items: LabItemSchema[]): Record<string, number> => {
     const map: Record<string, number> = {};
     for (const it of items) {
-      if (confirmedTests[it.canonical_name] === false) continue;
+      if (confirmedTests[it.canonical_name] !== true) continue;
       const val = editedValues[it.canonical_name] !== undefined ? editedValues[it.canonical_name] : it.value;
       if (it.canonical_name === "total_cholesterol") map.total_cholesterol = val;
       else if (it.canonical_name === "hdl_cholesterol") map.hdl_cholesterol = val;
@@ -183,14 +195,28 @@ Sex: Male`;
   const hasLowConfidence = result
     ? result.extracted_tests.some((t) => t.confidence < 0.70)
     : false;
-  const isScannedOrOcr = result ? result.extraction_method !== "pdf_text_layer" : false;
+  const isScannedOrOcr = result ? !["pdf_text_layer", "text_input"].includes(result.extraction_method) : false;
   const confirmedCount = result
-    ? result.extracted_tests.filter((t) => confirmedTests[t.canonical_name] !== false).length
+    ? result.extracted_tests.filter((t) => confirmedTests[t.canonical_name] === true).length
     : 0;
   const allTestsConfirmed = result
     ? result.extracted_tests.length > 0 &&
-      result.extracted_tests.every((t) => confirmedTests[t.canonical_name] !== false)
+      result.extracted_tests.every((t) => confirmedTests[t.canonical_name] === true)
     : false;
+
+  const transferConfirmed = async () => {
+    if (!result || !workspace.context || !result.upload_id) { setError("Extract the report with an active patient first."); return; }
+    const selected = result.extracted_tests.filter(test => confirmedTests[test.canonical_name] === true);
+    if (!selected.length) { setError("Confirm at least one extracted value in the table before transfer."); return; }
+    const corrections = Object.fromEntries(selected.map(test => [test.canonical_name, editedValues[test.canonical_name] ?? test.value]));
+    if (Object.values(corrections).some(value => !Number.isFinite(value) || value < 0)) { setError("Use finite, nonnegative confirmed values."); return; }
+    setTransferring(true); setError(null); const done = workspace.beginAnalysis();
+    try {
+      await api.review(result.upload_id, corrections, selected.map(test => test.canonical_name));
+      workspace.analysisSaved();
+      onTransferToRisk({ features: riskFeatures, source_record_id: result.upload_id, data_origin: result.data_origin, context: workspace.context });
+    } catch(e) { setError((e as Error).message); } finally { setTransferring(false); done(); }
+  };
 
   return (
     <div className="module-page space-y-6">
@@ -205,6 +231,7 @@ Sex: Male`;
         </div>
       </div>
 
+      <div className="module-timeline-link"><div><strong>Compare multiple reports over time</strong><p>Upload dated batches to a patient workspace, review values, and explore lab evolution.</p></div><button className="button-secondary" onClick={onOpenTimeline}>Open patient timelines <ArrowRight size={15} /></button></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upload & Controls */}
         <div className="lg:col-span-1 space-y-4">
@@ -248,12 +275,11 @@ Sex: Male`;
                 </div>
                 <button
                   className="button-primary text-xs px-3 py-1.5 shrink-0"
-                  disabled={loading}
+                  disabled={loading || !workspace.context}
                   onClick={() => runExtraction()}
                 >
                   {loading ? (
                     <>
-      <div className="module-timeline-link"><div><strong>Compare multiple reports over time</strong><p>Upload dated batches to a patient workspace, review values, and explore lab evolution.</p></div><button className="button-secondary" onClick={onOpenTimeline}>Open patient timelines <ArrowRight size={15} /></button></div>
                       <RefreshCw size={14} className="animate-spin" /> Extracting...
                     </>
                   ) : (
@@ -306,14 +332,14 @@ Sex: Male`;
             </div>
           </div>
 
-          {result && Object.keys(riskFeatures).length > 0 && (
+          {result && (
             <div className="content-panel bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-200">
               <div className="flex items-center gap-2 text-teal-900 font-semibold text-sm mb-1">
                 <Activity size={18} className="text-teal-600" />
                 Pipeline Integration
               </div>
               <p className="text-xs text-teal-800 mb-3">
-                {Object.keys(riskFeatures).length} clinical biomarkers ready for NHANES chronic disease risk prediction.
+                {confirmedCount} confirmed measurements ready for NHANES chronic disease risk prediction.
               </p>
 
               {hasLowConfidence && (
@@ -339,7 +365,7 @@ Sex: Male`;
                   />
                 </div>
                 <div className="text-[10px] text-emerald-800 font-medium">
-                  {confirmedCount > 0 ? "Automatic transfer enabled. Click below to populate Chronic Risk Engine." : "Select at least one biomarker to transfer."}
+                  {confirmedCount > 0 ? "Confirmed values selected. Transfer them into the risk form, then review and calculate." : "Select at least one biomarker to transfer."}
                 </div>
               </div>
 
@@ -347,7 +373,7 @@ Sex: Male`;
                 <div className="p-2.5 rounded-lg bg-teal-50 border border-teal-200 text-teal-950 text-xs flex items-center gap-2">
                   <CheckCircle2 size={16} className="text-teal-600 shrink-0" />
                   <span className="text-[11px] font-medium text-teal-800">
-                    Automated OCR Extraction: Values ready for one-click transfer. Review or edit anytime below.
+                    Only values you explicitly confirm will be transferred. Corrections are saved with the source report.
                   </span>
                 </div>
               )}
@@ -358,10 +384,10 @@ Sex: Male`;
                     ? "bg-teal-600 hover:bg-teal-700 cursor-pointer"
                     : "bg-slate-400 cursor-not-allowed opacity-60"
                 }`}
-                disabled={confirmedCount === 0}
-                onClick={() => onTransferToRisk(riskFeatures)}
+                disabled={confirmedCount === 0 || transferring}
+                onClick={() => void transferConfirmed()}
               >
-                <span>Send to Chronic Risk Engine</span>
+                <span>{transferring ? "Saving confirmed values…" : "Send confirmed values to Chronic Disease Risk"}</span>
                 <ArrowRight size={14} />
               </button>
             </div>
@@ -399,6 +425,8 @@ Sex: Male`;
 
           {result && (
             <>
+              <SavedToTimeline patientId={result.patient_id} observedOn={result.observed_on} />
+              <div className="ocr-transfer-action"><div><strong>Continue with Chronic Disease Risk</strong><p>Confirm values in the table, then transfer them with their patient, date and source report.</p></div><button className="button-primary" disabled={!confirmedCount || transferring} onClick={() => void transferConfirmed()}>{transferring ? "Saving review…" : `Send ${confirmedCount} confirmed values to risk`}<ArrowRight size={15} /></button><small>{confirmedCount ? "Review any missing demographics and measurements in the risk form before calculating." : "The transfer button enables after you confirm at least one value in the table."}</small></div>
               {/* Persistent warning for scanned / OCR inputs (Pass 5 F5) */}
               {isScannedOrOcr && (
                 <div className="p-3.5 rounded-xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-xs font-semibold flex items-center gap-2.5">
@@ -434,7 +462,7 @@ Sex: Male`;
                 <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-sm">
                   <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Risk Features</div>
                   <div className="text-sm font-bold text-blue-700 mt-1">
-                    {Object.keys(riskFeatures).length} mapped
+                    {confirmedCount} confirmed
                   </div>
                 </div>
               </div>
@@ -467,6 +495,7 @@ Sex: Male`;
                         <th className="py-2.5 px-3 font-semibold text-center w-12">
                           <input
                             type="checkbox"
+                            aria-label="Confirm all extracted values"
                             title={allTestsConfirmed ? "Uncheck all" : "Verify and confirm all biomarkers"}
                             className="rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer h-4 w-4"
                             checked={allTestsConfirmed}
@@ -494,7 +523,8 @@ Sex: Male`;
                             <input
                               type="checkbox"
                               className="rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer h-4 w-4"
-                              checked={confirmedTests[test.canonical_name] !== false}
+                              aria-label={`Confirm ${test.display_name}`}
+                              checked={confirmedTests[test.canonical_name] === true}
                               onChange={(e) =>
                                 setConfirmedTests((prev) => ({
                                   ...prev,

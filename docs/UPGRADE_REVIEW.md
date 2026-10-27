@@ -100,3 +100,7 @@ The underlying lung model remains weak for COVID-19, and reference-range movemen
 The code review covered backend routes/storage/schemas, all five service modules, frontend screens/data access, model and audit metadata, training entry points, dependency manifests and tests. Large historical audit/training scripts were inventoried and sampled; the full historical research literature and every reported metric were not re-audited in this implementation pass.
 
 A design reference for transparent subgroup evidence and limitations is the [FDA's machine-learning transparency principles](https://www.fda.gov/medical-devices/artificial-intelligence-enabled-medical-devices/transparency-machine-learning-enabled-medical-devices-guiding-principles). This project does not claim regulatory conformity from following them.
+
+## Connected modules
+
+See [MODULE_WORKFLOW.md](MODULE_WORKFLOW.md) for the shared patient/date context, automatic linking, OCR transfer, overall timeline assessment and risk evolution. Earlier account-only records can be linked explicitly from the timeline source queue.

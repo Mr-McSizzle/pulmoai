@@ -231,7 +231,7 @@ class UserDataStore:
     def list_records(self, user_id: str) -> list[dict[str, Any]]:
         with self._connection() as connection:
             rows = connection.execute(
-                "SELECT id, kind, original_filename, content_type, size_bytes, summary, uploaded_at, stored_filename "
+                "SELECT * "
                 "FROM uploads WHERE user_id = ? ORDER BY uploaded_at DESC, id DESC",
                 (user_id,),
             ).fetchall()
@@ -240,7 +240,7 @@ class UserDataStore:
     def get_record(self, user_id: str, record_id: str) -> dict[str, Any] | None:
         with self._connection() as connection:
             row = connection.execute(
-                "SELECT id, kind, original_filename, content_type, size_bytes, summary, uploaded_at, stored_filename, result_json "
+                "SELECT * "
                 "FROM uploads WHERE id = ? AND user_id = ?",
                 (record_id, user_id),
             ).fetchone()
@@ -342,4 +342,5 @@ class UserDataStore:
             "summary": row["summary"],
             "uploaded_at": row["uploaded_at"],
             "has_file": row["stored_filename"] is not None,
+            **{key: row[key] for key in ("patient_id", "observed_on", "series_label", "review_status") if key in row.keys()},
         }

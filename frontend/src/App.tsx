@@ -1,3 +1,5 @@
+import { PatientWorkspaceProvider, PatientContextBar, SavedToTimeline, usePatientWorkspace } from "./components/PatientWorkspace";
+import type { RiskTransfer } from "./types";
 import { Fragment, useCallback, useEffect, useMemo, useState, type ChangeEvent, type DragEvent, type ReactNode } from "react";
 import {
   Activity,
@@ -125,7 +127,7 @@ function App() {
   const [healthError, setHealthError] = useState<string | null>(null);
   const [recent, setRecent] = useState<RecentAnalysis[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [riskInitialFeatures, setRiskInitialFeatures] = useState<Record<string, number> | null>(null);
+  const [riskTransfer, setRiskTransfer] = useState<RiskTransfer | null>(null);
 
   const refresh = useCallback(() => {
     api.health().then((result) => {
@@ -184,7 +186,7 @@ function App() {
       setAuthMode("login");
       setActivePage("overview");
       setRecent([]);
-      setRiskInitialFeatures(null);
+      setRiskTransfer(null);
     });
   };
 
@@ -197,7 +199,7 @@ function App() {
   }
 
   return (
-    <div className="workspace-shell">
+    <PatientWorkspaceProvider key={currentUser.id}><div className="workspace-shell">
       <div className={`sidebar-scrim ${sidebarOpen ? "is-visible" : ""}`} onClick={() => setSidebarOpen(false)} />
       <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
         <div className="brand-lockup">
@@ -254,18 +256,19 @@ function App() {
         </header>
 
         <div className="page-content">
+          <PatientContextBar onTimeline={() => navigate("timeline")} />
           {activePage === "overview" && <OverviewPage data={dashboard} error={dashboardError} recent={recent} onNavigate={navigate} />}
-          {activePage === "timeline" && <PatientTimelinePage />}
+          {activePage === "timeline" && <PatientTimelinePage onTransferToRisk={transfer => { setRiskTransfer(transfer); navigate("risk"); }} />}
           {activePage === "analyze" && <AnalyzePage onPrediction={addRecentAnalysis} />}
           {activePage === "reports" && (
             <LabReportPage onOpenTimeline={() => navigate("timeline")}
-              onTransferToRisk={(features) => {
-                setRiskInitialFeatures(features);
+              onTransferToRisk={(transfer) => {
+                setRiskTransfer(transfer);
                 setActivePage("risk");
               }}
             />
           )}
-          {activePage === "risk" && <RiskCalculatorPage initialFeatures={riskInitialFeatures} />}
+          {activePage === "risk" && <RiskCalculatorPage transfer={riskTransfer} />}
           {activePage === "images" && <ImageScreeningPage onOpenTimeline={() => navigate("timeline")} />}
           {activePage === "uploads" && <MyUploadsPage user={currentUser} />}
           {activePage === "performance" && <PerformancePage data={dashboard} error={dashboardError} />}
@@ -286,7 +289,7 @@ function App() {
           </div>
         </footer>
       </main>
-    </div>
+    </div></PatientWorkspaceProvider>
   );
 }
 
@@ -512,6 +515,7 @@ function DistributionBars({ data }: { data: DashboardData }) {
 }
 
 function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result: PredictionResponse) => void }) {
+  const workspace = usePatientWorkspace();
   const [file, setFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const [validating, setValidating] = useState(false);
@@ -520,6 +524,8 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
   const [validation, setValidation] = useState<ValidationResponse | null>(null);
   const [result, setResult] = useState<PredictionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => { setResult(null); setFile(null); setValidation(null); setError(null); setReportedSex(workspace.patient?.reported_sex ?? "unknown"); }, [workspace.patientId, workspace.observedOn]);
 
   const selectFile = (next: File | null) => {
     setFile(next);
@@ -551,16 +557,19 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
 
   const predict = async () => {
     if (!file || !validation?.valid) return;
+    if (!workspace.context) { setError("Select the patient and visit date above first."); return; }
+    const done = workspace.beginAnalysis();
     setPredicting(true);
     setError(null);
     try {
-      const prediction = await api.predict(file, reportedSex);
+      const prediction = await api.predict(file, reportedSex, workspace.context);
       setResult(prediction);
       onPrediction(file.name, prediction);
+      workspace.analysisSaved();
     } catch (caught) {
       setError((caught as Error).message);
     } finally {
-      setPredicting(false);
+      setPredicting(false); done();
     }
   };
 
@@ -643,7 +652,7 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
           <div className="sex-model-context"><label>Reported biological sex<select className="sex-context-select" value={reportedSex} disabled={predicting} onChange={e => { setReportedSex(e.target.value as ReportedSex); setResult(null); }}><option value="unknown">Unknown / not provided</option><option value="female">Female</option><option value="male">Male</option><option value="intersex">Intersex</option></select></label><p>The released model is pooled: verified sex annotations are absent from the atlas. Sex-specific research models can be selected only after local training, held-out-study evaluation and checksum verification. Gender identity is not a model input.</p></div>
           <div className="upload-actions">
             <button className="button-secondary" onClick={validate} disabled={!file || validating || predicting}>{validating ? <><span className="button-spinner" /> Validating…</> : <><FileCheck2 size={16} /> Validate file</>}</button>
-            <button className="button-primary" onClick={predict} disabled={!validation?.valid || predicting || validating}>{predicting ? <><span className="button-spinner" /> Analyzing…</> : <>Run classification <ArrowRight size={16} /></>}</button>
+            <button className="button-primary" onClick={predict} disabled={!validation?.valid || predicting || validating || !workspace.context}>{predicting ? <><span className="button-spinner" /> Analyzing…</> : <>Run classification <ArrowRight size={16} /></>}</button>
           </div>
           {validation && <div className="validation-success"><CircleCheck size={17} /><div><strong>Profile validated by the backend</strong><span>{number(validation.recognized_gene_count)} of {number(validation.required_gene_count)} genes matched · {validation.normalization}</span></div><Check size={16} /></div>}
           {error && <div className="validation-error"><CircleAlert size={17} /><span>{error}</span></div>}
@@ -664,6 +673,7 @@ function AnalyzePage({ onPrediction }: { onPrediction: (filename: string, result
 
           {result && (
             <section className="content-panel prediction-panel">
+              <SavedToTimeline patientId={result.patient_id} observedOn={result.observed_on} />
               <p className="eyebrow">RESEARCH CLASSIFICATION</p>
               <h2 className="text-xl font-bold text-slate-900">{displayDisease(result.predicted_class)}</h2>
               <div className="text-xs font-semibold text-teal-800 bg-teal-50 px-2.5 py-1.5 rounded border border-teal-200 my-2">

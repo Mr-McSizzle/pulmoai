@@ -40,6 +40,7 @@ from backend.schemas import (
     UserResponse,
     ValidationResponse,
 )
+from backend.analysis_records import form_context, normalize_risk_inputs, save_analysis, validate_context, validate_source
 from backend.storage import DuplicateEmailError, SESSION_DAYS, UserDataStore
 
 
@@ -460,23 +461,16 @@ async def predict_upload(
     file: Annotated[UploadFile, File(description="One compatible raw-count gene-expression CSV")],
     user: Annotated[dict[str, str] | None, Depends(optional_current_user)],
     reported_sex: Annotated[Literal["female", "male", "intersex", "unknown"], Form()] = "unknown",
+    patient_id: Annotated[str | None, Form()] = None,
+    observed_on: Annotated[str | None, Form()] = None,
 ) -> PredictionResponse:
+    context = form_context(get_user_data_store(request), user, patient_id, observed_on)
     service = require_service(request)
     contents = await read_csv_upload(file)
     try:
         result = PredictionResponse(**await run_in_threadpool(service.predict_upload, contents, reported_sex=reported_sex))
-        if user is not None:
-            record = get_user_data_store(request).save_record(
-                user["id"],
-                "scrna_csv",
-                file.filename or "lung-expression.csv",
-                file.content_type or "text/csv",
-                result.model_dump(mode="json"),
-                f"Predicted class: {result.predicted_class}",
-                contents,
-            )
-            result.upload_id = record["id"]
-            result.uploaded_at = record["uploaded_at"]
+        save_analysis(get_user_data_store(request), user, result, "scrna_csv", file.filename or "lung-expression.csv",
+                      file.content_type or "text/csv", f"Predicted class: {result.predicted_class}", context, contents)
         return result
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
@@ -499,7 +493,10 @@ async def extract_report(
     sex: Annotated[str | None, Form(description="Patient biological sex (male/female) for sex-specific reference ranges")] = None,
     user: Annotated[dict[str, str] | None, Depends(optional_current_user)] = None,
     data_origin: Annotated[Literal["user_supplied_unverified", "generated_example"], Form()] = "user_supplied_unverified",
+    patient_id: Annotated[str | None, Form()] = None,
+    observed_on: Annotated[str | None, Form()] = None,
 ) -> ReportExtractResponse:
+    context = form_context(get_user_data_store(request), user, patient_id, observed_on)
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
     suffix = Path(file.filename).suffix.lower()
@@ -522,19 +519,11 @@ async def extract_report(
         from pulmoai.provenance import data_origin as resolve_origin
         extraction_result["data_origin"] = resolve_origin(contents, file.filename, data_origin)
         response = ReportExtractResponse(**extraction_result)
-        if user is not None:
-            record = get_user_data_store(request).save_record(
-                user["id"],
-                "lab_report",
-                file.filename,
-                file.content_type or "application/octet-stream",
-                response.model_dump(mode="json", exclude={"upload_id", "uploaded_at"}),
-                f"Extracted {response.count} lab values",
-                contents,
-            )
-            response.upload_id = record["id"]
-            response.uploaded_at = record["uploaded_at"]
+        save_analysis(get_user_data_store(request), user, response, "lab_report", file.filename,
+                      file.content_type or "application/octet-stream", f"Extracted {response.count} lab values", context, contents)
         return response
+    except HTTPException:
+        raise
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
     except Exception as error:
@@ -548,19 +537,20 @@ def predict_chronic_risk(
     payload: RiskPredictionRequest,
     user: Annotated[dict[str, str] | None, Depends(optional_current_user)],
 ) -> RiskPredictionResponse:
+    store = get_user_data_store(request)
+    context = validate_context(store, user, payload.context)
+    source = validate_source(store, user, payload.source_record_id, context)
+    inputs = normalize_risk_inputs(payload.inputs)
     risk_service = require_risk_service(request)
     try:
-        response = RiskPredictionResponse(**risk_service.predict_risk(payload.inputs))
-        if user is not None:
-            get_user_data_store(request).save_record(
-                user["id"],
-                "risk_assessment",
-                "Chronic disease risk assessment",
-                "application/json",
-                {"inputs": payload.inputs, "result": response.model_dump(mode="json")},
-                f"Calculated {len(response.risk_predictions)} condition risk estimates",
-            )
+        response = RiskPredictionResponse(**risk_service.predict_risk(inputs))
+        response.data_origin = source["result"].get("data_origin", "user_supplied_unverified") if source else payload.data_origin
+        response.artifact_id = get_artifact_verification(request.app).get("artifacts", {}).get("models/nhanes_risk_models.joblib", {}).get("actual_sha256")
+        save_analysis(store, user, response, "risk_assessment", "Chronic disease risk assessment", "application/json", "Condition risk estimates",
+                      context, inputs=inputs, source_record_id=payload.source_record_id)
         return response
+    except HTTPException:
+        raise
     except Exception as error:
         logger.exception("Risk prediction calculation failed")
         raise HTTPException(status_code=500, detail="An error occurred while calculating chronic disease risk.") from error
@@ -572,19 +562,20 @@ def predict_future_mortality_risk(
     payload: RiskPredictionRequest,
     user: Annotated[dict[str, str] | None, Depends(optional_current_user)],
 ) -> FutureRiskResponse:
+    store = get_user_data_store(request)
+    context = validate_context(store, user, payload.context)
+    source = validate_source(store, user, payload.source_record_id, context)
+    inputs = normalize_risk_inputs(payload.inputs)
     future_service = require_future_risk_service(request)
     try:
-        response = FutureRiskResponse(**future_service.predict_future_risk(payload.inputs))
-        if user is not None:
-            get_user_data_store(request).save_record(
-                user["id"],
-                "future_risk_assessment",
-                "Future risk assessment",
-                "application/json",
-                {"inputs": payload.inputs, "result": response.model_dump(mode="json")},
-                "Calculated future mortality risk estimates",
-            )
+        response = FutureRiskResponse(**future_service.predict_future_risk(inputs))
+        response.data_origin = source["result"].get("data_origin", "user_supplied_unverified") if source else payload.data_origin
+        response.artifact_id = get_artifact_verification(request.app).get("artifacts", {}).get("models/future_risk_models.joblib", {}).get("actual_sha256")
+        save_analysis(store, user, response, "future_risk_assessment", "Future risk assessment", "application/json", "Future mortality risk estimates",
+                      context, inputs=inputs, source_record_id=payload.source_record_id)
         return response
+    except HTTPException:
+        raise
     except Exception as error:
         logger.exception("Future risk prediction calculation failed")
         raise HTTPException(status_code=500, detail="An error occurred while calculating prospective future risk.") from error
@@ -603,7 +594,13 @@ async def predict_medical_image(
     patient_is_pediatric: Annotated[bool, Form(description="Patient pediatric confirmation flag")] = False,
     user: Annotated[dict[str, str] | None, Depends(optional_current_user)] = None,
     data_origin: Annotated[Literal["user_supplied_unverified", "generated_example"], Form()] = "user_supplied_unverified",
+    patient_id: Annotated[str | None, Form()] = None,
+    observed_on: Annotated[str | None, Form()] = None,
+    series_label: Annotated[str, Form(max_length=80)] = "",
 ) -> ImagePredictionResponse:
+    context = form_context(get_user_data_store(request), user, patient_id, observed_on, series_label)
+    if context and not context["series_label"]:
+        raise HTTPException(422, "Enter an acquisition series for linked imaging observations.")
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename must be provided.")
     suffix = Path(file.filename).suffix.lower()
@@ -646,19 +643,11 @@ async def predict_medical_image(
         from pulmoai.provenance import data_origin as resolve_origin
         result["data_origin"] = resolve_origin(contents, file.filename, data_origin)
         response = ImagePredictionResponse(**result)
-        if user is not None:
-            record = get_user_data_store(request).save_record(
-                user["id"],
-                "medical_image",
-                file.filename,
-                file.content_type or "application/octet-stream",
-                response.model_dump(mode="json", exclude={"upload_id", "uploaded_at"}),
-                f"{response.modality_name}: {response.predicted_class or response.status}",
-                contents,
-            )
-            response.upload_id = record["id"]
-            response.uploaded_at = record["uploaded_at"]
+        save_analysis(get_user_data_store(request), user, response, "medical_image", file.filename,
+                      file.content_type or "application/octet-stream", f"{response.modality_name}: {response.predicted_class or response.status}", context, contents)
         return response
+    except HTTPException:
+        raise
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
     except Exception as error:

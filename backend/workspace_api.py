@@ -45,6 +45,7 @@ class RecordContext(Observation):
 class ReviewInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     confirmed: Literal[True]
+    confirmed_tests: list[str] | None = Field(default=None, max_length=100)
     corrections: dict[str, Annotated[float, Field(ge=0, allow_inf_nan=False)]] = Field(default_factory=dict)
 
 
@@ -99,7 +100,7 @@ def link_record(record_id: str, payload: RecordContext, request: Request, user: 
 @router.post("/uploads/{record_id}/review", status_code=204)
 def review_record(record_id: str, payload: ReviewInput, request: Request, user: User):
     try:
-        repository(request).review(user["id"], record_id, payload.corrections)
+        repository(request).review(user["id"], record_id, payload.corrections, payload.confirmed_tests)
     except LookupError as error:
         raise HTTPException(404, str(error)) from error
     except ValueError as error:

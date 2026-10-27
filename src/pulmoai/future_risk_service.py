@@ -290,6 +290,23 @@ class FutureRiskService:
             family_history_diabetes=fam_history,
         )
 
+        # Published point scores need explicit answers; model-imputed values are not measurements.
+        pce_required = ("age", "sex_male", "race_black", "current_smoker", "bp_medication",
+                        "target_diabetes", "systolic_bp", "total_cholesterol", "hdl_cholesterol", "prior_cvd")
+        pce_missing = [name for name in pce_required if user_inputs.get(name) is None]
+        pce_notice = "Provide: " + ", ".join(pce_missing) if pce_missing else None
+        if pce_missing or user_inputs.get("prior_cvd") != 0:
+            pce_risk, pce_category = None, None
+            if not pce_missing:
+                pce_notice = "Primary-prevention score unavailable with reported prior cardiovascular disease."
+        elif pce_risk is None:
+            pce_notice = "Outside the equation's supported age or measurement range."
+        idrs_required = ("age", "sex_male", "waist_cm", "activity_level", "family_history_diabetes")
+        idrs_missing = [name for name in idrs_required if user_inputs.get(name) is None]
+        idrs_notice = "Provide: " + ", ".join(idrs_missing) if idrs_missing else None
+        if idrs_missing:
+            idrs_res = {"score": None, "tier": "Unavailable", "interpretation": idrs_notice, "components": {}}
+
         return {
             "future_endpoints": {
                 "all_cause_mortality": {
@@ -334,6 +351,7 @@ class FutureRiskService:
                 "pooled_cohort_equations_pce": {
                     "display_name": "Pooled Cohort Equations (ACC/AHA 2013)",
                     "eligible": pce_risk is not None,
+                    "availability_notice": pce_notice,
                     "eligibility_criteria": "Age 40-79 years without prior CVD with measured blood pressure and lipid panel",
                     "estimated_10yr_ascvd_risk_pct": pce_risk,
                     "risk_category": pce_category,
@@ -346,6 +364,7 @@ class FutureRiskService:
                 "indian_diabetes_risk_score_idrs": {
                     "display_name": "Indian Diabetes Risk Score (IDRS)",
                     "score": idrs_res["score"],
+                    "availability_notice": idrs_notice,
                     "risk_tier": idrs_res["tier"],
                     "interpretation": idrs_res["interpretation"],
                     "components": idrs_res["components"],

@@ -24,7 +24,23 @@ class ValidationResponse(BaseModel):
     message: str
 
 
-class PredictionResponse(BaseModel):
+class AnalysisContext(BaseModel):
+    patient_id: str = Field(min_length=1, max_length=64)
+    observed_on: str
+    series_label: str = Field(default="", max_length=80)
+
+
+class AnalysisMetadata(BaseModel):
+    upload_id: str | None = None
+    uploaded_at: str | None = None
+    patient_id: str | None = None
+    observed_on: str | None = None
+    source_record_id: str | None = None
+    artifact_id: str | None = None
+    data_origin: Literal["user_supplied_unverified", "generated_example"] = "user_supplied_unverified"
+
+
+class PredictionResponse(AnalysisMetadata):
     predicted_class: str
     model_name: str
     artifact_id: str
@@ -85,7 +101,7 @@ class LabItemSchema(BaseModel):
     confidence: float
 
 
-class ReportExtractResponse(BaseModel):
+class ReportExtractResponse(AnalysisMetadata):
     data_origin: Literal["user_supplied_unverified", "generated_example"] = "user_supplied_unverified"
     quality_tier: str | None = None
     extraction_method: str
@@ -98,6 +114,9 @@ class ReportExtractResponse(BaseModel):
 
 
 class RiskPredictionRequest(BaseModel):
+    context: AnalysisContext | None = None
+    source_record_id: str | None = Field(default=None, max_length=64)
+    data_origin: Literal["user_supplied_unverified", "generated_example"] = "user_supplied_unverified"
     inputs: dict[str, Annotated[float, Field(allow_inf_nan=False)] | int | None] = Field(max_length=100)
 
 
@@ -116,7 +135,7 @@ class ConditionRiskResult(BaseModel):
     test_prevalence: float | None = None
 
 
-class RiskPredictionResponse(BaseModel):
+class RiskPredictionResponse(AnalysisMetadata):
     risk_predictions: dict[str, ConditionRiskResult]
     contributing_factors: list[str] = Field(default_factory=list)
     features_provided_count: int
@@ -128,7 +147,7 @@ class RiskPredictionResponse(BaseModel):
 # Phase 4: Medical Image Screening Schemas
 # ---------------------------------------------------------------------------
 
-class ImagePredictionResponse(BaseModel):
+class ImagePredictionResponse(AnalysisMetadata):
     data_origin: Literal["user_supplied_unverified", "generated_example"] = "user_supplied_unverified"
     artifact_id: str | None = None
     image_type: str
@@ -192,6 +211,10 @@ class AuthResponse(BaseModel):
 
 
 class StoredRecordResponse(BaseModel):
+    patient_id: str | None = None
+    observed_on: str | None = None
+    series_label: str = ""
+    review_status: str = "unreviewed"
     id: str
     kind: str
     filename: str
@@ -233,7 +256,7 @@ class FutureRiskEndpoint(BaseModel):
     benchmark_metrics: dict[str, float]
 
 
-class FutureRiskResponse(BaseModel):
+class FutureRiskResponse(AnalysisMetadata):
     future_endpoints: dict[str, FutureRiskEndpoint]
     published_scores: dict[str, Any]
     features_provided_count: int

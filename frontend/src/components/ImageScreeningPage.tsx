@@ -1,4 +1,5 @@
-import { useState, type ChangeEvent, type DragEvent } from "react";
+import { SavedToTimeline, usePatientWorkspace } from "./PatientWorkspace";
+import { useEffect, useState, type ChangeEvent, type DragEvent } from "react";
 import {
   Image as ImageIcon,
   Upload,
@@ -46,6 +47,8 @@ const MODALITIES = [
 ];
 
 export function ImageScreeningPage({ onOpenTimeline }: { onOpenTimeline: () => void }) {
+  const workspace = usePatientWorkspace();
+  useEffect(() => { setResult(null); setImageFile(null); setImagePreview(null); }, [workspace.patientId, workspace.observedOn]);
   const [dataOrigin, setDataOrigin] = useState<DataOrigin>("user_supplied_unverified");
   const [pediatric, setPediatric] = useState(false);
   const [selectedModality, setSelectedModality] = useState("chest_xray");
@@ -85,15 +88,17 @@ export function ImageScreeningPage({ onOpenTimeline }: { onOpenTimeline: () => v
   const runPrediction = async (customFile?: File, originOverride?: DataOrigin) => {
     const f = customFile || imageFile;
     if (!f) return;
+    if (!workspace.context || !workspace.seriesLabel.trim()) { setError("Select a patient/date and enter the acquisition series before screening."); return; }
+    const done = workspace.beginAnalysis();
     setLoading(true);
     setError(null);
     try {
-      const res = await api.predictImage(f, selectedModality, oodThreshold, pediatric, originOverride ?? dataOrigin);
-      setResult(res);
+      const res = await api.predictImage(f, selectedModality, oodThreshold, pediatric, originOverride ?? dataOrigin, workspace.context);
+      setResult(res); workspace.analysisSaved();
     } catch (err: any) {
       setError(err?.message || "Medical image screening failed.");
     } finally {
-      setLoading(false);
+      setLoading(false); done();
     }
   };
 
@@ -206,7 +211,7 @@ export function ImageScreeningPage({ onOpenTimeline }: { onOpenTimeline: () => v
             </h2>
             <button
               className="button-primary text-xs py-1.5 px-3 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading || !imageFile || (selectedModality === "chest_xray" && !pediatric)}
+              disabled={loading || !imageFile || !workspace.context || !workspace.seriesLabel.trim() || (selectedModality === "chest_xray" && !pediatric)}
               onClick={() => runPrediction()}
             >
               {loading ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
@@ -215,6 +220,7 @@ export function ImageScreeningPage({ onOpenTimeline }: { onOpenTimeline: () => v
           </div>
 
           {selectedModality === "chest_xray" && <label className="timeline-confirm"><input type="checkbox" checked={pediatric} onChange={e => setPediatric(e.target.checked)} /> I confirm this image is from a child aged 1–5, matching the training cohort.</label>}
+          <label className="acquisition-field">Acquisition series (same site and view)<input aria-label="Acquisition series" maxLength={80} value={workspace.seriesLabel} disabled={loading} onChange={e => workspace.setSeriesLabel(e.target.value)} placeholder="e.g. left forearm · dermatoscopy" /></label>
           {/* Upload Drop Zone */}
           <div
             className={`drop-zone border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer ${
@@ -327,6 +333,7 @@ export function ImageScreeningPage({ onOpenTimeline }: { onOpenTimeline: () => v
 
           {result && (
             <div className="space-y-4">
+              <SavedToTimeline patientId={result.patient_id} observedOn={result.observed_on} />
               <p className="data-origin-badge">{result.data_origin === "generated_example" ? "Generated pattern · not a medical scan" : "Uploaded source · authenticity unverified"}</p>
               {/* Benchmark model clinical notice banner */}
               <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold flex items-center justify-between">
