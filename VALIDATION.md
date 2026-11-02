@@ -1,12 +1,12 @@
-# Local validation — 2026-10-27
+# Local validation — 2026-11-02
 
 Baseline: `927c78d3342fb14a92295c7af7fff0eb64e2cfa8`.
 
 ## Results
 
-- **Backend: 115 tests run; 105 passed, 10 skipped; no failures.**
+- **Backend: 122 tests run; 112 passed, 10 skipped; no failures.**
 - Nine skips require the upstream-excluded vision checkpoints. One integration test requires a local Tesseract executable, which is absent here. Decoder, parser and image-model safety regressions using controlled inputs still run.
-- **Frontend:** TypeScript check and Vite production build passed (1,590 modules; built assets included).
+- **Frontend:** TypeScript check and Vite production build passed (1,592 modules; built assets included).
 - **Diff hygiene:** `git diff --check` passed.
 - **Compose:** `docker compose config --quiet` passed. A Docker daemon was not running, so no image build or container runtime is claimed.
 - **Browser:** exercised isolated synthetic local sign-in, batch creation of three dated reports, explicit source review of each, persistence after reload, chronological charts, baseline/latest deltas, and narrow-viewport layout. The original timeline preview shows the generated cholesterol series (220 → 170 → 130 mg/dL). The evidence update also has browser coverage of the source-backed metric cards and processing workflow controls.
@@ -20,6 +20,13 @@ Baseline: `927c78d3342fb14a92295c7af7fff0eb64e2cfa8`.
 - All five module kinds auto-link with owner-checked patient/date context; exact source and model lineage persist. Twelve new integration/comparison tests cover module coverage, partial OCR confirmation, correction transfer, source/patient isolation, reassignment, account-only compatibility, repeated inference, risk model/date separation and rejected-image handling.
 - One additional regression verifies published PCE/IDRS scores remain unavailable when required inputs are absent. The complete-input fixture now explicitly supplies PCE primary-prevention eligibility.
 - Browser verification with the shipped numerical models: corrected generated OCR cholesterol (245 to 230 mg/dL), explicit confirmation and transfer, chronic/future calculation, RNA classification, and archive-only generated image all appear under the same patient. The consolidated panel shows coverage for all five module kinds and keeps unreviewed findings visible with review status.
+
+## Presentation-case update — 2026-11-02
+
+- Seven additional real-model tests passed: four checked visits plus a live review exercise produce 21 records across all five module kinds; repeated preparation preserves edits and avoids duplicates; missing services produce explicit gaps without fabricated outputs; failed preparation rolls back new files/records; ZIP contents, dates, actual risk inputs and account ownership are verified.
+- Eight laboratory series have four dates, including cholesterol/hemoglobin toward their reported intervals and creatinine away. Ten compatible risk series have four calculated observations each. RNA history repeats one generated profile explicitly; four source illustrations have no screening scores.
+- Browser: loaded the case in the local QA account, verified dated visits, lab/risk chart navigation, earlier/latest loaded PNG previews, RNA/model-scope history, the pending source-review dialog, and transfer of saved cholesterol/creatinine corrections with the original patient/date. The live exercise remains unreviewed for the user's presentation.
+- The guide provides downloads and a walkthrough. Image AI screening and scanned-photo OCR still require their missing checkpoints/Tesseract; source archives and text extraction are available.
 
 ## Commands
 

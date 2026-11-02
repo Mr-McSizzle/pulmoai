@@ -23,6 +23,13 @@ def migrate_workspace(connection: sqlite3.Connection) -> None:
             action TEXT NOT NULL, resource_id TEXT NOT NULL, occurred_at TEXT NOT NULL
         );
         CREATE INDEX IF NOT EXISTS audit_owner_idx ON audit_events(user_id, id DESC);
+        CREATE TABLE IF NOT EXISTS example_cases (
+            user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            scenario_version TEXT NOT NULL,
+            patient_id TEXT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+            manifest_json TEXT NOT NULL,
+            PRIMARY KEY(user_id, scenario_version)
+        );
     """)
     columns = {row[1] for row in connection.execute("PRAGMA table_info(uploads)")}
     for name, definition in {
@@ -137,6 +144,8 @@ class WorkspaceRepository:
                 name = test["canonical_name"]
                 if name in confirmed:
                     values[name] = corrections.get(name, values.get(name, test["value"]))
+            if "example_validation" in result:
+                result["example_validation"] = "user_reviewed"
             result["reviewed_values"] = values
             result["reviewed_tests"] = sorted(reviewed)
             status = "reviewed" if row["kind"] != "lab_report" or reviewed == names else "partially_reviewed"

@@ -1,4 +1,4 @@
-import type { AnalysisContext } from "./types";
+import type { PresentationCase, AnalysisContext } from "./types";
 import type { BenchmarkEvidence, DataOrigin } from "./types";
 import type { Patient, PatientTimeline, ReportedSex, BatchOutcome, AuditEvent } from "./types";
 import type {
@@ -79,6 +79,7 @@ export const api = {
     appendContext(form, context);
     return request("/api/predict", { method: "POST", body: form });
   },
+  preparePresentationCase: () => request<{patient: Patient; example_case: PresentationCase; reused: boolean}>("/api/workspace/presentation-case", {method:"POST"}),
   patients: () => request<Patient[]>("/api/patients"),
   createPatient: (alias: string, reported_sex: ReportedSex) => request<Patient>("/api/patients", {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alias, reported_sex }),

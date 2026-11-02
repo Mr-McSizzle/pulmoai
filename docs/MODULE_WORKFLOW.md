@@ -31,3 +31,7 @@ Risk evolution compares only fully reviewed, dated records with the same artifac
 Earlier account-only uploads can be attached from **Source records → Link an earlier upload**, including RNA and both risk-record types. Select their real observation date and patient deliberately. Reassignment requires source review again; records are never assigned to an arbitrary patient automatically.
 
 Legacy API calls without context retain account-only history for backward compatibility. The web interface requires patient/date context for new analyses.
+
+## Presenting without historical records
+
+Use **Patient timelines → Load presentation case**. The separate generated case contains four checked dates across available modules and one pending source-review exercise. Guide cards lead to visit history, lab/risk evolution, image-source comparison, RNA history and the overall assessment. Reopening preserves edits. Download the original sources and [walkthrough](PRESENTATION_WALKTHROUGH.md) from the guide. Numeric outputs are calculated; missing models are reported explicitly.

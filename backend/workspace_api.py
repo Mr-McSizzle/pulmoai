@@ -77,7 +77,28 @@ def create_patient(payload: PatientInput, request: Request, user: User):
 def timeline(patient_id: str, request: Request, user: User):
     repo = repository(request)
     patient = patient_or_404(repo, user, patient_id)
-    return build_timeline(patient, repo.records(user["id"], patient_id))
+    from backend.example_cases import metadata
+    data = build_timeline(patient, repo.records(user["id"], patient_id))
+    data["example_case"] = metadata(repo, user["id"], patient_id)
+    return data
+
+
+@router.post("/workspace/presentation-case")
+def presentation_case(request: Request, user: User):
+    from backend.example_cases import prepare
+    try:
+        return prepare(request, repository(request), user)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+
+
+@router.get("/patients/{patient_id}/example-pack")
+def example_source_pack(patient_id: str, request: Request, user: User):
+    from backend.example_cases import source_pack
+    repo = repository(request)
+    patient_or_404(repo, user, patient_id)
+    return Response(source_pack(repo, user["id"], patient_id), media_type="application/zip",
+                    headers={"Content-Disposition": 'attachment; filename="pulmoai-presentation-sources.zip"'})
 
 
 @router.get("/patients/{patient_id}/export")

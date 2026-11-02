@@ -300,7 +300,12 @@ export interface TrendSeries {
   series_label?: string;
   artifact_id?: string;
 }
+export type TimelineView = "visits" | "assessment" | "labs" | "images" | "risks" | "rna" | "records" | "audit";
+export interface PresentationCase {
+  version: string; title: string; prepared_on: string; visit_dates: string[]; visit_labels: string[]; practice_record_id: string; practice_date: string; record_count: number; story: string; validation_notice: string; notices: string[];
+}
 export interface PatientTimeline {
+  example_case?: PresentationCase | null;
   patient: Patient;
   records: TimelineRecord[];
   lab_series: TrendSeries[];

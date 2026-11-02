@@ -43,7 +43,7 @@ cd ..
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open http://127.0.0.1:8000, create your own local account, and choose **Patient timelines**. The **Explore an example case** button creates three synthetic lab visits. Review their sources, confirm each, and switch to **Lab evolution**. Synthetic observations are never automatically reviewed.
+Open http://127.0.0.1:8000, create your own local account, and choose **Patient timelines**. The **Load presentation case** button prepares a separate generated case with four checked visits across all available modules and one unreviewed report for a live exercise. Example preparation checks are labeled separately from user source review. See `docs/PRESENTATION_WALKTHROUGH.md` for the presentation sequence and dependencies.
 
 The `frontend/dist` build is included. Node.js is needed only to rebuild it.
 
